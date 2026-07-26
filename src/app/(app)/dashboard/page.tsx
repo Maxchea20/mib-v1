@@ -1,12 +1,7 @@
 import { supabase } from "@/lib/supabase";
 
 export default async function DashboardPage() {
-  const { data, error } = await supabase
-  .from("clients")
-  .select("*");
-
-  console.log(data);
-  return (
+   return (
     
       <div className="rounded-xl bg-white p-8 shadow">
         <h1 className="text-3xl font-bold">
