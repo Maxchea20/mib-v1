@@ -2,7 +2,13 @@
 
 ## 📊 Overall Progress
 
-**32 / 50 Steps Completed (64%)**
+run vs - npm run dev
+Check Git status - git status
+Stage everything - git add .
+Commit - git commit -m
+Push to GitHub - git push
+
+**34 / 50 Steps Completed (68%)**
 
 ---
 
@@ -51,10 +57,37 @@
 - [x] Step 31 - Listing Profile
 - [x] Step 32 - Edit Listing
 
-- [ ] Step 33 - Structured Photo Manager
-- [ ] Step 34 - Delete Listing
-- [ ] Step 35 - Search Listings
-- [ ] Step 36 - Filter Listings
+## ✅ Step 33 - Property Media Manager
+
+- [x] 33.1 Property Photos Database
+- [x] 33.2 Supabase Storage Bucket
+- [x] 33.3 Property Media Manager UI
+- [x] 33.4 Category-based Photo Templates
+- [x] 33.5 Upload Photos
+- [x] 33.6 Preview Photos
+- [x] 33.7 Replace Photos
+
+## ✅ Step 34 - Delete Listing
+
+- [x] Delete Listing
+- [x] Delete Storage Images
+- [x] Delete property_photos Records
+
+## 🔄 Step 35 - Search Listings
+
+- [x] 35.1 Create ListingList Component
+- [x] 35.2 Move Listing UI to ListingList
+- [x] 35.3 Refactor Cover Photo Template
+- [x] 35.4 Search UI
+- [ ] 35.5 Live Search Logic
+- [ ] 35.6 Search Testing
+
+## ⏳ Step 36 - Filter Listings
+
+- [ ] Category Filter
+- [ ] Purpose Filter
+- [ ] Status Filter
+- [ ] Search + Filter Integration
 
 ---
 

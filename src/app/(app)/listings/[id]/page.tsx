@@ -32,11 +32,23 @@ export default async function ListingProfilePage({
     notFound();
   }
 
+ const coverPhotoMap = {
+  Residential: "Front House",
+  Commercial: "Shop Front",
+  Industrial: "Factory Front",
+  Land: "Front View",
+};
+
+const coverPhotoType =
+  coverPhotoMap[
+    listing.category as keyof typeof coverPhotoMap
+  ] ?? "Front House";
+
   const coverPhoto =
-    listing.property_photos?.find(
-      (photo: any) =>
-        photo.photo_type === "Front House"
-    );
+  listing.property_photos?.find(
+    (photo: any) =>
+      photo.photo_type === coverPhotoType
+  );
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -51,14 +63,14 @@ export default async function ListingProfilePage({
 
             <img
               src={coverPhoto.image_url}
-              alt="Front House"
+              alt={coverPhotoType}
               className="w-full h-full object-cover"
             />
 
           ) : (
 
             <p className="text-gray-400 text-xl">
-              No Front House Photo
+              No {coverPhotoType} Photo
             </p>
 
           )}
