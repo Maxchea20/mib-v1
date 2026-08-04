@@ -1,4 +1,6 @@
 // File: src/app/(app)/listings/page.tsx
+export const dynamic = "force-dynamic";
+
 import ListingList from "@/components/listings/ListingList";
 import DeleteListingButton from "@/components/DeleteListingButton";
 import Link from "next/link";

@@ -1,4 +1,5 @@
 // File: src/app/(app)/listings/[id]/page.tsx
+export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
