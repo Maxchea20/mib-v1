@@ -1,8 +1,9 @@
-// File: src/app/(app)/buyers/[id]/page.tsx
+// File: src/app/(app)/contacts/[id]/page.tsx
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import OwnerPropertiesSection from "@/components/buyers/OwnerPropertiesSection";
 
 import {
   calculateMatchScore,
@@ -55,6 +56,16 @@ export default async function BuyerProfilePage({
       .from("properties")
 
       .select("*");
+
+  const { data: ownerProperties } =
+  await supabase
+    .from("properties")
+    .select("*")
+    .eq("owner_id", buyer.id);
+
+    console.log("Buyer ID:", buyer.id);
+console.log("Owner Properties:", ownerProperties);
+
 
   const matches =
     (properties ?? [])
@@ -518,6 +529,13 @@ export default async function BuyerProfilePage({
 
         </div>
 
+        <OwnerPropertiesSection
+  buyer={buyer}
+  properties={ownerProperties ?? []}
+/>
+
+        
+
         {/* ================================= */}
         {/* REMARKS */}
         {/* ================================= */}
@@ -547,10 +565,10 @@ export default async function BuyerProfilePage({
           <div className="flex flex-wrap justify-end gap-3">
 
             <Link
-              href={`/buyers/${buyer.id}/edit`}
+              href={`/contacts/${buyer.id}/edit`}
               className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded"
             >
-              ✏ Edit Buyer
+              ✏ Edit Contact
             </Link>
 
             {from === "listing" &&
@@ -566,10 +584,10 @@ export default async function BuyerProfilePage({
               )}
 
             <Link
-              href="/buyers"
+              href="/contacts"
               className="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded"
             >
-              📋 Back to Buyers
+              📋 Back to Contacts
             </Link>
 
           </div>

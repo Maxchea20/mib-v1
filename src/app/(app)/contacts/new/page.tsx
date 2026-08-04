@@ -12,15 +12,15 @@ export default function NewBuyerPage() {
       <div className="flex justify-between items-center mb-6">
 
         <h1 className="text-3xl font-bold text-black">
-          Add Buyer
-        </h1>
+  Add Contact
+</h1>
 
         <Link
-          href="/buyers"
-          className="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded"
-        >
-          Back
-        </Link>
+  href="/contacts"
+  className="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded"
+>
+  Back
+</Link>
 
       </div>
 

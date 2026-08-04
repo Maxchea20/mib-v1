@@ -45,6 +45,36 @@ export default function useBuyerForm(buyer?: any) {
     buyer?.remarks ?? ""
   );
 
+  const [isBuyer, setIsBuyer] = useState(
+  buyer?.is_buyer ?? false
+);
+
+const [isOwner, setIsOwner] = useState(
+  buyer?.is_owner ?? false
+);
+
+const [isTenant, setIsTenant] = useState(
+  buyer?.is_tenant ?? false
+);
+
+// Owner Draft Property
+
+const [ownerPurpose, setOwnerPurpose] = useState(
+  "Sell"
+);
+
+const [ownerCategory, setOwnerCategory] = useState(
+  "Residential"
+);
+
+const [ownerArea, setOwnerArea] = useState("");
+
+const [ownerState, setOwnerState] = useState(
+  "Perak"
+);
+
+const [ownerPrice, setOwnerPrice] = useState("");
+
   // Residential
 
   const [residentialType, setResidentialType] =
@@ -137,7 +167,21 @@ export default function useBuyerForm(buyer?: any) {
     );
 
   }
+function handleOwnerPriceChange(value: string) {
 
+  const numbers =
+    value.replace(/\D/g, "");
+
+  if (!numbers) {
+    setOwnerPrice("");
+    return;
+  }
+
+  setOwnerPrice(
+    Number(numbers).toLocaleString()
+  );
+
+}
   return {
 
     name,
@@ -166,6 +210,30 @@ export default function useBuyerForm(buyer?: any) {
 
     remarks,
     setRemarks,
+
+    isBuyer,
+setIsBuyer,
+
+isOwner,
+setIsOwner,
+
+isTenant,
+setIsTenant,
+
+ownerPurpose,
+setOwnerPurpose,
+
+ownerCategory,
+setOwnerCategory,
+
+ownerArea,
+setOwnerArea,
+
+ownerState,
+setOwnerState,
+
+ownerPrice,
+handleOwnerPriceChange,
 
     residentialType,
     setResidentialType,

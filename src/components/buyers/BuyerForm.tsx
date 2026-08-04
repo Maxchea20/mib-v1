@@ -8,15 +8,18 @@ import { useRouter } from "next/navigation";
 import {
   createBuyer,
   updateBuyer,
+  createDraftProperty,
 } from "@/lib/buyers";
 
 import useBuyerForm from "./hooks/useBuyerForm";
-
+import RolesSection from "./sections/RolesSection";
+import BuyerRequirementSection from "./sections/BuyerRequirementSection";
 import GeneralSection from "./sections/GeneralSection";
 import ResidentialSection from "./sections/ResidentialSection";
 import CommercialSection from "./sections/CommercialSection";
 import IndustrialSection from "./sections/IndustrialSection";
 import LandSection from "./sections/LandSection";
+import OwnerSection from "./sections/OwnerSection";
 import RemarksSection from "./sections/RemarksSection";
 
 type Props = {
@@ -67,69 +70,117 @@ export default function BuyerForm({
 
       const payload = {
 
-        name: form.name,
+  name: form.name,
 
-        phone: form.phone,
+  phone: form.phone,
 
-        status: form.status,
+  status: form.status,
 
-        lead_source:
-          form.leadSource,
+  lead_source: form.leadSource,
 
-        purpose:
-          form.purpose,
+  purpose: form.purpose,
 
-        budget,
+  owner_purpose:
+  form.isOwner
+    ? form.ownerPurpose
+    : null,
 
-        category:
-          form.category,
+  budget,
 
-        preferred_location:
-          form.preferredLocation,
+  category: form.category,
 
-        residential_type:
-          form.residentialType,
+  preferred_location: form.preferredLocation,
 
-        residential_storey:
-          form.residentialStorey,
+  // Residential
 
-        commercial_type:
-          form.commercialType,
+  residential_type:
+    form.category === "Residential"
+      ? form.residentialType
+      : null,
 
-        industrial_property_type:
-          form.industrialPropertyType,
+  residential_storey:
+    form.category === "Residential"
+      ? form.residentialStorey
+      : null,
 
-        industrial_zoning:
-          form.industrialZoning,
+  // Commercial
 
-        industrial_land_size:
-          form.industrialLandSize,
+  commercial_type:
+    form.category === "Commercial"
+      ? form.commercialType
+      : null,
 
-        industrial_built_up:
-          form.industrialBuiltUp,
+  // Industrial
 
-        industrial_ceiling_height:
-          form.industrialCeilingHeight,
+  industrial_property_type:
+    form.category === "Industrial"
+      ? form.industrialPropertyType
+      : null,
 
-        industrial_power_supply:
-          form.industrialPowerSupply,
+  industrial_zoning:
+    form.category === "Industrial"
+      ? form.industrialZoning
+      : null,
 
-        land_type:
-          form.landType,
+  industrial_land_size:
+    form.category === "Industrial"
+      ? form.industrialLandSize
+      : null,
 
-        land_size:
-          form.landSize,
+  industrial_built_up:
+    form.category === "Industrial"
+      ? form.industrialBuiltUp
+      : null,
 
-        remarks:
-          form.remarks,
+  industrial_ceiling_height:
+    form.category === "Industrial"
+      ? form.industrialCeilingHeight
+      : null,
 
-      };
+  industrial_power_supply:
+    form.category === "Industrial"
+      ? form.industrialPowerSupply
+      : null,
+
+  // Land
+
+  land_type:
+    form.category === "Land"
+      ? form.landType
+      : null,
+
+  land_size:
+    form.category === "Land"
+      ? form.landSize
+      : null,
+
+  remarks: form.remarks,
+
+};
 
       if (mode === "create") {
 
-  await createBuyer(payload);
+  const buyer = await createBuyer(payload);
 
-  router.push("/buyers");
+  if (form.isOwner) {
+
+    await createDraftProperty({
+
+      owner_id: buyer.id,
+
+      purpose: form.ownerPurpose,
+
+      area: form.ownerArea,
+
+      price: Number(
+        form.ownerPrice.replace(/,/g, "")
+      ) || 0,
+
+    });
+
+  }
+
+  router.push("/contacts");
 
   router.refresh();
 
@@ -145,8 +196,8 @@ if (mode === "edit") {
   );
 
   router.push(
-    `/buyers/${buyer.id}`
-  );
+  `/contacts/${buyer.id}`
+);
 
   router.refresh();
 
@@ -156,15 +207,20 @@ if (mode === "edit") {
       // Step 38.6 (Edit Buyer)
       // Will be implemented later.
 
-    } catch (error) {
+    } catch (error: any) {
 
-      console.error(error);
+  console.error("FULL ERROR:", error);
+  console.error("MESSAGE:", error?.message);
+  console.error("DETAILS:", error?.details);
+  console.error("HINT:", error?.hint);
 
-      alert(
-        "Failed to save buyer."
-      );
+  alert(
+    error?.message ?? "Failed to save contact."
+  );
 
-    } finally {
+} 
+    
+    finally {
 
       setLoading(false);
 
@@ -176,13 +232,7 @@ if (mode === "edit") {
 
     <div className="bg-white rounded-lg shadow p-6">
 
-      <h2 className="text-2xl font-bold text-black mb-6">
-
-        {mode === "create"
-          ? "Add Buyer"
-          : "Edit Buyer"}
-
-      </h2>
+      
 
       <form
         className="space-y-8"
@@ -209,21 +259,49 @@ if (mode === "edit") {
           leadSource={form.leadSource}
           setLeadSource={form.setLeadSource}
 
-          purpose={form.purpose}
-          setPurpose={form.setPurpose}
+          
 
-          budget={form.budget}
-          onBudgetChange={form.handleBudgetChange}
-
-          category={form.category}
-          setCategory={form.setCategory}
-
-          preferredLocation={form.preferredLocation}
-          setPreferredLocation={form.setPreferredLocation}
+          
 
         />
 
-        {form.category === "Residential" && (
+        <RolesSection
+
+  isBuyer={form.isBuyer}
+  setIsBuyer={form.setIsBuyer}
+
+  isOwner={form.isOwner}
+  setIsOwner={form.setIsOwner}
+
+  isTenant={form.isTenant}
+  setIsTenant={form.setIsTenant}
+
+/>
+
+{form.isBuyer && (
+
+  <BuyerRequirementSection
+
+    purpose={form.purpose}
+    setPurpose={form.setPurpose}
+
+    budget={form.budget}
+    onBudgetChange={form.handleBudgetChange}
+
+    category={form.category}
+    setCategory={form.setCategory}
+
+    preferredLocation={form.preferredLocation}
+    setPreferredLocation={form.setPreferredLocation}
+
+  />
+  
+
+)}
+
+
+        {form.isBuyer &&
+form.category === "Residential" && (
 
           <ResidentialSection
 
@@ -243,7 +321,8 @@ if (mode === "edit") {
 
         )}
 
-        {form.category === "Commercial" && (
+        {form.isBuyer &&
+form.category === "Commercial" && (
 
           <CommercialSection
 
@@ -259,7 +338,8 @@ if (mode === "edit") {
 
         )}
 
-        {form.category === "Industrial" && (
+        {form.isBuyer &&
+form.category === "Industrial" && (
 
           <IndustrialSection
 
@@ -315,7 +395,8 @@ if (mode === "edit") {
 
         )}
 
-                {form.category === "Land" && (
+                {form.isBuyer &&
+form.category === "Land" && (
 
           <LandSection
 
@@ -338,7 +419,28 @@ if (mode === "edit") {
           />
 
         )}
+{form.isOwner && (
 
+  <OwnerSection
+
+    purpose={form.ownerPurpose}
+    setPurpose={form.setOwnerPurpose}
+
+    category={form.ownerCategory}
+    setCategory={form.setOwnerCategory}
+
+    area={form.ownerArea}
+    setArea={form.setOwnerArea}
+
+    state={form.ownerState}
+    setState={form.setOwnerState}
+
+    price={form.ownerPrice}
+    onPriceChange={form.handleOwnerPriceChange}
+
+  />
+
+)}
         <RemarksSection
 
           remarks={
@@ -356,7 +458,7 @@ if (mode === "edit") {
           <button
             type="button"
             onClick={() =>
-              router.push("/buyers")
+              router.push("/contacts")
             }
             className="px-6 py-3 rounded border border-gray-300 hover:bg-gray-100"
           >
@@ -371,8 +473,8 @@ if (mode === "edit") {
             {loading
               ? "Saving..."
               : mode === "create"
-              ? "Save Buyer"
-              : "Update Buyer"}
+              ? "Save Contact"
+              : "Update Contact"}
           </button>
 
         </div>

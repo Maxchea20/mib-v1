@@ -19,7 +19,7 @@ export default function BuyerList({
 
       <p className="text-gray-500">
 
-        Total Buyers:
+        Total Contacts
         <span className="font-semibold ml-1">
           {buyers.length}
         </span>
@@ -30,7 +30,7 @@ export default function BuyerList({
 
         <div className="bg-white rounded-lg shadow border p-8 text-center text-gray-500">
 
-          No buyers found.
+          No Contact found.
 
         </div>
 
@@ -81,11 +81,11 @@ export default function BuyerList({
             <div className="flex gap-2">
 
               <Link
-                href={`/buyers/${buyer.id}`}
-                className="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded"
-              >
-                View
-              </Link>
+  href={`/contacts/${buyer.id}`}
+  className="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded"
+>
+  View
+</Link>
 
               <DeleteBuyerButton
                 id={buyer.id}

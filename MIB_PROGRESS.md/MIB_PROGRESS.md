@@ -4,149 +4,215 @@ Stage everything - git add .
 Commit - git commit -m
 Push to GitHub - git push
 
-# MIB (Max Intelligent Brain)
-
-## Development Progress
+# MIB Development Roadmap
 
 ---
 
-# ✅ Module 1 - Foundation (100%)
+# Phase 1 - Foundation ✅
 
-- [x] Step 1 - Project Setup
-- [x] Step 2 - Connect Supabase
-- [x] Step 3 - Client Database
-- [x] Step 4 - Client Form
-- [x] Step 5 - Create Client
-- [x] Step 6 - Client Listing
-- [x] Step 7 - Client Validation
-- [x] Step 8 - Client Search
-- [x] Step 9 - Client Detail
-- [x] Step 10 - Edit Client
-- [x] Step 11 - Delete Client
-- [x] Step 12 - Timeline
-- [x] Step 13 - Timeline CRUD
+## Authentication
+- [ ] Login
+- [ ] Register
+- [ ] Forgot Password
+- [ ] User Roles
+- [ ] Subscription Control
+
+Status:
+🟡 Freeze until V1 launch.
 
 ---
 
-# ✅ Module 2 - Listings CRM (100%)
+# Phase 2 - Contacts ✅
 
-- [x] Step 28 - Property Database
-- [x] Step 29 - Add Listing
-- [x] Step 30 - Listing List
-- [x] Step 31 - Listing Profile
-- [x] Step 32 - Edit Listing
-- [x] Step 33 - Structured Photo Manager
-- [x] Step 34 - Delete Listing
-- [x] Step 35 - Live Search
-- [x] Step 36 - Listing Filters
-
----
-
-# ✅ Module 3 - Buyer CRM (100%)
-
-## Database
-
-- [x] Step 37 - Buyer Database
-
-## Buyer CRUD
-
-- [x] Step 38.1 - Buyer Form
-- [x] Step 38.2 - Buyer Sections
-- [x] Step 38.3 - Buyer Hook Architecture
-- [x] Step 38.4 - Save Buyer
-- [x] Step 39.1 - Buyer Profile
-- [x] Step 39.2 - Edit Buyer
-- [x] Step 39.3 - Delete Buyer
+## Contact Management
+- [x] Contact List
+- [x] Add Contact
+- [x] Edit Contact
+- [x] Delete Contact
+- [x] Contact Profile
+- [x] Search
+- [x] Status
+- [x] Lead Source
+- [x] Buyer / Owner / Tenant Roles
 
 ---
 
-# 🚧 Module 4 - Smart Matching Engine (85%)
+## Buyer Module ✅
 
-## Matching Engine Foundation
+- [x] Residential Requirements
+- [x] Commercial Requirements
+- [x] Industrial Requirements
+- [x] Land Requirements
+- [x] Matching Engine
+- [x] Matching Score
+- [x] Matching Listing Page
 
-- [x] Step 40.1 - Matching Engine Foundation
-- [x] Step 40.2 - Category Matching
-- [x] Step 40.3 - Purpose Matching
-- [x] Step 40.4 - Budget Matching (±10%)
-- [x] Step 40.5 - Preferred Location Matching
-- [x] Step 40.6 - Residential Requirement Matching
-- [x] Step 40.7 - Commercial Requirement Matching
-- [x] Step 40.8 - Industrial Requirement Matching
-- [x] Step 40.9 - Land Requirement Matching
-
-## Match Score Engine
-
-- [x] Step 40.10 - Match Progress Bar
-- [x] Step 40.11 - Match Reasons
-- [x] Step 40.12 - Match Ranking System
-
-## Listing Intelligence
-
-- [x] Step 40.13 - Listing Profile Redesign
-- [x] Step 40.14 - Category Aware Property Details
-- [x] Step 40.15 - Matching Buyers Panel
-- [x] Step 40.15.1 - Smart Buyer Navigation
-- [x] Step 40.15.2 - Back To Listing Navigation
-
-## Buyer Intelligence
-
-- [x] Step 40.16.1 - Buyer Intelligence Engine
-- [ ] Step 40.16.2 - Buyer Intelligence Header UI (In Progress)
-- [ ] Step 40.16.3 - Matching Listings Page
-- [ ] Step 40.16.4 - View Listing Navigation
-- [ ] Step 40.16.5 - Matching Listing Reasons
+Status:
+✅ Complete for V1
 
 ---
 
-# 🚧 Module 5 - Dashboard (0%)
+## Owner Module ✅
 
-- [ ] Step 41 - Dashboard
-- [ ] Step 42 - Statistics
-- [ ] Step 43 - Follow-up Dashboard
-- [ ] Step 44 - Calendar
+- [x] Owner checkbox
+- [x] Owner Information
+    - Purpose
+    - Category
+    - Area
+    - Price
+- [x] Auto Create Draft Property
+- [x] Link Property using owner_id
+- [x] Owner Properties shown in Contact Profile
+- [x] Edit Listing shortcut
 
----
-
-# 🚧 Module 6 - Reports (0%)
-
-- [ ] Step 45 - Commission Tracking
-- [ ] Step 46 - Sales Report
-- [ ] Step 47 - Export Report
-
----
-
-# 🚧 Module 7 - AI Assistant (0%)
-
-- [ ] Step 48 - AI Assistant
-- [ ] Step 49 - AI Marketing Assistant
+Status:
+✅ Complete for V1
 
 ---
 
-# 🚧 Module 8 - Production (0%)
+## Tenant Module
 
-- [ ] Step 50 - Authentication
-- [ ] Step 51 - User Roles
-- [ ] Step 52 - Row Level Security (RLS)
-- [ ] Step 53 - Production Deployment
+- [x] Tenant Role
+- [ ] Tenant Requirement
+- [ ] Rental Matching
+
+Status:
+🟡 Deferred to V1.1
 
 ---
 
-# 🚀 Current Development Status
+# Phase 3 - Listings 🚧
 
-**Current Version**
-> MIB V1 Build 0.40.16.2
+## Listings
 
-**Current Focus**
-> Buyer Intelligence Dashboard
+- [x] Listing Table
+- [x] Listing Profile
+- [x] Add Listing
+- [x] Edit Listing
+- [x] Draft Status
+- [x] Published Status
+- [x] Owner Link
 
-**Current Task**
-> Redesign Buyer Profile Header into a premium KPI dashboard.
+Remaining
 
-**Paused At**
-> Step 40.16.2
+- [ ] Property Timeline
+- [ ] Duplicate Detection
+- [ ] Archive Listing
+- [ ] Listing History
 
-Next:
+Status:
+🟡 In Progress
 
-- Buyer Intelligence Header UI
-- Matching Listings Page
-- Listing ↔ Buyer two-way intelligence
+---
+
+# Phase 4 - Matching 🚧
+
+- [x] Buyer → Listing
+- [ ] Listing → Buyers
+- [ ] Live Match Refresh
+- [ ] Match Notifications
+
+---
+
+# Phase 5 - Dashboard
+
+- [ ] KPI
+- [ ] Active Contacts
+- [ ] Active Listings
+- [ ] Matching Overview
+- [ ] Pipeline
+- [ ] Weekly Statistics
+
+---
+
+# Phase 6 - Media
+
+- [x] Photo Upload
+- [x] Media Manager
+- [x] Templates
+
+Remaining
+
+- [ ] Video Upload
+- [ ] Auto Resize
+- [ ] Watermark
+
+---
+
+# Phase 7 - AI
+
+- [ ] AI Listing Description
+- [ ] AI FB Post
+- [ ] AI WhatsApp Reply
+- [ ] AI Property Matching Explanation
+
+---
+
+# Phase 8 - CRM
+
+- [ ] Follow Up
+- [ ] Reminder
+- [ ] Notes Timeline
+- [ ] Activity History
+- [ ] WhatsApp Integration
+
+---
+
+# Phase 9 - Reports
+
+- [ ] Commission
+- [ ] Sales Report
+- [ ] Monthly Performance
+- [ ] Export PDF
+- [ ] Export Excel
+
+---
+
+# Phase 10 - Deployment
+
+- [ ] Domain
+- [ ] Production Database
+- [ ] Backup
+- [ ] SSL
+- [ ] Launch
+
+---
+
+# V1 Launch Checklist
+
+## Core CRM
+- [x] Contacts
+- [x] Buyer
+- [x] Owner
+- [ ] Tenant
+
+## Listings
+- [x] Draft Listing
+- [x] Edit Listing
+- [x] Owner Link
+- [ ] Listing Profile Polish
+
+## Matching
+- [x] Buyer → Listing
+- [ ] Listing → Buyer
+
+## Dashboard
+- [ ] Basic Dashboard
+
+## Deployment
+- [ ] Production Build
+- [ ] Domain
+- [ ] Launch
+
+---
+
+# RULES
+
+✅ No more architecture changes before V1.
+
+Only:
+- Finish remaining features
+- Fix bugs
+- Deploy
+
+Refactoring and UI polish move to V1.1.

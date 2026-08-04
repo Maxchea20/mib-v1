@@ -2,8 +2,7 @@ import Link from "next/link";
 
 const menus = [
   { name: "Dashboard", href: "/dashboard", emoji: "🏠" },
-  { name: "Clients", href: "/clients", emoji: "👥" },
-  { name: "Buyer", href: "/buyers", emoji: "🛒" },
+  { name: "Contacts", href: "/contacts", emoji: "🛒" },
   { name: "Listings", href: "/listings", emoji: "🏡" },
   { name: "Sales", href: "/sales", emoji: "💰" },
   { name: "Settings", href: "/settings", emoji: "⚙️" },
