@@ -1,4 +1,6 @@
 // File: src/app/(app)/buyers/page.tsx
+export const dynamic = "force-dynamic";
+
 import DeleteBuyerButton from "@/components/DeleteBuyerButton";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
