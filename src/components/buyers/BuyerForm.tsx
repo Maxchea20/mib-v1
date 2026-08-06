@@ -78,18 +78,36 @@ export default function BuyerForm({
 
   lead_source: form.leadSource,
 
-  purpose: form.purpose,
+  is_buyer: form.isBuyer,
+
+is_owner: form.isOwner,
+
+is_tenant: form.isTenant,
+
+purpose:
+  form.isBuyer
+    ? form.purpose
+    : null,
 
   owner_purpose:
   form.isOwner
     ? form.ownerPurpose
     : null,
 
-  budget,
+  budget:
+  form.isBuyer
+    ? budget
+    : null,
 
-  category: form.category,
+  category:
+  form.isBuyer
+    ? form.category
+    : null,
 
-  preferred_location: form.preferredLocation,
+  preferred_location:
+  form.isBuyer
+    ? form.preferredLocation
+    : null,
 
   // Residential
 

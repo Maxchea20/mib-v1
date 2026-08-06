@@ -1,72 +1,136 @@
-run vs - npm run dev
-Check Git status - git status
-Stage everything - git add .
-Commit - git commit -m
-Push to GitHub - git push
+# MIB Development Workflow
+
+## Daily Development
+
+1. Open VS Code
+2. Run
+```bash
+npm run dev
+```
+
+3. Check Git status
+```bash
+git status
+```
+
+4. Stage changes
+```bash
+git add .
+```
+
+5. Commit
+```bash
+git commit -m "Your commit message"
+```
+
+6. Push
+```bash
+git push
+```
+
+7. Vercel automatically creates Preview Deployment
+
+8. Test on:
+- Laptop
+- iPhone
+
+9. Merge into `main` only after everything is verified.
+
+---
 
 # MIB Development Roadmap
+
+---
+
+# Production Status
+
+## Production Branch
+- ✅ main (LIVE)
+
+## Development Branch
+- ✅ develop
+
+## Vercel
+- ✅ Production Deployment
+- ✅ Preview Deployment
 
 ---
 
 # Phase 1 - Foundation ✅
 
 ## Authentication
+
 - [ ] Login
 - [ ] Register
 - [ ] Forgot Password
 - [ ] User Roles
 - [ ] Subscription Control
 
-Status:
-🟡 Freeze until V1 launch.
+Status
+
+🟡 Freeze until commercial release.
 
 ---
 
-# Phase 2 - Contacts ✅
+# Phase 2 - Contact Management 🚧
 
-## Contact Management
+## Master Contact
+
 - [x] Contact List
 - [x] Add Contact
 - [x] Edit Contact
 - [x] Delete Contact
 - [x] Contact Profile
 - [x] Search
-- [x] Status
 - [x] Lead Source
-- [x] Buyer / Owner / Tenant Roles
+- [x] Status
 
 ---
 
-## Buyer Module ✅
+## Contact Roles
+
+- [x] Buyer
+- [x] Owner
+- [x] Tenant
+- [ ] Investor
+
+---
+
+## Buyer Module
 
 - [x] Residential Requirements
 - [x] Commercial Requirements
 - [x] Industrial Requirements
 - [x] Land Requirements
-- [x] Matching Engine
+- [x] Buyer → Listing Matching
 - [x] Matching Score
 - [x] Matching Listing Page
 
-Status:
+Status
+
 ✅ Complete for V1
 
 ---
 
-## Owner Module ✅
+## Owner Module
 
-- [x] Owner checkbox
-- [x] Owner Information
-    - Purpose
-    - Category
-    - Area
-    - Price
-- [x] Auto Create Draft Property
-- [x] Link Property using owner_id
-- [x] Owner Properties shown in Contact Profile
-- [x] Edit Listing shortcut
+- [x] Owner Role
+- [x] Auto Create Draft Listing
+- [x] Owner Properties
+- [x] Owner Link
+- [x] Edit Listing Shortcut
 
-Status:
+Status
+
 ✅ Complete for V1
+
+Remaining (V1.0.1)
+
+- [ ] Contact Information (replace Buyer Details)
+- [ ] Owner Profile layout
+- [ ] Hide Buyer Requirement for Owner-only contacts
+- [ ] Matching Buyers for Owner
+- [ ] Buyer + Owner dual profile support
 
 ---
 
@@ -76,134 +140,168 @@ Status:
 - [ ] Tenant Requirement
 - [ ] Rental Matching
 
-Status:
-🟡 Deferred to V1.1
+Deferred to V1.1
 
 ---
 
 # Phase 3 - Listings 🚧
 
-## Listings
+Completed
 
-- [x] Listing Table
+- [x] Listing List
 - [x] Listing Profile
 - [x] Add Listing
 - [x] Edit Listing
 - [x] Draft Status
-- [x] Published Status
+- [x] Available Status
 - [x] Owner Link
+- [x] Photo Upload
 
 Remaining
 
 - [ ] Property Timeline
 - [ ] Duplicate Detection
-- [ ] Archive Listing
+- [ ] Archive
 - [ ] Listing History
-
-Status:
-🟡 In Progress
 
 ---
 
 # Phase 4 - Matching 🚧
 
 - [x] Buyer → Listing
-- [ ] Listing → Buyers
-- [ ] Live Match Refresh
-- [ ] Match Notifications
+- [ ] Listing → Buyer
+- [ ] Live Refresh
+- [ ] Match Notification
 
 ---
 
-# Phase 5 - Dashboard
+# Phase 5 - Dashboard ✅
 
-- [ ] KPI
-- [ ] Active Contacts
-- [ ] Active Listings
-- [ ] Matching Overview
-- [ ] Pipeline
-- [ ] Weekly Statistics
+Completed
 
----
+- [x] KPI Cards
+- [x] Recent Contacts
+- [x] Recent Listings
 
-# Phase 6 - Media
+Future
 
-- [x] Photo Upload
-- [x] Media Manager
-- [x] Templates
-
-Remaining
-
-- [ ] Video Upload
-- [ ] Auto Resize
-- [ ] Watermark
+- [ ] Remaining Commission Target
+- [ ] Monthly Performance Widget
 
 ---
 
-# Phase 7 - AI
+# Phase 6 - Sales Module (V1.1)
 
-- [ ] AI Listing Description
-- [ ] AI FB Post
-- [ ] AI WhatsApp Reply
-- [ ] AI Property Matching Explanation
+Independent Module
+
+- [ ] Add Deal
+- [ ] Link Listing (Optional)
+- [ ] Selling Price
+- [ ] Commission %
+- [ ] Gross Commission
+- [ ] Net Commission
+- [ ] Solo / Co-broke
+- [ ] Pending Commission
+- [ ] Claimed Commission
+- [ ] Expected Claim Date
+- [ ] Deal Status
+- [ ] Progress Timeline
+- [ ] Remarks
+- [ ] Monthly Graph
+- [ ] Yearly Graph
+- [ ] Category Breakdown
+- [ ] Annual Target
+- [ ] Dashboard Remaining Target
 
 ---
 
-# Phase 8 - CRM
+# Phase 7 - PDF Generator (V1.1)
+
+- [ ] Client Brochure
+- [ ] Internal Agent Sheet
+- [ ] Marketing Flyer
+- [ ] Template Selector
+- [ ] QR Code
+- [ ] Property Gallery
+- [ ] WhatsApp Optimized PDF
+
+---
+
+# Phase 8 - Mobile First (V1.1)
+
+- [ ] Complete Mobile UI Redesign
+- [ ] Bottom Navigation
+- [ ] Responsive Dashboard
+- [ ] Responsive Contacts
+- [ ] Responsive Listings
+- [ ] Responsive Forms
+- [ ] Responsive Profile Pages
+
+---
+
+# Phase 9 - CRM
 
 - [ ] Follow Up
 - [ ] Reminder
 - [ ] Notes Timeline
-- [ ] Activity History
+- [ ] Activity Timeline
 - [ ] WhatsApp Integration
 
 ---
 
-# Phase 9 - Reports
+# Phase 10 - AI
 
-- [ ] Commission
+- [ ] AI Listing Description
+- [ ] AI Facebook Post
+- [ ] AI WhatsApp Reply
+- [ ] AI Matching Explanation
+
+---
+
+# Phase 11 - Reports
+
 - [ ] Sales Report
-- [ ] Monthly Performance
-- [ ] Export PDF
-- [ ] Export Excel
+- [ ] Commission Report
+- [ ] Monthly Report
+- [ ] Yearly Report
+- [ ] Excel Export
 
 ---
 
-# Phase 10 - Deployment
+# Phase 12 - Performance
 
-- [ ] Domain
-- [ ] Production Database
-- [ ] Backup
-- [ ] SSL
-- [ ] Launch
-
----
-
-# V1 Launch Checklist
-
-## Core CRM
-- [x] Contacts
-- [x] Buyer
-- [x] Owner
-- [ ] Tenant
-
-## Listings
-- [x] Draft Listing
-- [x] Edit Listing
-- [x] Owner Link
-- [ ] Listing Profile Polish
-
-## Matching
-- [x] Buyer → Listing
-- [ ] Listing → Buyer
-
-## Dashboard
-- [ ] Basic Dashboard
-
-## Deployment
-- [ ] Production Build
-- [ ] Domain
-- [ ] Launch
+- [ ] Optimize Dashboard
+- [ ] Faster Queries
+- [ ] Lazy Loading
+- [ ] Better Mobile Speed
 
 ---
 
-Development Branch Test
+# Future
+
+- [ ] Facebook Publishing
+- [ ] PropertyGuru Export
+- [ ] iProperty Export
+- [ ] Google Maps Integration
+- [ ] WhatsApp Automation
+- [ ] iPhone App
+- [ ] Android App
+
+---
+
+# Current Priority
+
+## V1.0.1
+
+- [ ] Owner Profile Improvements
+- [ ] Contact Profile Role-aware Layout
+- [ ] Listing Status Investigation
+
+---
+
+## V1.1
+
+- [ ] Mobile First UI
+- [ ] Master Contact Architecture
+- [ ] Sales Module
+- [ ] PDF Generator

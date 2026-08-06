@@ -63,6 +63,15 @@ export default async function BuyerProfilePage({
     .select("*")
     .eq("owner_id", buyer.id);
 
+    const isBuyer =
+  buyer.is_buyer;
+
+const isOwner =
+  buyer.is_owner;
+
+const isTenant =
+  buyer.is_tenant;
+
     console.log("Buyer ID:", buyer.id);
 console.log("Owner Properties:", ownerProperties);
 
@@ -145,6 +154,18 @@ console.log("Owner Properties:", ownerProperties);
               {buyer.name}
 
             </h1>
+
+            <p className="text-red-500">
+  Purpose: {buyer.purpose}
+</p>
+
+<p className="text-red-500">
+  isBuyer: {String(isBuyer)}
+</p>
+
+<p className="text-red-500">
+  isOwner: {String(isOwner)}
+</p>
 
             <p className="text-3xl font-bold text-green-600 mt-3">
 
@@ -245,7 +266,7 @@ console.log("Owner Properties:", ownerProperties);
 
           <h2 className="text-2xl font-bold mb-6">
 
-            Buyer Details
+            Contact Information
 
           </h2>
 
@@ -355,7 +376,9 @@ console.log("Owner Properties:", ownerProperties);
         {/* BUYER REQUIREMENT */}
         {/* ================================= */}
 
-        <div className="border-t p-8">
+        {isBuyer && (
+
+<div className="border-t p-8">
 
           <h2 className="text-2xl font-bold mb-6">
 
@@ -529,10 +552,14 @@ console.log("Owner Properties:", ownerProperties);
 
         </div>
 
-        <OwnerPropertiesSection
-  buyer={buyer}
-  properties={ownerProperties ?? []}
-/>
+        )}
+
+        {isOwner && (
+  <OwnerPropertiesSection
+    buyer={buyer}
+    properties={ownerProperties ?? []}
+  />
+)}
 
         
 
