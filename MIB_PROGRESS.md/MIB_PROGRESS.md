@@ -206,13 +206,4 @@ Remaining
 
 ---
 
-# RULES
-
-✅ No more architecture changes before V1.
-
-Only:
-- Finish remaining features
-- Fix bugs
-- Deploy
-
-Refactoring and UI polish move to V1.1.
+Development Branch Test
