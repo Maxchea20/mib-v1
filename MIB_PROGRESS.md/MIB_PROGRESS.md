@@ -2,7 +2,7 @@
 
 ## Current Version
 
-**V1.0.2**
+**V1.0.3**
 
 Last Updated:
 2026-08-07
@@ -17,6 +17,12 @@ Last Updated:
 
 ```bash
 npm run dev
+```
+
+For iPhone testing
+
+```bash
+npm run dev -- --hostname 172.20.10.4
 ```
 
 3. Verify Current Branch
@@ -61,8 +67,10 @@ git push origin main
 
 10. Test on
 
-- Desktop
-- iPhone
+- Chrome Desktop
+- Chrome Responsive Mode
+- iPhone Safari
+- Vercel Production
 
 ---
 
@@ -111,6 +119,9 @@ Status
 - [x] Search
 - [x] Lead Source
 - [x] Status
+- [x] Responsive Contact Cards
+- [x] Mobile Sidebar
+- [x] Hamburger Navigation
 
 ## Contact Roles
 
@@ -157,7 +168,7 @@ Deferred
 
 ---
 
-# Phase 3 - Listings
+# Phase 3 - Listings 🚧
 
 Completed
 
@@ -169,9 +180,14 @@ Completed
 - [x] Available Status
 - [x] Owner Link
 - [x] Photo Upload
+- [x] Listing Action Menu (⋮)
+- [x] Clickable Listing Card
+- [x] Mobile Horizontal Scroll Fix
 
 Remaining
 
+- [ ] Mobile Listing Layout
+- [ ] Listing Profile Mobile Layout
 - [ ] Property Timeline
 - [ ] Duplicate Detection
 - [ ] Archive
@@ -203,6 +219,7 @@ Completed
 
 Remaining
 
+- [ ] Mobile Dashboard
 - [ ] Remaining Commission
 - [ ] Monthly Performance
 - [ ] Recent Activities
@@ -228,13 +245,24 @@ Remaining
 
 ---
 
-# Phase 8 - Mobile (V1.1)
+# Phase 8 - Mobile First 🚧
 
-- [ ] Mobile Contacts
+Completed
+
+- [x] Mobile Sidebar
+- [x] Hamburger Menu
+- [x] Responsive Contact Cards
+- [x] iPhone Safari Testing Environment
+
+Remaining
+
+- [ ] Mobile Contacts Polish
 - [ ] Mobile Listings
+- [ ] Mobile Listing Profile
 - [ ] Mobile Dashboard
-- [ ] Bottom Navigation
+- [ ] Mobile Sales
 - [ ] Responsive Forms
+- [ ] Bottom Navigation
 
 ---
 
@@ -287,26 +315,33 @@ Remaining
 
 ---
 
-# Current Sprint (V1.0.2)
+# Current Sprint (V1.0.3)
 
-## Contacts
+## Mobile First
 
-- [x] Compact Contact UI
-- [x] Owner Property Preview
-- [x] Clickable Contact Card
-- [x] Action Menu (⋮)
+Completed
 
-Remaining
+- [x] Responsive Contact Cards
+- [x] Mobile Sidebar
+- [x] Hamburger Menu
+- [x] Clickable Contact Cards
+- [x] Listing Action Menu
+- [x] Clickable Listing Cards
+- [x] Fixed Mobile Horizontal Scrolling
+- [x] iPhone Safari Testing
 
-- [ ] Contact Profile Polish
-- [ ] Owner Profile Polish
-- [ ] Mobile Contact Layout
+In Progress
+
+- [ ] Mobile Listing Layout
+- [ ] Mobile Listing Profile
+- [ ] Mobile Dashboard
 
 ---
 
-# Next Sprint (V1.0.3)
+# Next Sprint (V1.0.4)
 
-1. Contact Profile Polish
-2. Owner Profile Polish
-3. Listing → Buyer Matching
-4. Dashboard Improvements
+1. Mobile Listing Layout
+2. Mobile Listing Profile
+3. Mobile Dashboard
+4. Listing → Buyer Matching
+5. Owner Profile Polish

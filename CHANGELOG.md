@@ -33,3 +33,15 @@ V1.0.2 Contacts UI redesign
 - Improved typography and spacing
 - Card clickable to open Contact Profile
 - Preserved buyer/owner/tenant filtering
+
+V1.0.3 Mobile UI foundation
+
+- Added responsive mobile sidebar
+- Added hamburger navigation
+- Added AppShell architecture
+- Added Listing action menu
+- Made listing cards clickable
+- Fixed mobile horizontal scrolling on listings
+- Improved responsive layout foundation
+- Updated Next.js allowedDevOrigins for local device testing
+- Verified on iPhone Safari
