@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import ContactMenu from "./ContactMenu";
 
 type Props = {
@@ -6,6 +9,8 @@ type Props = {
 };
 
 export default function ContactCard({ buyer }: Props) {
+
+  const router = useRouter();
 
   const property = buyer.ownerProperty;
 
@@ -31,85 +36,162 @@ export default function ContactCard({ buyer }: Props) {
 
   return (
 
-    <div className="relative bg-white border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-md transition-all duration-200">
+    <div
+  onClick={() => router.push(`/contacts/${buyer.id}`)}
+  className="relative cursor-pointer bg-white border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-md transition-all duration-200"
+>
 
-      {/* Clickable Card */}
+      
 
-      <Link
-        href={`/contacts/${buyer.id}`}
-        className="absolute inset-0 z-0"
-        aria-label={`Open ${buyer.name}`}
-      />
+      {/* ============================= */}
+      {/* Desktop */}
+      {/* ============================= */}
 
-      {/* Header */}
+      <div className="hidden md:block">
 
-      <div className="relative z-10 flex items-start justify-between px-5 pt-3">
+        <div className="relative z-10 flex items-start justify-between px-5 pt-3">
 
-        <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900">
+            {buyer.name}
+          </h2>
 
-          {buyer.name}
+          <div
+            className="relative z-20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ContactMenu
+              id={buyer.id}
+              name={buyer.name}
+            />
+          </div>
 
-        </h2>
+        </div>
 
-        <div
-          className="relative z-20"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <ContactMenu
-            id={buyer.id}
-            name={buyer.name}
-          />
+        <div className="relative z-10 flex flex-wrap items-center gap-6 px-5 pb-3 mt-3 text-base">
+
+          {buyer.is_buyer && (
+            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
+              Buyer
+            </span>
+          )}
+
+          {buyer.is_owner && (
+            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
+              Owner
+            </span>
+          )}
+
+          {buyer.is_tenant && (
+            <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-semibold">
+              Tenant
+            </span>
+          )}
+
+          <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
+            {buyer.status}
+          </span>
+
+          <span className="text-gray-700 text-lg">
+            📞 {buyer.phone}
+          </span>
+
+          <span className="text-blue-600 text-lg font-semibold">
+            {purpose || "-"}
+          </span>
+
+          <span className="text-gray-900 text-lg font-bold">
+            {category || "-"}
+          </span>
+
+          <span className="text-green-600 text-lg font-bold">
+            {price
+              ? `RM ${Number(price).toLocaleString()}`
+              : "-"}
+          </span>
+
+          <span className="text-gray-500 text-lg font-semibold">
+            {area || "-"}
+          </span>
+
         </div>
 
       </div>
 
-      {/* Information Row */}
+      {/* ============================= */}
+      {/* Mobile - Option A */}
+      {/* ============================= */}
 
-      <div className="relative z-10 flex flex-wrap items-center gap-6 px-5 pb-3 mt-3 text-base">
+      <div className="block md:hidden relative z-10 p-4">
 
-        {buyer.is_buyer && (
-          <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
-            Buyer
-          </span>
-        )}
+        <div className="flex items-start justify-between">
 
-        {buyer.is_owner && (
+          <h2 className="text-2xl font-bold text-gray-900">
+            {buyer.name}
+          </h2>
+
+          <div
+            className="relative z-20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ContactMenu
+              id={buyer.id}
+              name={buyer.name}
+            />
+          </div>
+
+        </div>
+
+        <div className="flex gap-2 mt-3">
+
+          {buyer.is_buyer && (
+            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
+              Buyer
+            </span>
+          )}
+
+          {buyer.is_owner && (
+            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
+              Owner
+            </span>
+          )}
+
+          {buyer.is_tenant && (
+            <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-semibold">
+              Tenant
+            </span>
+          )}
+
           <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
-            Owner
+            {buyer.status}
           </span>
-        )}
 
-        {buyer.is_tenant && (
-          <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-semibold">
-            Tenant
-          </span>
-        )}
+        </div>
 
-        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
-          {buyer.status}
-        </span>
+        <div className="mt-4 space-y-3 text-lg">
 
-        <span className="text-gray-700 text-lg">
-          📞 {buyer.phone}
-        </span>
+          <div>
+            📞 {buyer.phone}
+          </div>
 
-        <span className="text-blue-600 text-lg font-semibold">
-          {purpose || "-"}
-        </span>
+          <div>
+            🏠 {category || "-"}
+          </div>
 
-        <span className="text-gray-900 text-lg font-bold">
-          {category || "-"}
-        </span>
+          <div>
+            📌 {purpose || "-"}
+          </div>
 
-        <span className="text-green-600 text-lg font-bold">
-          {price
-            ? `RM ${Number(price).toLocaleString()}`
-            : "-"}
-        </span>
+          <div className="font-bold text-green-600">
+            💰 {price
+              ? `RM ${Number(price).toLocaleString()}`
+              : "-"}
+          </div>
 
-        <span className="text-gray-500 text-lg font-semibold">
-          {area || "-"}
-        </span>
+          <div className="font-semibold text-gray-700">
+            📍 {area || "-"}
+          </div>
+
+        </div>
 
       </div>
 

@@ -3,8 +3,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
-import DeleteListingButton from "@/components/DeleteListingButton";
+import { useRouter } from "next/navigation";
+import ListingMenu from "./ListingMenu";
 import { coverPhotoMap } from "@/lib/photoTemplates";
 
 type Props = {
@@ -14,6 +14,8 @@ type Props = {
 export default function ListingList({
   listings,
 }: Props) {
+
+  const router = useRouter();
 
   const [search, setSearch] = useState("");
 
@@ -198,13 +200,14 @@ export default function ListingList({
         return (
 
           <div
-            key={listing.id}
-            className="bg-white border rounded-lg shadow-sm p-5"
-          >
+  key={listing.id}
+  onClick={() => router.push(`/listings/${listing.id}`)}
+  className="cursor-pointer bg-white border rounded-lg shadow-sm hover:border-blue-500 hover:shadow-md transition-all duration-200 p-5"
+>
 
-            <div className="flex items-start gap-5">
+            <div className="flex flex-col md:flex-row gap-5">
 
-              <div className="w-48 h-36 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+              <div className="w-full md:w-48 h-52 md:h-36 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
 
                 {coverPhoto ? (
 
@@ -226,9 +229,9 @@ export default function ListingList({
 
               </div>
 
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
 
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start gap-4">
 
                   <div>
 
@@ -262,21 +265,17 @@ export default function ListingList({
 
                   </div>
 
-                  <div className="flex flex-col gap-2">
+                  <div
+  className="relative z-20 flex-shrink-0"
+  onClick={(e) => e.stopPropagation()}
+>
 
-                    <Link
-                      href={`/listings/${listing.id}`}
-                      className="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded text-center"
-                    >
-                      View
-                    </Link>
+  <ListingMenu
+    id={listing.id}
+    title={listing.title}
+  />
 
-                    <DeleteListingButton
-                      id={listing.id}
-                      title={listing.title}
-                    />
-
-                  </div>
+</div>
 
                 </div>
 
