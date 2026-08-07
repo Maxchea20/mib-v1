@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import { deleteBuyer } from "@/lib/buyers";
 
 type Props = {
@@ -18,7 +19,7 @@ export default function DeleteBuyerButton({
   async function handleDelete() {
 
     const ok = confirm(
-      `Delete buyer "${name}"?`
+      `Delete contact "${name}"?`
     );
 
     if (!ok) return;
@@ -31,7 +32,7 @@ export default function DeleteBuyerButton({
 
     } catch {
 
-      alert("Failed to delete buyer.");
+      alert("Failed to delete contact.");
 
     }
 
@@ -41,8 +42,9 @@ export default function DeleteBuyerButton({
 
     <button
       onClick={handleDelete}
-      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+      className="flex items-center gap-3 w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 transition"
     >
+      <TrashIcon className="w-5 h-5" />
       Delete
     </button>
 

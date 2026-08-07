@@ -1,32 +1,94 @@
-// File: src/components/buyers/BuyerList.tsx
-
 "use client";
 
-import Link from "next/link";
-import DeleteBuyerButton from "@/components/DeleteBuyerButton";
+import ContactCard from "./ContactCard";
+import { useState } from "react";
 
 type Props = {
   buyers: any[];
 };
 
-export default function BuyerList({
-  buyers,
-}: Props) {
+export default function BuyerList({ buyers }: Props) {
+
+  const [filter, setFilter] = useState<
+    "all" | "buyer" | "owner" | "tenant"
+  >("all");
+
+  const filteredBuyers = buyers.filter((buyer) => {
+
+    if (filter === "buyer") return buyer.is_buyer;
+
+    if (filter === "owner") return buyer.is_owner;
+
+    if (filter === "tenant") return buyer.is_tenant;
+
+    return true;
+
+  });
 
   return (
 
     <div className="space-y-4">
 
-      <p className="text-gray-500">
+      <div className="space-y-3">
 
-        Total Contacts
-        <span className="font-semibold ml-1">
-          {buyers.length}
-        </span>
+        <div className="flex flex-wrap gap-2">
 
-      </p>
+          <button
+            onClick={() => setFilter("all")}
+            className={`px-4 py-2 rounded-full ${
+              filter === "all"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200"
+            }`}
+          >
+            All
+          </button>
 
-      {buyers.length === 0 && (
+          <button
+            onClick={() => setFilter("buyer")}
+            className={`px-4 py-2 rounded-full ${
+              filter === "buyer"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200"
+            }`}
+          >
+            Buyers
+          </button>
+
+          <button
+            onClick={() => setFilter("owner")}
+            className={`px-4 py-2 rounded-full ${
+              filter === "owner"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200"
+            }`}
+          >
+            Owners
+          </button>
+
+          <button
+            onClick={() => setFilter("tenant")}
+            className={`px-4 py-2 rounded-full ${
+              filter === "tenant"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200"
+            }`}
+          >
+            Tenants
+          </button>
+
+        </div>
+
+        <p className="text-gray-500">
+          Total Contacts
+          <span className="font-semibold ml-1">
+            {filteredBuyers.length}
+          </span>
+        </p>
+
+      </div>
+
+      {filteredBuyers.length === 0 && (
 
         <div className="bg-white rounded-lg shadow border p-8 text-center text-gray-500">
 
@@ -36,69 +98,20 @@ export default function BuyerList({
 
       )}
 
-      {buyers.map((buyer) => (
+      {/* ONE COLUMN */}
 
-        <div
-          key={buyer.id}
-          className="bg-white border rounded-lg shadow-sm p-5"
-        >
+      <div className="space-y-2">
 
-          <div className="flex justify-between items-start">
+        {filteredBuyers.map((buyer) => (
 
-            <div>
+          <ContactCard
+            key={buyer.id}
+            buyer={buyer}
+          />
 
-              <h2 className="text-2xl font-bold text-black">
-                {buyer.name}
-              </h2>
+        ))}
 
-              <p className="text-gray-600 mt-2">
-                📞 {buyer.phone}
-              </p>
-
-              <div className="mt-3 space-y-1">
-
-                <p className="text-gray-700">
-                  Category: {buyer.category || "-"}
-                </p>
-
-                <p className="text-gray-700">
-                  Budget:
-                  {buyer.budget
-                    ? ` RM ${Number(
-                        buyer.budget
-                      ).toLocaleString()}`
-                    : " -"}
-                </p>
-
-                <p className="text-gray-700">
-                  Status: {buyer.status}
-                </p>
-
-              </div>
-
-            </div>
-
-            <div className="flex gap-2">
-
-              <Link
-  href={`/contacts/${buyer.id}`}
-  className="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded"
->
-  View
-</Link>
-
-              <DeleteBuyerButton
-                id={buyer.id}
-                name={buyer.name}
-              />
-
-            </div>
-
-          </div>
-
-        </div>
-
-      ))}
+      </div>
 
     </div>
 

@@ -1,18 +1,42 @@
-// File: src/app/(app)/buyers/page.tsx
 export const dynamic = "force-dynamic";
 
-import DeleteBuyerButton from "@/components/DeleteBuyerButton";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import BuyerList from "@/components/buyers/BuyerList";
 
-export default async function BuyersPage() {
+export default async function ContactsPage() {
 
+  // Load all contacts
   const { data: buyers } = await supabase
     .from("buyers")
     .select("*")
     .order("created_at", {
       ascending: false,
+    });
+
+  // Load all properties
+  const { data: properties } = await supabase
+    .from("properties")
+    .select("*");
+
+  // Attach first owner property to each contact
+  const contacts =
+    (buyers ?? []).map((buyer) => {
+
+      const ownerProperty =
+        (properties ?? []).find(
+          (property) =>
+            property.owner_id === buyer.id
+        );
+
+      return {
+
+        ...buyer,
+
+        ownerProperty,
+
+      };
+
     });
 
   return (
@@ -35,7 +59,7 @@ export default async function BuyersPage() {
       </div>
 
       <BuyerList
-        buyers={buyers ?? []}
+        buyers={contacts}
       />
 
     </div>
