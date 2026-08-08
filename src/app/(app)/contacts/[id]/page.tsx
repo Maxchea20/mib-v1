@@ -72,11 +72,7 @@ const isOwner =
 const isTenant =
   buyer.is_tenant;
 
-    console.log("Buyer ID:", buyer.id);
-console.log("Owner Properties:", ownerProperties);
-
-
-  const matches =
+    const matches =
     (properties ?? [])
 
       .map((listing) => {
@@ -155,18 +151,6 @@ console.log("Owner Properties:", ownerProperties);
 
             </h1>
 
-            <p className="text-red-500">
-  Purpose: {buyer.purpose}
-</p>
-
-<p className="text-red-500">
-  isBuyer: {String(isBuyer)}
-</p>
-
-<p className="text-red-500">
-  isOwner: {String(isOwner)}
-</p>
-
             <p className="text-3xl font-bold text-green-600 mt-3">
 
               RM {Number(
@@ -238,7 +222,7 @@ console.log("Owner Properties:", ownerProperties);
               <div className="pt-3">
 
                 <Link
-                  href={`/buyers/${buyer.id}/matches`}
+  href={`/contacts/${buyer.id}/matches`}
                   className={`inline-flex items-center justify-center rounded-lg px-5 py-3 font-semibold text-white transition ${
                     matchedCount === 0
                       ? "bg-gray-400 pointer-events-none"

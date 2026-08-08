@@ -1,6 +1,6 @@
 // File: src/app/(app)/listings/[id]/page.tsx
 export const dynamic = "force-dynamic";
-
+import ListingActionsMenu from "@/components/listings/ListingActionsMenu";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -84,9 +84,9 @@ export default async function ListingProfilePage({
       {/* COVER */}
       {/* ================================= */}
 
-      <div className="bg-white border rounded-lg shadow overflow-hidden mb-6">
+      <div className="bg-white border rounded-lg shadow overflow-visible mb-6">
 
-        <div className="h-[420px] bg-gray-100 flex items-center justify-center">
+        <div className="h-[420px] bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg">
 
           {coverPhoto ? (
 
@@ -162,27 +162,20 @@ export default async function ListingProfilePage({
 
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex items-center gap-2">
 
-              <Link
-                href={`/listings/${listing.id}/edit`}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded"
-              >
+  <ListingActionsMenu
+    listing={listing}
+  />
 
-                Edit Listing
+  <Link
+    href="/listings"
+    className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded text-sm"
+  >
+    Back
+  </Link>
 
-              </Link>
-
-              <Link
-                href="/listings"
-                className="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded"
-              >
-
-                Back
-
-              </Link>
-
-            </div>
+</div>
 
           </div>
 
