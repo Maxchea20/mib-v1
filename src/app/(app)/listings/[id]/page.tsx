@@ -9,6 +9,8 @@ import { supabase } from "@/lib/supabase";
 import ListingTabs from "@/components/ListingTabs";
 import MediaManager from "@/components/media/MediaManager";
 import BuyerMatches from "@/components/matching/BuyerMatches";
+import AIDescriptionButton from "@/components/ai/AIDescriptionButton";
+import AIHighlightsButton from "@/components/ai/AIHighlightsButton";
 
 type Props = {
   params: Promise<{
@@ -426,6 +428,8 @@ export default async function ListingProfilePage({
 
                     </div>
 
+                    
+
                   </>
 
                 )}
@@ -633,8 +637,38 @@ export default async function ListingProfilePage({
 
               </div>
 
+              {/* TENURE & FACING */}
+
+            <div className="grid md:grid-cols-2 gap-x-16 gap-y-6 mt-6">
+
+              <div>
+
+                <p className="text-sm text-gray-500">
+                  Tenure
+                </p>
+
+                <p className="text-lg font-semibold">
+                  {listing.tenure || "-"}
+                </p>
+
+              </div>
+
+              <div>
+
+                <p className="text-sm text-gray-500">
+                  Facing
+                </p>
+
+                <p className="text-lg font-semibold">
+                  {listing.facing || "-"}
+                </p>
+
+              </div>
+
             </div>
 
+            </div>
+  
             {/* ================================= */}
             {/* LOCATION */}
             {/* ================================= */}
@@ -690,6 +724,54 @@ export default async function ListingProfilePage({
             {/* ================================= */}
 
                         {/* ================================= */}
+            {/* PROPERTY HIGHLIGHTS */}
+            {/* ================================= */}
+
+            {Array.isArray(listing.highlights) &&
+              listing.highlights.length > 0 && (
+
+                <div className="bg-white border rounded-lg shadow p-6">
+
+                  <h2 className="text-2xl font-bold text-black mb-6">
+                    ✨ Property Highlights
+                  </h2>
+
+                  <div className="grid md:grid-cols-2 gap-x-10 gap-y-4">
+
+                    {listing.highlights.map(
+                      (highlight: string, index: number) => (
+
+                        <div
+                          key={index}
+                          className="flex items-start gap-3"
+                        >
+
+                          <span className="text-yellow-600 font-bold text-lg leading-none">
+                            ✓
+                          </span>
+
+                          <p className="text-black leading-6">
+                            {highlight}
+                          </p>
+
+                          
+                        </div>
+
+                      )
+                    )}
+
+                  </div>
+
+                  {/* ONE AI BUTTON — OUTSIDE THE MAP */}
+  <AIHighlightsButton
+    listing={listing}
+  />
+
+                </div>
+
+              )}
+
+            {/* ================================= */}
             {/* DESCRIPTION */}
             {/* ================================= */}
 
@@ -706,6 +788,10 @@ export default async function ListingProfilePage({
                 {listing.description || "-"}
 
               </p>
+
+              <AIDescriptionButton
+    listing={listing}
+  />
 
             </div>
 

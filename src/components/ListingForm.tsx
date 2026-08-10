@@ -86,6 +86,25 @@ export default function ListingForm({
       ""
     );
 
+      const [tenure, setTenure] =
+    useState(
+      listing?.tenure ??
+      ""
+    );
+
+  const [facing, setFacing] =
+    useState(
+      listing?.facing ??
+      ""
+    );
+
+  const [highlights, setHighlights] =
+  useState(
+    Array.isArray(listing?.highlights)
+      ? listing.highlights.join("\n")
+      : ""
+  );
+
   const [bedrooms, setBedrooms] =
     useState(
       listing?.bedrooms?.toString() ??
@@ -220,6 +239,20 @@ export default function ListingForm({
 
       built_up:
         builtUp || null,
+
+      tenure:
+  tenure || null,
+
+facing:
+  facing || null,
+
+highlights:
+  highlights
+    ? highlights
+        .split("\n")
+        .map((item: string) => item.trim())
+        .filter(Boolean)
+    : [],
 
       bedrooms:
         bedrooms
@@ -453,6 +486,32 @@ export default function ListingForm({
           onChange={(e) => setBuiltUp(e.target.value)}
           className="w-full border rounded p-2 text-black"
         />
+
+        <select
+  value={tenure}
+  onChange={(e) => setTenure(e.target.value)}
+  className="w-full border rounded p-2 text-black"
+>
+  <option value="">Tenure</option>
+  <option>Freehold</option>
+  <option>Leasehold</option>
+</select>
+
+<select
+  value={facing}
+  onChange={(e) => setFacing(e.target.value)}
+  className="w-full border rounded p-2 text-black"
+>
+  <option value="">Facing</option>
+  <option>North</option>
+  <option>South</option>
+  <option>East</option>
+  <option>West</option>
+  <option>North East</option>
+  <option>North West</option>
+  <option>South East</option>
+  <option>South West</option>
+</select>
 
         <input
           type="number"
@@ -696,6 +755,14 @@ export default function ListingForm({
           }
           className="w-full border rounded p-2 text-black"
         />
+
+        <textarea
+  rows={5}
+  placeholder="Property Highlights — one highlight per line"
+  value={highlights}
+  onChange={(e) => setHighlights(e.target.value)}
+  className="w-full border rounded p-2 text-black"
+/>
 
         <button
             type="submit"

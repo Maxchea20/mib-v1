@@ -62,32 +62,17 @@ git push origin main
 * Desktop
 * Mobile
 
----
+# MIB Development Roadmap
 
-# Production
+## Phase 1 — Foundation 🟡
 
-✅ main
-
-# Development
-
-✅ develop
-
-# Deployment
-
-✅ Vercel Production
-✅ Vercel Preview
+**Frozen**
 
 ---
 
-# Phase 1 - Foundation
+## Phase 2 — Contacts ✅
 
-🟡 Frozen
-
----
-
-# Phase 2 - Contacts ✅
-
-Completed
+### Completed
 
 * [x] Contact List
 * [x] Contact Profile
@@ -100,15 +85,15 @@ Completed
 * [x] Clickable Contact Card
 * [x] Mobile Responsive
 
-Remaining
+### Remaining
 
 * [ ] Profile Polish
 
 ---
 
-# Phase 3 - Listings ✅
+# Phase 3 — Listings ✅
 
-Completed
+### Completed
 
 * [x] Listing List
 * [x] Listing Profile
@@ -119,8 +104,12 @@ Completed
 * [x] Mobile Responsive
 * [x] Clickable Listing Card
 * [x] Listing Action Menu (⋮)
+* [x] Tenure
+* [x] Facing
+* [x] Property Highlights
+* [x] Highlights displayed on Listing Profile
 
-Remaining
+### Remaining
 
 * [ ] Property Timeline
 * [ ] Duplicate Detection
@@ -129,9 +118,9 @@ Remaining
 
 ---
 
-# Phase 4 - Matching ✅
+# Phase 4 — Matching ✅
 
-Completed
+### Completed
 
 * [x] Buyer → Listing
 * [x] Listing → Buyer
@@ -140,22 +129,22 @@ Completed
 * [x] Matching Listings Page
 * [x] Matching Buyers Page
 
-Deferred
+### Deferred
 
 * [ ] Live Refresh
 * [ ] Notifications
 
 ---
 
-# Phase 5 - Dashboard
+# Phase 5 — Dashboard 🚧
 
-Completed
+### Completed
 
 * [x] KPI Cards
 * [x] Recent Contacts
 * [x] Recent Listings
 
-Next
+### Remaining
 
 * [ ] 2026 Gross Commission Target
 * [ ] Remaining to Target
@@ -165,9 +154,9 @@ Next
 
 ---
 
-# Phase 6 - Sales 🚧
+# Phase 6 — Sales 🚧
 
-Completed
+### Completed
 
 * [x] Deals Table
 * [x] CSV Import
@@ -178,7 +167,7 @@ Completed
 * [x] Recharts Integration
 * [x] Mobile Chart Support
 
-Next
+### Remaining
 
 * [ ] Highest Gross Commission
 * [ ] Lowest Gross Commission
@@ -191,7 +180,7 @@ Next
 * [ ] Edit Sales
 * [ ] Delete Sales
 
-Future
+### Future
 
 * [ ] Save Deal
 * [ ] "Deal Saved Successfully"
@@ -203,116 +192,118 @@ Future
 
 ---
 
-# Phase 7 - PDF Generator 🚧
+# Phase 7 — PDF Generator 🚧 **PAUSED**
 
-Completed
+### Completed
 
-* [x] Brochure PDF Generator
-* [x] Internal Sheet PDF Generator
-* [x] 2-page Brochure
-* [x] Maximum 9 Photos
-* [x] Dynamic Listing Information
-* [x] Property Hero Image
+* [x] Brochure PDF generation
+* [x] 2-page brochure structure
+* [x] Maximum 9 photos
+* [x] Cover photo selection by property category
+* [x] Photo gallery
 * [x] Property Overview
-* [x] Property Description
-* [x] Property Gallery
-* [x] Location Information
-* [x] Listing Agent Section
-* [x] MIB Branding
-* [x] PDF Download
-* [x] Listing 3-dot Action Menu Integration
+* [x] Dynamic property information
+* [x] Tenure
+* [x] Facing
+* [x] Property Highlights
+* [x] Listing Profile → PDF data flow
+* [x] Native PDF vector icons
+* [x] MIB branding structure
+* [x] Agent section
+* [x] Listing action menu
+* [x] Generate Brochure action
+* [x] Internal Sheet action
 
-Brochure Polish Completed
+### Paused
 
-* [x] Hero title wrapping
-* [x] Hero overlay adjustment
-* [x] Hero height adjustment
-* [x] Price / key-facts spacing
-* [x] Fact label sizing
-* [x] Fact value sizing
-* [x] Back button reduced
-* [x] Action menu click-outside closing
-* [x] PDF generation runtime issue fixed
-* [x] TypeScript errors resolved
+* [ ] Final brochure visual polishing
+* [ ] Exact reference-design matching
+* [ ] Final spacing/alignment polish
+* [ ] Final typography polish
 
-Remaining
-
-* [ ] Property Overview proper icons
-* [ ] Page 1 visual polish
-* [ ] Page 2 visual polish
-* [ ] Agent section polish
-* [ ] Property Highlights integration
-
-Deferred
+### Not Started / Deferred
 
 * [ ] Flyer
 * [ ] QR Code
-* [ ] Public Property Listing URL
 
-Notes
-
-* Brochure and Flyer will not be maintained as separate generators for now.
-* Brochure is the main external property document.
-* Internal Sheet remains an internal-use document.
-* QR Code is postponed because the system is currently internal.
-* Public property listing/search functionality is postponed.
-* Property Highlights will eventually be entered from the Listing module and pulled automatically into the brochure.
+**Phase 7 status: PAUSED — functional, but visual polish intentionally postponed.**
 
 ---
 
-# Phase 8 - Mobile
+# Phase 8 — Mobile 🚧
 
-Completed
+### Completed
 
 * [x] Mobile Sidebar
 * [x] Mobile Contacts
 * [x] Mobile Listings
+* [x] Responsive Listing Action Menu
 
-Remaining
+### Remaining
 
 * [ ] Mobile Dashboard
 * [ ] Bottom Navigation
+* [ ] Full mobile system review
 
 ---
 
-# Phase 9 - CRM
+# Phase 9 — CRM 🔜
+
+This is the next major phase.
 
 * [ ] Follow Up
 * [ ] Reminder
-* [ ] Timeline
+* [ ] Activity Timeline
 * [ ] Activity Log
 * [ ] WhatsApp
+* [ ] Call Button
+* [ ] Follow-up Status
+* [ ] Follow-up History
+* [ ] Contact → Listing activity
+* [ ] Listing → Contact activity
+
+### Mobile behaviour
+
+* [ ] WhatsApp button on phone
+* [ ] Call button on phone
+* [ ] Hide WhatsApp/Call buttons on desktop browser
 
 ---
 
-# Phase 10 - AI
+# Phase 10 — AI 🤖
 
 * [ ] AI Listing
 * [ ] AI Facebook
 * [ ] AI WhatsApp
 * [ ] AI Matching
+* [ ] AI Listing Description
+* [ ] AI Property Highlights
+* [ ] AI Buyer Recommendation
 
 ---
 
-# Phase 11 - Reports
+# Phase 11 — Reports 📊
 
-* [ ] Sales
-* [ ] Commission
-* [ ] Monthly
-* [ ] Yearly
+* [ ] Sales Reports
+* [ ] Commission Reports
+* [ ] Monthly Reports
+* [ ] Yearly Reports
 * [ ] Excel Export
 
 ---
 
-# Phase 12 - Performance
+# Phase 12 — Performance ⚡
 
 * [ ] Query Optimization
 * [ ] Lazy Loading
+* [ ] Database Optimization
 * [ ] Mobile Optimization
+* [ ] Large Dataset Testing
+* [ ] 10,000+ Transaction Data Testing
 
 ---
 
-# Future
+# Future — External Integrations
 
 * [ ] Facebook Publishing
 * [ ] PropertyGuru Export
@@ -324,73 +315,52 @@ Remaining
 
 ---
 
-# Current Sprint (V1.0.5)
+# Future — Commercialisation
 
-Module:
+**Separate roadmap. Not part of your current personal MIB system.**
 
-**Phase 7 - PDF Generator**
-
-Completed
-
-* [x] Brochure Generator
-* [x] Internal Sheet Generator
-* [x] 2-page Brochure
-* [x] Maximum 9 Photos
-* [x] Listing Profile PDF Actions
-* [x] PDF Download
-* [x] Brochure Initial Design
-* [x] Brochure Visual Polish Pass
-
-Remaining
-
-* [ ] Proper Property Overview Icons
-* [ ] Page 1 Polish
-* [ ] Page 2 Polish
-* [ ] Agent Section Polish
-* [ ] Property Highlights Integration
-* [ ] Final Brochure Approval
-
-Deferred
-
-* [ ] Flyer
-* [ ] QR Code
-* [ ] Public Listing Page
+* [ ] Multi-agent accounts
+* [ ] Agent permissions
+* [ ] Admin panel
+* [ ] Company-level data
+* [ ] Subscription tiers
+* [ ] Payment system
+* [ ] Usage limits
+* [ ] Gatherian-wide listings
+* [ ] Gatherian-wide transaction database
+* [ ] Security / row-level access
+* [ ] Audit logs
+* [ ] Agent billing
+* [ ] Company reporting
+* [ ] SaaS infrastructure
 
 ---
 
-# Next Sprint (V1.0.6)
+# 🎯 Current Position
 
-1. Finish Brochure Visual Polish
-2. Replace Overview Placeholder Icons
-3. Polish Page 2
-4. Improve Agent Section
-5. Add Property Highlights to Listing
-6. Connect Property Highlights to Brochure
-7. Final Brochure Approval
-
----
-
-# Development Rules
-
-* Work on one task at a time.
-* Do not skip steps.
-* Do not make multiple unrelated code changes at once.
-* Test after every code change.
-* Keep Problems at 0 before moving to the next task.
-* Do not build future features before the current module is stable.
-* Keep MIB internal-first until public functionality is intentionally introduced.
-
+```text
+Phase 1  Foundation       🟡 Frozen
+Phase 2  Contacts         ✅
+Phase 3  Listings         ✅
+Phase 4  Matching         ✅
+Phase 5  Dashboard        🚧
+Phase 6  Sales            🚧
+Phase 7  PDF Generator    🚧 PAUSED
+Phase 8  Mobile           🚧
+Phase 9  CRM              🔜 NEXT
+Phase 10 AI               🔜
+Phase 11 Reports          🔜
+Phase 12 Performance      🔜
 ```
 
-### One thing I deliberately changed
+### The important decision
 
-I changed:
+**Phase 7 does NOT need to be perfect before moving on.**
 
-> **Current Version V1.0.3 → V1.0.5**
+We now have the important foundation:
 
-because your changelog now has **V1.0.4 Buyer Matching & Contact Profile** and **V1.0.5 PDF Generator**.
+> **Listing data → Supabase → Listing Profile → Brochure**
 
-And I moved the **Current Sprint** from Sales to **Phase 7 PDF Generator**, because that's where we actually stopped tonight.
+That's working. The brochure can be cosmetically upgraded later without redesigning the underlying data structure.
 
-So when we come back, there should be **zero confusion**: we're not going back to Sales unless you specifically tell me to. We're continuing the brochure polish.
-```
+So I would officially move the focus to **Phase 9 — CRM** when you're ready. That gets directly at the operational pain points of the system instead of burning another night fighting PDF spacing. 😅
