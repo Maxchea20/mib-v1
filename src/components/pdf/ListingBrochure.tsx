@@ -16,6 +16,7 @@ import {
 
 type Props = {
   listing: any;
+  aiPlan?: any;
 };
 
 /* =========================================================
@@ -150,9 +151,22 @@ const IconCheck = ({ color = C.navy }: { color?: string }) => (
   </Svg>
 );
 
-const IconCompass = ({ color = C.navy }: { color?: string }) => (
-  <Svg width="15" height="15" viewBox="0 0 24 24">
-    <Circle cx="12" cy="12" r="9" stroke={color} strokeWidth="1.8" fill="none" />
+const IconCompass = ({
+  color = C.navy,
+  size = 15,
+}: {
+  color?: string;
+  size?: number;
+}) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle
+      cx="12"
+      cy="12"
+      r="9"
+      stroke={color}
+      strokeWidth="1.8"
+      fill="none"
+    />
     <Path
       d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"
       stroke={color}
@@ -508,7 +522,7 @@ const styles = StyleSheet.create({
 
   highlightText: {
     flex: 1,
-    fontSize: 7.5,
+    fontSize: 12,
     color: C.black,
     lineHeight: 1.3,
   },
@@ -816,27 +830,53 @@ function add(
    COMPONENT
 ========================================================= */
 
-export default function ListingBrochure({ listing }: Props) {
+export default function ListingBrochure({
+  listing,
+  aiPlan,
+}: Props) {
+
+   console.log("AI PDF Design Plan:", aiPlan);
   /* PHOTOS */
   const photos = Array.isArray(listing.property_photos)
     ? listing.property_photos.filter((photo: any) => photo?.image_url)
     : [];
 
-  const coverMap: Record<string, string> = {
-    Residential: "Front House",
-    Commercial: "Shop Front",
-    Industrial: "Factory Front",
-    Land: "Front View",
-  };
+  const coverType =
+  aiPlan?.hero?.photo_type || null;
 
-  const coverType = coverMap[listing.category];
+const coverPhoto =
+  coverType
+    ? photos.find(
+        (photo: any) =>
+          photo.photo_type ===
+          coverType
+      ) ?? photos[0]
+    : photos[0];
 
-  const coverPhoto =
-    photos.find((photo: any) => photo.photo_type === coverType) ?? photos[0];
+const galleryEnabled =
+  aiPlan?.gallery?.enabled !== false;
 
-  const galleryPhotos = photos
-    .filter((photo: any) => photo.image_url !== coverPhoto?.image_url)
-    .slice(0, 8);
+const galleryMaxPhotos =
+  Number(
+    aiPlan?.gallery?.max_photos
+  ) || 8;
+
+const galleryPhotos =
+  galleryEnabled
+    ? photos
+        .filter(
+          (photo: any) =>
+            photo.image_url !==
+            coverPhoto?.image_url
+        )
+        .slice(
+          0,
+          Math.min(
+            galleryMaxPhotos,
+            8
+          )
+        )
+    : [];
 
   /* LOCATION */
   const locationParts = [
@@ -866,96 +906,926 @@ export default function ListingBrochure({ listing }: Props) {
   const titleLines = wrapTitle(mainTitleString);
 
   /* OVERVIEW */
-  const overview: {
+
+const overview: {
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+}[] = [];
+
+/*
+ * Map every possible AI field to:
+ *
+ * - PDF display label
+ * - actual listing value
+ * - matching icon
+ *
+ * AI only chooses the field name.
+ * It never creates the value.
+ */
+
+const overviewFieldMap: Record<
+  string,
+  {
     label: string;
-    value: string;
+    value: any;
     icon: React.ReactNode;
-  }[] = [];
-
-  if (listing.category === "Residential") {
-    add(overview, "Property Type", listing.residential_type, <IconHouse />);
-    add(overview, "Category", listing.category, <IconCategory />);
-    add(overview, "Purpose", listing.purpose, <IconTag />);
-    add(overview, "Bedrooms", listing.bedrooms, <IconBed />);
-    add(overview, "Bathrooms", listing.bathrooms, <IconBath />);
-    add(overview, "Land Area", listing.land_size, <IconRuler />);
-    add(overview, "Built-up", listing.built_up, <IconBuilding />);
-    add(overview, "Tenure", listing.tenure, <IconTenure />);
-    add(overview, "Status", listing.status, <IconCheck />);
-    add(overview, "Facing", listing.facing, <IconCompass />);
-  } else if (listing.category === "Commercial") {
-    add(overview, "Property Type", listing.commercial_type, <IconBuilding />);
-    add(overview, "Category", listing.category, <IconCategory />);
-    add(overview, "Purpose", listing.purpose, <IconTag />);
-    add(overview, "Land Area", listing.land_size, <IconRuler />);
-    add(overview, "Built-up", listing.built_up, <IconBuilding />);
-    add(overview, "Tenure", listing.tenure, <IconTenure />);
-    add(overview, "Status", listing.status, <IconCheck />);
-  } else if (listing.category === "Industrial") {
-    add(overview, "Factory Type", listing.industrial_property_type, <IconBuilding />);
-    add(overview, "Category", listing.category, <IconCategory />);
-    add(overview, "Purpose", listing.purpose, <IconTag />);
-    add(overview, "Zoning", listing.industrial_zoning, <IconHouse />);
-    add(overview, "Land Area", listing.land_size, <IconRuler />);
-    add(overview, "Built-up", listing.built_up, <IconBuilding />);
-    add(overview, "Tenure", listing.tenure, <IconTenure />);
-    add(overview, "Status", listing.status, <IconCheck />);
-  } else if (listing.category === "Land") {
-    add(overview, "Land Type", listing.land_type, <IconHouse />);
-    add(overview, "Category", listing.category, <IconCategory />);
-    add(overview, "Purpose", listing.purpose, <IconTag />);
-    add(overview, "Land Area", listing.land_size, <IconRuler />);
-    add(overview, "Tenure", listing.tenure, <IconTenure />);
-    add(overview, "Status", listing.status, <IconCheck />);
   }
+> = {
+  residential_type: {
+    label: "Property Type",
+    value: listing.residential_type,
+    icon: <IconHouse />,
+  },
 
+  residential_storey: {
+    label: "Storey",
+    value: listing.residential_storey,
+    icon: <IconBuilding />,
+  },
+
+  commercial_type: {
+    label: "Property Type",
+    value: listing.commercial_type,
+    icon: <IconBuilding />,
+  },
+
+  industrial_property_type: {
+    label: "Factory Type",
+    value:
+      listing.industrial_property_type,
+    icon: <IconBuilding />,
+  },
+
+  industrial_zoning: {
+    label: "Zoning",
+    value:
+      listing.industrial_zoning,
+    icon: <IconCategory />,
+  },
+
+  industrial_ceiling_height: {
+    label: "Ceiling Height",
+    value:
+      listing.industrial_ceiling_height,
+    icon: <IconRuler />,
+  },
+
+  industrial_power_supply: {
+    label: "Power Supply",
+    value:
+      listing.industrial_power_supply,
+    icon: <IconBuilding />,
+  },
+
+  land_type: {
+    label: "Land Type",
+    value: listing.land_type,
+    icon: <IconHouse />,
+  },
+
+  land_size: {
+    label: "Land Area",
+    value: listing.land_size,
+    icon: <IconRuler />,
+  },
+
+  built_up: {
+    label: "Built-up",
+    value: listing.built_up,
+    icon: <IconBuilding />,
+  },
+
+  bedrooms: {
+    label: "Bedrooms",
+    value: listing.bedrooms,
+    icon: <IconBed />,
+  },
+
+  bathrooms: {
+    label: "Bathrooms",
+    value: listing.bathrooms,
+    icon: <IconBath />,
+  },
+
+  tenure: {
+    label: "Tenure",
+    value: listing.tenure,
+    icon: <IconTenure />,
+  },
+
+  facing: {
+    label: "Facing",
+    value: listing.facing,
+    icon: <IconCompass />,
+  },
+
+  status: {
+    label: "Status",
+    value: listing.status,
+    icon: <IconCheck />,
+  },
+
+  purpose: {
+    label: "Purpose",
+    value: listing.purpose,
+    icon: <IconTag />,
+  },
+
+  category: {
+    label: "Category",
+    value: listing.category,
+    icon: <IconCategory />,
+  },
+};
+
+/*
+ * AI decides which fields should appear
+ * in the Property Overview.
+ */
+
+const aiOverviewFields =
+  Array.isArray(
+    aiPlan?.overview_fields
+  )
+    ? aiPlan.overview_fields
+    : [];
+
+/*
+ * Build the overview using the AI
+ * selected field order.
+ */
+
+aiOverviewFields.forEach(
+  (field: string) => {
+
+    const config =
+      overviewFieldMap[field];
+
+    if (!config) {
+      return;
+    }
+
+    add(
+      overview,
+      config.label,
+      config.value,
+      config.icon
+    );
+  }
+);
+
+/*
+ * Safety fallback.
+ *
+ * If the AI returns no usable overview
+ * fields, use the original category-based
+ * overview logic.
+ */
+
+if (overview.length === 0) {
+
+  const category =
+    listing.category;
+
+  if (
+    category === "Residential"
+  ) {
+
+    add(
+      overview,
+      "Property Type",
+      listing.residential_type,
+      <IconHouse />
+    );
+
+    add(
+      overview,
+      "Category",
+      listing.category,
+      <IconCategory />
+    );
+
+    add(
+      overview,
+      "Purpose",
+      listing.purpose,
+      <IconTag />
+    );
+
+    add(
+      overview,
+      "Bedrooms",
+      listing.bedrooms,
+      <IconBed />
+    );
+
+    add(
+      overview,
+      "Bathrooms",
+      listing.bathrooms,
+      <IconBath />
+    );
+
+    add(
+      overview,
+      "Land Area",
+      listing.land_size,
+      <IconRuler />
+    );
+
+    add(
+      overview,
+      "Built-up",
+      listing.built_up,
+      <IconBuilding />
+    );
+
+    add(
+      overview,
+      "Tenure",
+      listing.tenure,
+      <IconTenure />
+    );
+
+    add(
+      overview,
+      "Status",
+      listing.status,
+      <IconCheck />
+    );
+
+    add(
+      overview,
+      "Facing",
+      listing.facing,
+      <IconCompass />
+    );
+
+  } else if (
+    category === "Commercial"
+  ) {
+
+    add(
+      overview,
+      "Property Type",
+      listing.commercial_type,
+      <IconBuilding />
+    );
+
+    add(
+      overview,
+      "Category",
+      listing.category,
+      <IconCategory />
+    );
+
+    add(
+      overview,
+      "Purpose",
+      listing.purpose,
+      <IconTag />
+    );
+
+    add(
+      overview,
+      "Land Area",
+      listing.land_size,
+      <IconRuler />
+    );
+
+    add(
+      overview,
+      "Built-up",
+      listing.built_up,
+      <IconBuilding />
+    );
+
+    add(
+      overview,
+      "Tenure",
+      listing.tenure,
+      <IconTenure />
+    );
+
+    add(
+      overview,
+      "Status",
+      listing.status,
+      <IconCheck />
+    );
+
+  } else if (
+    category === "Industrial"
+  ) {
+
+    add(
+      overview,
+      "Factory Type",
+      listing.industrial_property_type,
+      <IconBuilding />
+    );
+
+    add(
+      overview,
+      "Category",
+      listing.category,
+      <IconCategory />
+    );
+
+    add(
+      overview,
+      "Purpose",
+      listing.purpose,
+      <IconTag />
+    );
+
+    add(
+      overview,
+      "Zoning",
+      listing.industrial_zoning,
+      <IconHouse />
+    );
+
+    add(
+      overview,
+      "Land Area",
+      listing.land_size,
+      <IconRuler />
+    );
+
+    add(
+      overview,
+      "Built-up",
+      listing.built_up,
+      <IconBuilding />
+    );
+
+    add(
+      overview,
+      "Tenure",
+      listing.tenure,
+      <IconTenure />
+    );
+
+    add(
+      overview,
+      "Status",
+      listing.status,
+      <IconCheck />
+    );
+
+  } else if (
+    category === "Land"
+  ) {
+
+    add(
+      overview,
+      "Land Type",
+      listing.land_type,
+      <IconHouse />
+    );
+
+    add(
+      overview,
+      "Category",
+      listing.category,
+      <IconCategory />
+    );
+
+    add(
+      overview,
+      "Purpose",
+      listing.purpose,
+      <IconTag />
+    );
+
+    add(
+      overview,
+      "Land Area",
+      listing.land_size,
+      <IconRuler />
+    );
+
+    add(
+      overview,
+      "Tenure",
+      listing.tenure,
+      <IconTenure />
+    );
+
+    add(
+      overview,
+      "Status",
+      listing.status,
+      <IconCheck />
+    );
+
+    add(
+      overview,
+      "Facing",
+      listing.facing,
+      <IconCompass />
+    );
+  }
+}
   /* HIGHLIGHTS */
-  const highlights: string[] = [];
 
-  if (Array.isArray(listing.highlights)) {
-    listing.highlights.forEach((item: any) => {
+const highlights: string[] = [];
+
+/*
+ * First, collect the original highlights
+ * supplied by the listing.
+ *
+ * We do NOT let AI create the text.
+ */
+
+if (Array.isArray(listing.highlights)) {
+  listing.highlights.forEach(
+    (item: any) => {
       if (item) {
-        highlights.push(String(item));
+        highlights.push(
+          String(item)
+        );
       }
-    });
-  }
+    }
+  );
+}
 
-  if (highlights.length === 0 && listing.remarks) {
-    String(listing.remarks)
-      .split("\n")
-      .map((line) => line.replace(/^[-•*✓]+\s*/, "").trim())
-      .filter(Boolean)
-      .forEach((line) => highlights.push(line));
-  }
+/*
+ * If the listing does not have a
+ * highlights array, use the existing
+ * remarks fallback.
+ */
 
-  const finalHighlights = highlights.slice(0, 8);
+if (
+  highlights.length === 0 &&
+  listing.remarks
+) {
+  String(listing.remarks)
+    .split("\n")
+    .map((line) =>
+      line
+        .replace(
+          /^[-•*✓]+\s*/,
+          ""
+        )
+        .trim()
+    )
+    .filter(Boolean)
+    .forEach((line) =>
+      highlights.push(line)
+    );
+}
+
+/*
+ * AI chooses which supplied highlights
+ * deserve to appear in the brochure.
+ *
+ * Example:
+ *
+ * listing.highlights:
+ *
+ * 0 = Private garden
+ * 1 = Fully renovated
+ * 2 = South-facing
+ * 3 = Leasehold
+ * 4 = Near school
+ *
+ * AI:
+ *
+ * highlight_indexes: [0, 1, 2, 4]
+ *
+ * We then retrieve the ORIGINAL text.
+ */
+
+const aiHighlightIndexes =
+  Array.isArray(
+    aiPlan?.highlight_indexes
+  )
+    ? aiPlan.highlight_indexes
+    : [];
+
+/*
+ * Build the final highlight list
+ * according to the AI selection.
+ */
+
+const selectedHighlights: string[] = [];
+
+aiHighlightIndexes.forEach(
+  (index: any) => {
+
+    const numericIndex =
+      Number(index);
+
+    if (
+      Number.isInteger(
+        numericIndex
+      ) &&
+      numericIndex >= 0 &&
+      numericIndex <
+        highlights.length
+    ) {
+      const highlight =
+        highlights[numericIndex];
+
+      if (
+        highlight &&
+        !selectedHighlights.includes(
+          highlight
+        )
+      ) {
+        selectedHighlights.push(
+          highlight
+        );
+      }
+    }
+  }
+);
+
+/*
+ * Safety fallback.
+ *
+ * If AI returns no usable indexes,
+ * use the original first 8 highlights.
+ */
+
+const finalHighlights =
+  selectedHighlights.length > 0
+    ? selectedHighlights.slice(
+        0,
+        8
+      )
+    : highlights.slice(0, 8);
 
   /* KEY FACTS */
-  const keyFacts: {
+
+const keyFacts: {
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+}[] = [];
+
+const keyFactMap: Record<
+  string,
+  {
     label: string;
-    value: string;
+    value: any;
     icon: React.ReactNode;
-  }[] = [];
-
-  const category = listing.category;
-
-  if (category === "Residential") {
-    add(keyFacts, "Tenure", listing.tenure, <IconTenure color={C.white} size={22} />);
-    add(keyFacts, "Land Area", listing.land_size, <IconRuler color={C.white} size={22} />);
-    add(keyFacts, "Built-up", listing.built_up, <IconBuilding color={C.white} size={22} />);
-  } else if (category === "Commercial") {
-    add(keyFacts, "Tenure", listing.tenure, <IconTenure color={C.white} size={22} />);
-    add(keyFacts, "Land Area", listing.land_size, <IconRuler color={C.white} size={22} />);
-    add(keyFacts, "Built-up", listing.built_up, <IconBuilding color={C.white} size={22} />);
-  } else if (category === "Industrial") {
-    add(keyFacts, "Tenure", listing.tenure, <IconTenure color={C.white} size={22} />);
-    add(keyFacts, "Land Area", listing.land_size, <IconRuler color={C.white} size={22} />);
-    add(keyFacts, "Built-up", listing.built_up, <IconBuilding color={C.white} size={22} />);
-  } else if (category === "Land") {
-    add(keyFacts, "Tenure", listing.tenure, <IconTenure color={C.white} size={22} />);
-    add(keyFacts, "Land Area", listing.land_size, <IconRuler color={C.white} size={22} />);
-    add(keyFacts, "Category", listing.category, <IconCategory color={C.white} size={22} />);
   }
+> = {
+  tenure: {
+    label: "Tenure",
+    value: listing.tenure,
+    icon: (
+      <IconTenure
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+
+  land_size: {
+    label: "Land Area",
+    value: listing.land_size,
+    icon: (
+      <IconRuler
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+
+  built_up: {
+    label: "Built-up",
+    value: listing.built_up,
+    icon: (
+      <IconBuilding
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+
+  bedrooms: {
+    label: "Bedrooms",
+    value: listing.bedrooms,
+    icon: (
+      <IconBed
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+
+  bathrooms: {
+    label: "Bathrooms",
+    value: listing.bathrooms,
+    icon: (
+      <IconBath
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+
+  residential_type: {
+    label: "Property Type",
+    value: listing.residential_type,
+    icon: (
+      <IconHouse
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+
+  residential_storey: {
+    label: "Storey",
+    value: listing.residential_storey,
+    icon: (
+      <IconBuilding
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+
+  facing: {
+    label: "Facing",
+    value: listing.facing,
+    icon: (
+      <IconCompass
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+
+  commercial_type: {
+    label: "Property Type",
+    value: listing.commercial_type,
+    icon: (
+      <IconBuilding
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+
+  industrial_property_type: {
+    label: "Factory Type",
+    value: listing.industrial_property_type,
+    icon: (
+      <IconBuilding
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+
+  industrial_zoning: {
+    label: "Zoning",
+    value: listing.industrial_zoning,
+    icon: (
+      <IconCategory
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+
+  industrial_ceiling_height: {
+    label: "Ceiling Height",
+    value:
+      listing.industrial_ceiling_height,
+    icon: (
+      <IconRuler
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+
+  industrial_power_supply: {
+    label: "Power Supply",
+    value:
+      listing.industrial_power_supply,
+    icon: (
+      <IconBuilding
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+
+  land_type: {
+    label: "Land Type",
+    value: listing.land_type,
+    icon: (
+      <IconHouse
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+
+  category: {
+    label: "Category",
+    value: listing.category,
+    icon: (
+      <IconCategory
+        color={C.white}
+        size={22}
+      />
+    ),
+  },
+};
+
+/*
+ * AI chooses which supplied fields
+ * deserve prominent placement.
+ */
+const aiKeyFacts =
+  Array.isArray(
+    aiPlan?.key_facts
+  )
+    ? aiPlan.key_facts
+    : [];
+
+/*
+ * Build key facts according to
+ * the AI design plan.
+ */
+aiKeyFacts
+  .slice(0, 3)
+  .forEach((field: string) => {
+
+    const config =
+      keyFactMap[field];
+
+    if (!config) {
+      return;
+    }
+
+    add(
+      keyFacts,
+      config.label,
+      config.value,
+      config.icon
+    );
+  });
+
+/*
+ * Safety fallback.
+ *
+ * If AI returns no usable key facts,
+ * keep the original category-based
+ * behaviour.
+ */
+if (keyFacts.length === 0) {
+
+  const category =
+    listing.category;
+
+  if (
+    category === "Residential"
+  ) {
+
+    add(
+      keyFacts,
+      "Tenure",
+      listing.tenure,
+      <IconTenure
+        color={C.white}
+        size={22}
+      />
+    );
+
+    add(
+      keyFacts,
+      "Land Area",
+      listing.land_size,
+      <IconRuler
+        color={C.white}
+        size={22}
+      />
+    );
+
+    add(
+      keyFacts,
+      "Built-up",
+      listing.built_up,
+      <IconBuilding
+        color={C.white}
+        size={22}
+      />
+    );
+
+  } else if (
+    category === "Commercial"
+  ) {
+
+    add(
+      keyFacts,
+      "Tenure",
+      listing.tenure,
+      <IconTenure
+        color={C.white}
+        size={22}
+      />
+    );
+
+    add(
+      keyFacts,
+      "Land Area",
+      listing.land_size,
+      <IconRuler
+        color={C.white}
+        size={22}
+      />
+    );
+
+    add(
+      keyFacts,
+      "Built-up",
+      listing.built_up,
+      <IconBuilding
+        color={C.white}
+        size={22}
+      />
+    );
+
+  } else if (
+    category === "Industrial"
+  ) {
+
+    add(
+      keyFacts,
+      "Tenure",
+      listing.tenure,
+      <IconTenure
+        color={C.white}
+        size={22}
+      />
+    );
+
+    add(
+      keyFacts,
+      "Land Area",
+      listing.land_size,
+      <IconRuler
+        color={C.white}
+        size={22}
+      />
+    );
+
+    add(
+      keyFacts,
+      "Built-up",
+      listing.built_up,
+      <IconBuilding
+        color={C.white}
+        size={22}
+      />
+    );
+
+  } else if (
+    category === "Land"
+  ) {
+
+    add(
+      keyFacts,
+      "Tenure",
+      listing.tenure,
+      <IconTenure
+        color={C.white}
+        size={22}
+      />
+    );
+
+    add(
+      keyFacts,
+      "Land Area",
+      listing.land_size,
+      <IconRuler
+        color={C.white}
+        size={22}
+      />
+    );
+
+    add(
+      keyFacts,
+      "Category",
+      listing.category,
+      <IconCategory
+        color={C.white}
+        size={22}
+      />
+    );
+  }
+}
 
   /* AGENT & BADGE */
   const agentPhoto = listing.agent_photo || listing.agent_photo_url || null;
@@ -1067,9 +1937,9 @@ export default function ListingBrochure({ listing }: Props) {
             <View style={styles.highlightGrid}>
               {finalHighlights.map((item, index) => (
                 <View key={index} style={styles.highlight}>
-                  <Text style={styles.check}>✓</Text>
-                  <Text style={styles.highlightText}>{item}</Text>
-                </View>
+  <IconCheck color={C.gold} />
+  <Text style={styles.highlightText}>{item}</Text>
+</View>
               ))}
             </View>
           </View>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import BuyerList from "@/components/buyers/BuyerList";
 
+
 export default async function ContactsPage() {
 
   // Load all contacts
@@ -57,6 +58,7 @@ export default async function ContactsPage() {
         </Link>
 
       </div>
+
 
       <BuyerList
         buyers={contacts}

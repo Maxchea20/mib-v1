@@ -3,6 +3,7 @@ import Link from "next/link";
 const menus = [
   { name: "Dashboard", href: "/dashboard", emoji: "🏠" },
   { name: "Contacts", href: "/contacts", emoji: "🛒" },
+  { name: "AI Cobroke Match", href: "/cobroke-match", emoji: "🤝" },
   { name: "Listings", href: "/listings", emoji: "🏡" },
   { name: "Sales", href: "/sales", emoji: "💰" },
   { name: "Settings", href: "/settings", emoji: "⚙️" },

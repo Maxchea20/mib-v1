@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 import ListingTabs from "@/components/ListingTabs";
 import MediaManager from "@/components/media/MediaManager";
 import BuyerMatches from "@/components/matching/BuyerMatches";
+import AIFacebookContentButton from "@/components/ai/AIFacebookContentButton";
 import AIDescriptionButton from "@/components/ai/AIDescriptionButton";
 import AIHighlightsButton from "@/components/ai/AIHighlightsButton";
 
@@ -813,6 +814,10 @@ export default async function ListingProfilePage({
       {/* ================================= */}
       {/* MATCHING BUYERS */}
       {/* ================================= */}
+
+      <AIFacebookContentButton
+        listing={listing}
+      />
 
       <BuyerMatches
         listing={listing}
