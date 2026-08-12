@@ -12,6 +12,7 @@ import BuyerMatches from "@/components/matching/BuyerMatches";
 import AIFacebookContentButton from "@/components/ai/AIFacebookContentButton";
 import AIDescriptionButton from "@/components/ai/AIDescriptionButton";
 import AIHighlightsButton from "@/components/ai/AIHighlightsButton";
+import AIGeneratePropertyPosterButton from "@/components/ai/AIGeneratePropertyPosterButton";
 
 type Props = {
   params: Promise<{
