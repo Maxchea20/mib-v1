@@ -1,10 +1,21 @@
 import OpenAI, { toFile } from "openai";
 import { NextResponse } from "next/server";
-
+import { createClient } from "@supabase/supabase-js";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+/*
+|--------------------------------------------------------------------------
+| SUPABASE SERVER CLIENT
+|--------------------------------------------------------------------------
+*/
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -171,17 +182,62 @@ The strongest selling point must receive strong visual emphasis.
 Secondary information must never overpower the property photographs.
 
 ==================================================
-BRANDING
+BRANDING & CONTACT FOOTER
 ==================================================
 
-Use MIB PROPERTIES branding professionally.
+MIB PROPERTIES branding must be clearly visible.
 
-Use supplied agent information accurately.
+Create a professional branded footer or lower section
+that contains the agent/contact information.
 
-Do not invent agent information.
+Use the supplied agent information accurately.
 
-Agent branding must support credibility without overpowering
-the property photography.
+IMPORTANT:
+
+The contact information must be displayed exactly as supplied.
+
+Do NOT invent:
+- logo 
+- brand
+- agent name
+- phone number
+- email
+- website
+- registration number
+
+Preferred footer hierarchy:
+
+MAXCHEA
+PROPERTY
+
+Your Property, Our Priority.
+
+YOUR TRUSTED PROPERTY PARTNER
+
+MAX CHEA
+
+☎ [016-5210993]
+
+🌐 [Facebook.com/maxzchea]
+
+The MAXCHEA PROPERTY branding should feel premium,
+clean and corporate.
+
+The footer should NOT overpower the property photography.
+
+Use strong typography and good spacing.
+
+NO logo/branding should be positioned naturally
+according to the overall poster composition.
+
+Do NOT create a generic contact-information box.
+
+Integrate the branding into the overall design.
+
+If a QR code is supplied or available, it may be incorporated
+into the footer.
+
+If QR information is unavailable, do NOT invent a QR code.
 
 ==================================================
 SOCIAL MEDIA
@@ -305,17 +361,25 @@ async function downloadImage(
 |--------------------------------------------------------------------------
 */
 
-export async function POST(request: Request) {
+export async function POST(
+  request: Request
+) {
   try {
-    const body = await request.json();
+    const body =
+      await request.json();
 
-    const listing = body?.listing;
+    const listing =
+      body?.listing;
 
-    if (!listing || typeof listing !== "object") {
+    if (
+      !listing ||
+      typeof listing !== "object"
+    ) {
       return NextResponse.json(
         {
           success: false,
-          error: "Listing data is required.",
+          error:
+            "Listing data is required.",
         },
         {
           status: 400,
@@ -336,32 +400,65 @@ export async function POST(request: Request) {
 
     /*
     |--------------------------------------------------------------------------
+    | PROPERTY ID
+    |--------------------------------------------------------------------------
+    */
+
+    const propertyId =
+      listing?.id;
+
+    if (
+      propertyId === null ||
+      propertyId === undefined
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Listing ID is required.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | PROPERTY PHOTOS
     |--------------------------------------------------------------------------
     */
 
-    const photos = Array.isArray(property_photos)
-      ? property_photos
-          .filter(
-            (photo: any) =>
-              typeof photo?.image_url === "string" &&
-              photo.image_url.trim() !== ""
-          )
-          .map(
-            (
-              photo: any,
-              index: number
-            ) => ({
-              index,
-              photo_type:
-                photo?.photo_type || "",
-              image_url:
-                photo.image_url,
-            })
-          )
-      : [];
+    const photos =
+      Array.isArray(
+        property_photos
+      )
+        ? property_photos
+            .filter(
+              (photo: any) =>
+                typeof photo?.image_url ===
+                  "string" &&
+                photo.image_url.trim() !==
+                  ""
+            )
+            .map(
+              (
+                photo: any,
+                index: number
+              ) => ({
+                index,
+                photo_type:
+                  photo?.photo_type ||
+                  "",
+                image_url:
+                  photo.image_url,
+              })
+            )
+        : [];
 
-    if (photos.length === 0) {
+    if (
+      photos.length === 0
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -376,7 +473,7 @@ export async function POST(request: Request) {
 
     /*
     |--------------------------------------------------------------------------
-    | LIMIT TO 16 PHOTOS
+    | LIMIT PHOTOS
     |--------------------------------------------------------------------------
     */
 
@@ -385,7 +482,7 @@ export async function POST(request: Request) {
 
     /*
     |--------------------------------------------------------------------------
-    | DOWNLOAD PHOTOS
+    | DOWNLOAD REAL PROPERTY PHOTOS
     |--------------------------------------------------------------------------
     */
 
@@ -412,16 +509,23 @@ export async function POST(request: Request) {
         )
       );
 
+    /*
+    |--------------------------------------------------------------------------
+    | USE MAXIMUM 9 PHOTOS
+    |--------------------------------------------------------------------------
+    */
+
     const usablePhotos =
-  downloadedPhotos
-    .filter(
-      (photo: any) =>
-        Buffer.isBuffer(
-          photo.buffer
+      downloadedPhotos
+        .filter(
+          (
+            photo: any
+          ) =>
+            Buffer.isBuffer(
+              photo.buffer
+            )
         )
-    )
-    .slice(0, 5);
-    
+        .slice(0, 9);
 
     console.log(
       "AI POSTER PHOTO DIAGNOSTIC:",
@@ -441,7 +545,9 @@ export async function POST(request: Request) {
       }
     );
 
-    if (usablePhotos.length === 0) {
+    if (
+      usablePhotos.length === 0
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -456,13 +562,8 @@ export async function POST(request: Request) {
 
     /*
     |--------------------------------------------------------------------------
-    | CONVERT BUFFERS INTO REAL MULTIPART FILES
+    | CONVERT TO REAL IMAGE FILES
     |--------------------------------------------------------------------------
-    |
-    | THIS IS THE IMPORTANT FIX.
-    |
-    | images.edit() requires actual uploaded files.
-    |
     */
 
     const imageFiles =
@@ -585,7 +686,7 @@ Generate the FINAL POSTER IMAGE.
 
     /*
     |--------------------------------------------------------------------------
-    | OPENAI IMAGE EDIT
+    | OPENAI IMAGE GENERATION
     |--------------------------------------------------------------------------
     */
 
@@ -599,17 +700,22 @@ Generate the FINAL POSTER IMAGE.
       await openai.images.edit({
         model: "gpt-image-2",
 
-        image: imageFiles,
+        image:
+          imageFiles,
 
         prompt,
 
-        size: "1024x1536",
+        size:
+          "1024x1536",
 
-        quality: "medium",
+        quality:
+          "medium",
 
-        background: "opaque",
+        background:
+          "opaque",
 
-        output_format: "png",
+        output_format:
+          "png",
       });
 
     /*
@@ -619,40 +725,213 @@ Generate the FINAL POSTER IMAGE.
     */
 
     const imageBase64 =
-  response.data?.[0]?.b64_json;
+      response.data?.[0]?.b64_json;
 
-if (!imageBase64) {
-  console.error(
-    "AI returned no image:",
-    JSON.stringify(
-      response,
-      null,
-      2
-    )
-  );
+    if (!imageBase64) {
+      console.error(
+        "AI returned no image:",
+        JSON.stringify(
+          response,
+          null,
+          2
+        )
+      );
 
-  return NextResponse.json(
-    {
-      success: false,
-      error:
-        "AI completed but did not return a poster image.",
-    },
-    {
-      status: 500,
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "AI completed but did not return a poster image.",
+        },
+        {
+          status: 500,
+        }
+      );
     }
-  );
-}
 
-/*
-|--------------------------------------------------------------------------
-| SAVE GENERATED POSTER
-|--------------------------------------------------------------------------
-*/
+    console.log(
+      "AI POSTER: image generated successfully."
+    );
 
-return NextResponse.json({
-  success: true,
-  image: `data:image/png;base64,${imageBase64}`,
-});
+    /*
+    |--------------------------------------------------------------------------
+    | CONVERT GENERATED IMAGE
+    |--------------------------------------------------------------------------
+    */
+
+    const imageBuffer =
+      Buffer.from(
+        imageBase64,
+        "base64"
+      );
+
+    /*
+    |--------------------------------------------------------------------------
+    | STORAGE FILE PATH
+    |--------------------------------------------------------------------------
+    */
+
+    const fileName =
+      `property-${propertyId}/ai-poster-${Date.now()}.png`;
+
+    console.log(
+      "AI POSTER: uploading to Supabase Storage:",
+      fileName
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPLOAD TO AI-DESIGNS BUCKET
+    |--------------------------------------------------------------------------
+    */
+
+    const {
+      error: uploadError,
+    } =
+      await supabaseAdmin.storage
+        .from("ai-designs")
+        .upload(
+          fileName,
+          imageBuffer,
+          {
+            contentType:
+              "image/png",
+
+            cacheControl:
+              "31536000",
+
+            upsert:
+              false,
+          }
+        );
+
+    if (uploadError) {
+      console.error(
+        "AI POSTER STORAGE UPLOAD ERROR:",
+        uploadError
+      );
+
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            `Failed to save AI poster to Supabase Storage: ${uploadError.message}`,
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | GET PUBLIC URL
+    |--------------------------------------------------------------------------
+    */
+
+    const {
+      data: publicUrlData,
+    } =
+      supabaseAdmin.storage
+        .from("ai-designs")
+        .getPublicUrl(
+          fileName
+        );
+
+    const imageUrl =
+      publicUrlData?.publicUrl;
+
+    if (!imageUrl) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "AI poster was uploaded but no public URL was generated.",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    console.log(
+      "AI POSTER STORAGE URL:",
+      imageUrl
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | SAVE DESIGN RECORD
+    |--------------------------------------------------------------------------
+    */
+
+    const {
+      data: design,
+      error: databaseError,
+    } =
+      await supabaseAdmin
+        .from("ai_designs")
+        .insert({
+          property_id:
+            propertyId,
+
+          design_type:
+            "property_poster",
+
+          image_url:
+            imageUrl,
+        })
+        .select()
+        .single();
+
+    if (databaseError) {
+      console.error(
+        "AI POSTER DATABASE ERROR:",
+        databaseError
+      );
+
+      /*
+       * Remove orphaned image if
+       * database insertion fails.
+       */
+
+      await supabaseAdmin.storage
+        .from("ai-designs")
+        .remove([
+          fileName,
+        ]);
+
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            `Poster uploaded but database record failed: ${databaseError.message}`,
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    console.log(
+      "AI POSTER SAVED:",
+      design
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | RETURN NORMAL URL
+    |--------------------------------------------------------------------------
+    */
+
+    return NextResponse.json({
+      success: true,
+
+      image:
+        imageUrl,
+
+      design,
+    });
 
   } catch (error: any) {
     console.error(

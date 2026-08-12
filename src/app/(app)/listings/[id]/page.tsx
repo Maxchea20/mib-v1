@@ -13,6 +13,7 @@ import AIFacebookContentButton from "@/components/ai/AIFacebookContentButton";
 import AIDescriptionButton from "@/components/ai/AIDescriptionButton";
 import AIHighlightsButton from "@/components/ai/AIHighlightsButton";
 import AIGeneratePropertyPosterButton from "@/components/ai/AIGeneratePropertyPosterButton";
+import AIDesignTab from "@/components/ai/AIDesignTab";
 
 type Props = {
   params: Promise<{
@@ -808,7 +809,14 @@ export default async function ListingProfilePage({
             category={listing.category}
           />
 
-        }
+          }
+
+        aiDesign={
+  <AIDesignTab
+    key={`ai-design-${listing.id}`}
+    listing={listing}
+  />
+}
 
       />
 
