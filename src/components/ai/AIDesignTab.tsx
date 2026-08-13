@@ -14,25 +14,59 @@ type AIDesign = {
   created_at: string;
 };
 
+type AIVideo = {
+  id: string;
+  property_id: number;
+  video_id: string;
+  status: string;
+  progress: number;
+  video_url?: string | null;
+  created_at: string;
+  completed_at?: string | null;
+  error_message?: string | null;
+};
+
 export default function AIDesignTab({
   listing,
 }: Props) {
+
   const [designs, setDesigns] =
     useState<AIDesign[]>([]);
 
-  const [loading, setLoading] =
-    useState(false);
+  const [videos, setVideos] =
+    useState<AIVideo[]>([]);
 
   const [loadingDesigns, setLoadingDesigns] =
     useState(true);
 
+  const [loadingVideos, setLoadingVideos] =
+    useState(true);
+
+  const [loadingPoster, setLoadingPoster] =
+    useState(false);
+
+  const [generatingVideo, setGeneratingVideo] =
+    useState(false);
+
+  const [deletingVideoId, setDeletingVideoId] =
+    useState<string | null>(null);
+
   const [error, setError] =
     useState("");
 
+  /*
+  |--------------------------------------------------------------------------
+  | LOAD DESIGNS
+  |--------------------------------------------------------------------------
+  */
+
   async function loadDesigns() {
+    if (!listing?.id) {
+      return;
+    }
+
     try {
       setLoadingDesigns(true);
-      setError("");
 
       const response =
         await fetch(
@@ -42,31 +76,20 @@ export default function AIDesignTab({
           }
         );
 
-      const responseText =
-  await response.text();
+      const data =
+        await response.json();
 
-let data: any = {};
+      if (
+        !response.ok ||
+        !data.success
+      ) {
+        throw new Error(
+          data.error ||
+            "Failed to load AI designs."
+        );
+      }
 
-if (responseText) {
-  try {
-    data = JSON.parse(responseText);
-  } catch {
-    throw new Error(
-      `Server returned an invalid response (${response.status}).`
-    );
-  }
-}
-
-if (
-  !response.ok ||
-  !data.success
-) {
-  throw new Error(
-    data.error ||
-      `Failed to delete AI design (${response.status}).`
-  );
-}
-            setDesigns(
+      setDesigns(
         data.designs || []
       );
 
@@ -86,19 +109,123 @@ if (
     }
   }
 
-  useEffect(() => {
-    if (listing?.id) {
-      loadDesigns();
-    }
-  }, [listing?.id]);
+  /*
+  |--------------------------------------------------------------------------
+  | LOAD VIDEOS
+  |--------------------------------------------------------------------------
+  */
 
-  async function generatePoster() {
-    if (!listing || loading) {
+  async function loadVideos() {
+    if (!listing?.id) {
       return;
     }
 
     try {
-      setLoading(true);
+      const response =
+        await fetch(
+          `/api/ai/property-video?property_id=${listing.id}`,
+          {
+            cache: "no-store",
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !data.success
+      ) {
+        throw new Error(
+          data.error ||
+            "Failed to load AI videos."
+        );
+      }
+
+      setVideos(
+        data.videos || []
+      );
+
+    } catch (error: any) {
+      console.error(
+        "AI VIDEO LOAD ERROR:",
+        error
+      );
+
+    } finally {
+      setLoadingVideos(false);
+    }
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | INITIAL LOAD
+  |--------------------------------------------------------------------------
+  */
+
+  useEffect(() => {
+    if (!listing?.id) {
+      return;
+    }
+
+    loadDesigns();
+    loadVideos();
+
+  }, [listing?.id]);
+
+  /*
+  |--------------------------------------------------------------------------
+  | AUTO POLLING
+  |--------------------------------------------------------------------------
+  */
+
+  useEffect(() => {
+    if (!listing?.id) {
+      return;
+    }
+
+    const hasProcessingVideo =
+      videos.some(
+        (video) =>
+          video.status === "queued" ||
+          video.status === "in_progress"
+      );
+
+    if (!hasProcessingVideo) {
+      return;
+    }
+
+    const timer =
+      setTimeout(() => {
+        loadVideos();
+      }, 10000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+
+  }, [
+    listing?.id,
+    videos,
+  ]);
+
+  /*
+  |--------------------------------------------------------------------------
+  | GENERATE POSTER
+  |--------------------------------------------------------------------------
+  */
+
+  async function generatePoster() {
+    if (
+      !listing ||
+      loadingPoster ||
+      generatingVideo
+    ) {
+      return;
+    }
+
+    try {
+      setLoadingPoster(true);
       setError("");
 
       const response =
@@ -131,19 +258,6 @@ if (
         );
       }
 
-      if (!data.image) {
-        throw new Error(
-          "AI did not return an image."
-        );
-      }
-
-      /*
-       * Poster has already been saved
-       * to Supabase by the API.
-       *
-       * Reload the saved designs.
-       */
-
       await loadDesigns();
 
     } catch (error: any) {
@@ -158,9 +272,220 @@ if (
       );
 
     } finally {
-      setLoading(false);
+      setLoadingPoster(false);
     }
   }
+
+  /*
+  |--------------------------------------------------------------------------
+  | GET FIRST PROPERTY PHOTO
+  |--------------------------------------------------------------------------
+  */
+
+  function getVideoPhotoUrl() {
+    const photos =
+      Array.isArray(
+        listing?.property_photos
+      )
+        ? listing.property_photos
+        : [];
+
+    const usablePhoto =
+      photos.find(
+        (photo: any) =>
+          typeof photo?.image_url ===
+            "string" &&
+          photo.image_url.trim() !== ""
+      );
+
+    return (
+      usablePhoto?.image_url ||
+      ""
+    );
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | GENERATE VIDEO
+  |--------------------------------------------------------------------------
+  */
+
+  async function generateVideo() {
+    if (
+      !listing ||
+      generatingVideo ||
+      loadingPoster
+    ) {
+      return;
+    }
+
+    try {
+      setGeneratingVideo(true);
+      setError("");
+
+      const imageUrl =
+        getVideoPhotoUrl();
+
+      if (!imageUrl) {
+        throw new Error(
+          "This property does not have a usable property photo."
+        );
+      }
+
+      const response =
+        await fetch(
+          "/api/ai/property-video",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              propertyId:
+                listing.id,
+
+              imageUrl:
+                imageUrl,
+            }),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !data.success
+      ) {
+        throw new Error(
+          data.error ||
+            "Failed to create AI video."
+        );
+      }
+
+      await loadVideos();
+
+    } catch (error: any) {
+      console.error(
+        "AI VIDEO ERROR:",
+        error
+      );
+
+      setError(
+        error?.message ||
+          "Failed to generate AI video."
+      );
+
+    } finally {
+      setGeneratingVideo(false);
+    }
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | DELETE VIDEO
+  |--------------------------------------------------------------------------
+  */
+
+  async function deleteVideo(
+    video: AIVideo
+  ) {
+    const confirmed =
+      window.confirm(
+        "Delete this AI video?\n\nThis will permanently delete the video from Supabase Storage and remove its database record.\n\nThis cannot be undone."
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setDeletingVideoId(
+        video.id
+      );
+
+      setError("");
+
+      console.log(
+        "AI VIDEO DELETE:",
+        video.id
+      );
+
+      const response =
+        await fetch(
+          "/api/ai/property-video",
+          {
+            method: "DELETE",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              id: video.id,
+            }),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !data.success
+      ) {
+        throw new Error(
+          data.error ||
+            "Failed to delete AI video."
+        );
+      }
+
+      /*
+      |--------------------------------------------------------------------------
+      | REMOVE FROM UI IMMEDIATELY
+      |--------------------------------------------------------------------------
+      */
+
+      setVideos(
+        (current) =>
+          current.filter(
+            (item) =>
+              item.id !==
+              video.id
+          )
+      );
+
+      console.log(
+        "AI VIDEO DELETE: SUCCESS"
+      );
+
+    } catch (error: any) {
+      console.error(
+        "AI VIDEO DELETE ERROR:",
+        error
+      );
+
+      setError(
+        error?.message ||
+          "Failed to delete AI video."
+      );
+
+    } finally {
+      setDeletingVideoId(
+        null
+      );
+    }
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | DOWNLOAD POSTER
+  |--------------------------------------------------------------------------
+  */
 
   function downloadPoster(
     imageUrl: string,
@@ -169,12 +494,14 @@ if (
     const link =
       document.createElement("a");
 
-    link.href = imageUrl;
+    link.href =
+      imageUrl;
 
     link.download =
       `${listing?.title || "property"}-AI-poster-${index + 1}.png`;
 
-    link.target = "_blank";
+    link.target =
+      "_blank";
 
     document.body.appendChild(
       link
@@ -185,79 +512,91 @@ if (
     link.remove();
   }
 
+  /*
+  |--------------------------------------------------------------------------
+  | DELETE DESIGN
+  |--------------------------------------------------------------------------
+  */
+
   async function deleteDesign(
-  designId: string
-) {
-  const confirmed =
-    window.confirm(
-      "Delete this AI design?\n\nThe poster will be permanently removed."
-    );
-
-  if (!confirmed) {
-    return;
-  }
-
-  try {
-    setError("");
-
-    const response =
-      await fetch(
-        "/api/ai/property-designs",
-        {
-          method: "DELETE",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-
-          body: JSON.stringify({
-            id: designId,
-          }),
-        }
+    designId: string
+  ) {
+    const confirmed =
+      window.confirm(
+        "Delete this AI design?\n\nThe poster will be permanently removed."
       );
 
-    const data =
-      await response.json();
+    if (!confirmed) {
+      return;
+    }
 
-    if (
-      !response.ok ||
-      !data.success
-    ) {
-      throw new Error(
-        data.error ||
+    try {
+      setError("");
+
+      const response =
+        await fetch(
+          "/api/ai/property-designs",
+          {
+            method: "DELETE",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              id: designId,
+            }),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !data.success
+      ) {
+        throw new Error(
+          data.error ||
+            "Failed to delete AI design."
+        );
+      }
+
+      setDesigns(
+        (current) =>
+          current.filter(
+            (design) =>
+              design.id !==
+              designId
+          )
+      );
+
+    } catch (error: any) {
+      console.error(
+        "AI DESIGN DELETE ERROR:",
+        error
+      );
+
+      setError(
+        error?.message ||
           "Failed to delete AI design."
       );
     }
-
-    setDesigns(
-      (current) =>
-        current.filter(
-          (design) =>
-            design.id !==
-            designId
-        )
-    );
-
-  } catch (error: any) {
-    console.error(
-      "AI DESIGN DELETE ERROR:",
-      error
-    );
-
-    setError(
-      error?.message ||
-        "Failed to delete AI design."
-    );
   }
-}
+
+  /*
+  |--------------------------------------------------------------------------
+  | UI
+  |--------------------------------------------------------------------------
+  */
 
   return (
     <div className="space-y-6">
 
-      {/* ================================= */}
-      {/* AI DESIGN HEADER */}
-      {/* ================================= */}
+      {/* ===================================================== */}
+      {/* HEADER */}
+      {/* ===================================================== */}
 
       <div className="bg-white border rounded-xl shadow-sm p-6">
 
@@ -271,27 +610,54 @@ if (
 
             <p className="text-sm text-gray-500 mt-1">
               AI-generated marketing designs
-              for this property.
+              and videos for this property.
             </p>
 
           </div>
 
-          <button
-            type="button"
-            onClick={generatePoster}
-            disabled={loading}
-            className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-5 py-3 rounded-lg font-semibold"
-          >
-            {loading
-              ? "🎨 AI Designing..."
-              : "🎨 Generate AI Poster"}
-          </button>
+          <div className="flex flex-wrap gap-3">
+
+            <button
+              type="button"
+              onClick={
+                generatePoster
+              }
+              disabled={
+                loadingPoster ||
+                generatingVideo
+              }
+              className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-5 py-3 rounded-lg font-semibold"
+            >
+              {loadingPoster
+                ? "🎨 AI Designing..."
+                : "🎨 Generate AI Poster"}
+            </button>
+
+            <button
+              type="button"
+              onClick={
+                generateVideo
+              }
+              disabled={
+                generatingVideo ||
+                loadingPoster
+              }
+              className="bg-black hover:bg-gray-800 disabled:bg-gray-400 text-white px-5 py-3 rounded-lg font-semibold"
+            >
+              {generatingVideo
+                ? "🎬 Creating Video..."
+                : "🎬 Generate AI Video"}
+            </button>
+
+          </div>
 
         </div>
 
-        {/* LOADING MESSAGE */}
+        {/* ================================================= */}
+        {/* POSTER LOADING */}
+        {/* ================================================= */}
 
-        {loading ? (
+        {loadingPoster ? (
           <div className="mt-5 p-4 rounded-lg bg-purple-50 border border-purple-200">
 
             <p className="text-sm font-semibold text-purple-800">
@@ -301,13 +667,33 @@ if (
             <p className="text-xs text-purple-600 mt-1">
               Studying the listing information
               and actual property photographs.
-              This may take about 1–2 minutes.
             </p>
 
           </div>
         ) : null}
 
+        {/* ================================================= */}
+        {/* VIDEO LOADING */}
+        {/* ================================================= */}
+
+        {generatingVideo ? (
+          <div className="mt-5 p-4 rounded-lg bg-gray-50 border border-gray-200">
+
+            <p className="text-sm font-semibold text-gray-800">
+              🎬 AI is creating the property video...
+            </p>
+
+            <p className="text-xs text-gray-600 mt-1">
+              MIB is sending the property photo
+              to Sora.
+            </p>
+
+          </div>
+        ) : null}
+
+        {/* ================================================= */}
         {/* ERROR */}
+        {/* ================================================= */}
 
         {error ? (
           <div className="mt-4 p-4 rounded-lg border border-red-300 bg-red-50 text-red-700 text-sm">
@@ -317,9 +703,213 @@ if (
 
       </div>
 
-      {/* ================================= */}
-      {/* GENERATED DESIGNS */}
-      {/* ================================= */}
+      {/* ===================================================== */}
+      {/* VIDEOS */}
+      {/* ===================================================== */}
+
+      <div>
+
+        <div className="flex items-center justify-between mb-4">
+
+          <h3 className="text-lg font-bold text-black">
+            🎬 Generated Videos
+          </h3>
+
+          {videos.length > 0 ? (
+            <span className="text-sm text-gray-500">
+              {videos.length} video
+              {videos.length !== 1
+                ? "s"
+                : ""}
+            </span>
+          ) : null}
+
+        </div>
+
+        {loadingVideos ? (
+
+          <div className="bg-white border rounded-xl p-8 text-center text-gray-500">
+            Loading AI videos...
+          </div>
+
+        ) : videos.length === 0 ? (
+
+          <div className="bg-white border rounded-xl p-10 text-center">
+
+            <div className="text-4xl mb-3">
+              🎬
+            </div>
+
+            <h3 className="font-bold text-lg text-black">
+              No AI videos yet
+            </h3>
+
+            <p className="text-sm text-gray-500 mt-2">
+              Generate the first AI video
+              for this property.
+            </p>
+
+          </div>
+
+        ) : (
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+            {videos.map(
+              (video) => (
+
+                <div
+                  key={
+                    video.id
+                  }
+                  className="bg-white border rounded-xl shadow-sm overflow-hidden"
+                >
+
+                  {/* ================================================= */}
+                  {/* VIDEO */}
+                  {/* ================================================= */}
+
+                  {video.video_url ? (
+
+                    <div className="bg-black">
+
+                      <video
+                        src={
+                          video.video_url
+                        }
+                        controls
+                        playsInline
+                        className="w-full h-auto"
+                      />
+
+                    </div>
+
+                  ) : (
+
+                    <div className="bg-gray-100 p-10 text-center">
+
+                      <div className="text-4xl mb-3">
+                        🎬
+                      </div>
+
+                      <p className="font-semibold text-black">
+                        {video.status ===
+                        "queued"
+                          ? "Video Queued"
+                          : video.status ===
+                            "in_progress"
+                          ? "Video Generating"
+                          : video.status}
+                      </p>
+
+                      <p className="text-sm text-gray-500 mt-2">
+                        {video.progress ??
+                          0}
+                        %
+                      </p>
+
+                      <div className="w-full bg-gray-300 rounded-full h-2 mt-3 overflow-hidden">
+
+                        <div
+                          className="bg-black h-2 rounded-full transition-all duration-500"
+                          style={{
+                            width: `${Math.min(
+                              video.progress ??
+                                0,
+                              100
+                            )}%`,
+                          }}
+                        />
+
+                      </div>
+
+                      <p className="text-xs text-gray-400 mt-3">
+                        MIB is automatically
+                        checking the video.
+                      </p>
+
+                    </div>
+
+                  )}
+
+                  {/* ================================================= */}
+                  {/* VIDEO FOOTER */}
+                  {/* ================================================= */}
+
+                  <div className="p-4">
+
+                    <div className="flex items-start justify-between gap-3">
+
+                      <div>
+
+                        <p className="font-semibold text-black">
+                          AI Property Video
+                        </p>
+
+                        <p className="text-xs text-gray-500 mt-1">
+                          {new Date(
+                            video.created_at
+                          ).toLocaleString()}
+                        </p>
+
+                      </div>
+
+                      {/* DELETE VIDEO */}
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          deleteVideo(
+                            video
+                          )
+                        }
+                        disabled={
+                          deletingVideoId ===
+                          video.id
+                        }
+                        className="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white text-sm font-medium whitespace-nowrap"
+                      >
+                        {deletingVideoId ===
+                        video.id
+                          ? "Deleting..."
+                          : "🗑 Delete"}
+                      </button>
+
+                    </div>
+
+                    {/* DOWNLOAD */}
+
+                    {video.video_url ? (
+
+                      <a
+                        href={
+                          video.video_url
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block mt-4 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium"
+                      >
+                        ⬇ Download Video
+                      </a>
+
+                    ) : null}
+
+                  </div>
+
+                </div>
+
+              )
+            )}
+
+          </div>
+
+        )}
+
+      </div>
+
+      {/* ===================================================== */}
+      {/* POSTERS */}
+      {/* ===================================================== */}
 
       <div>
 
@@ -340,8 +930,6 @@ if (
 
         </div>
 
-        {/* LOADING */}
-
         {loadingDesigns ? (
 
           <div className="bg-white border rounded-xl p-10 text-center text-gray-500">
@@ -349,8 +937,6 @@ if (
           </div>
 
         ) : designs.length === 0 ? (
-
-          /* EMPTY STATE */
 
           <div className="bg-white border rounded-xl p-12 text-center">
 
@@ -371,8 +957,6 @@ if (
 
         ) : (
 
-          /* DESIGN GRID */
-
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 
             {designs.map(
@@ -382,23 +966,23 @@ if (
               ) => (
 
                 <div
-                  key={design.id}
+                  key={
+                    design.id
+                  }
                   className="bg-white border rounded-xl shadow-sm overflow-hidden"
                 >
-
-                  {/* POSTER */}
 
                   <div className="bg-gray-100">
 
                     <img
-                      src={design.image_url}
+                      src={
+                        design.image_url
+                      }
                       alt={`AI property poster ${index + 1}`}
                       className="w-full h-auto block"
                     />
 
                   </div>
-
-                  {/* FOOTER */}
 
                   <div className="p-4">
 
@@ -420,32 +1004,32 @@ if (
 
                       <div className="flex items-center gap-2">
 
-  <button
-    type="button"
-    onClick={() =>
-      downloadPoster(
-        design.image_url,
-        index
-      )
-    }
-    className="px-3 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium whitespace-nowrap"
-  >
-    ⬇ Download
-  </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            downloadPoster(
+                              design.image_url,
+                              index
+                            )
+                          }
+                          className="px-3 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium whitespace-nowrap"
+                        >
+                          ⬇ Download
+                        </button>
 
-  <button
-    type="button"
-    onClick={() =>
-      deleteDesign(
-        design.id
-      )
-    }
-    className="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium whitespace-nowrap"
-  >
-    🗑 Delete
-  </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            deleteDesign(
+                              design.id
+                            )
+                          }
+                          className="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium whitespace-nowrap"
+                        >
+                          🗑 Delete
+                        </button>
 
-</div>
+                      </div>
 
                     </div>
 
