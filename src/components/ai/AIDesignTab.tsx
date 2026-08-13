@@ -42,20 +42,31 @@ export default function AIDesignTab({
           }
         );
 
-      const data =
-        await response.json();
+      const responseText =
+  await response.text();
 
-      if (
-        !response.ok ||
-        !data.success
-      ) {
-        throw new Error(
-          data.error ||
-            "Failed to load AI designs."
-        );
-      }
+let data: any = {};
 
-      setDesigns(
+if (responseText) {
+  try {
+    data = JSON.parse(responseText);
+  } catch {
+    throw new Error(
+      `Server returned an invalid response (${response.status}).`
+    );
+  }
+}
+
+if (
+  !response.ok ||
+  !data.success
+) {
+  throw new Error(
+    data.error ||
+      `Failed to delete AI design (${response.status}).`
+  );
+}
+            setDesigns(
         data.designs || []
       );
 
@@ -173,6 +184,73 @@ export default function AIDesignTab({
 
     link.remove();
   }
+
+  async function deleteDesign(
+  designId: string
+) {
+  const confirmed =
+    window.confirm(
+      "Delete this AI design?\n\nThe poster will be permanently removed."
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    setError("");
+
+    const response =
+      await fetch(
+        "/api/ai/property-designs",
+        {
+          method: "DELETE",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            id: designId,
+          }),
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+      throw new Error(
+        data.error ||
+          "Failed to delete AI design."
+      );
+    }
+
+    setDesigns(
+      (current) =>
+        current.filter(
+          (design) =>
+            design.id !==
+            designId
+        )
+    );
+
+  } catch (error: any) {
+    console.error(
+      "AI DESIGN DELETE ERROR:",
+      error
+    );
+
+    setError(
+      error?.message ||
+        "Failed to delete AI design."
+    );
+  }
+}
 
   return (
     <div className="space-y-6">
@@ -340,18 +418,34 @@ export default function AIDesignTab({
 
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() =>
-                          downloadPoster(
-                            design.image_url,
-                            index
-                          )
-                        }
-                        className="px-3 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium whitespace-nowrap"
-                      >
-                        ⬇ Download
-                      </button>
+                      <div className="flex items-center gap-2">
+
+  <button
+    type="button"
+    onClick={() =>
+      downloadPoster(
+        design.image_url,
+        index
+      )
+    }
+    className="px-3 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium whitespace-nowrap"
+  >
+    ⬇ Download
+  </button>
+
+  <button
+    type="button"
+    onClick={() =>
+      deleteDesign(
+        design.id
+      )
+    }
+    className="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium whitespace-nowrap"
+  >
+    🗑 Delete
+  </button>
+
+</div>
 
                     </div>
 

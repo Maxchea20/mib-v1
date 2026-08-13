@@ -2,15 +2,17 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import MatchedListings from "@/components/dashboard/MatchedListings";
 
 export default async function DashboardPage() {
 
   const [
-    contactsResult,
-    listingsResult,
-    buyersResult,
-    draftResult,
-  ] = await Promise.all([
+  contactsResult,
+  listingsResult,
+  buyersResult,
+  draftResult,
+  dealsResult,
+] = await Promise.all([
 
     supabase
       .from("buyers")
@@ -30,6 +32,11 @@ export default async function DashboardPage() {
       .select("*", { count: "exact", head: true })
       .eq("status", "Draft"),
 
+      supabase
+  .from("deals")
+  .select("*")
+  .eq("year", 2026),
+
   ]);
 
   const totalContacts =
@@ -43,6 +50,46 @@ export default async function DashboardPage() {
 
   const draftListings =
     draftResult.count ?? 0;
+
+    const salesTarget = 200000;
+
+const grossCommission =
+  (dealsResult.data ?? []).reduce(
+    (sum, deal) => {
+      const gross = Number(
+        deal.gross_commission
+      );
+
+      if (!isNaN(gross) && gross > 0) {
+        return sum + gross;
+      }
+
+      const sellingPrice =
+        Number(deal.selling_price) || 0;
+
+      const commissionRate =
+        Number(deal.commission_rate) || 0;
+
+      return (
+        sum +
+        (sellingPrice * commissionRate) / 100
+      );
+    },
+    0
+  );
+
+const remainingToTarget = Math.max(
+  salesTarget - grossCommission,
+  0
+);
+
+const targetProgress =
+  salesTarget > 0
+    ? Math.min(
+        (grossCommission / salesTarget) * 100,
+        100
+      )
+    : 0;
 
   const { data: recentContacts } =
     await supabase
@@ -96,6 +143,8 @@ export default async function DashboardPage() {
 
         </div>
 
+        
+
         <div className="bg-white rounded-xl shadow p-6">
 
           <p className="text-gray-500 text-sm">
@@ -133,6 +182,76 @@ export default async function DashboardPage() {
         </div>
 
       </div>
+
+      {/* Sales Performance */}
+
+<div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+
+  <div className="bg-white rounded-xl shadow p-6">
+
+    <p className="text-gray-500 text-sm">
+      2026 Gross Commission
+    </p>
+
+    <h2 className="text-2xl font-bold text-black mt-2">
+      RM{" "}
+      {grossCommission.toLocaleString("en-MY", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}
+    </h2>
+
+  </div>
+
+  <div className="bg-white rounded-xl shadow p-6">
+
+    <p className="text-gray-500 text-sm">
+      2026 Target
+    </p>
+
+    <h2 className="text-2xl font-bold text-black mt-2">
+      RM{" "}
+      {salesTarget.toLocaleString("en-MY", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}
+    </h2>
+
+  </div>
+
+  <div className="bg-white rounded-xl shadow p-6">
+
+    <p className="text-gray-500 text-sm">
+      Remaining to Target
+    </p>
+
+    <h2 className="text-2xl font-bold text-black mt-2">
+      RM{" "}
+      {remainingToTarget.toLocaleString("en-MY", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}
+    </h2>
+
+  </div>
+
+  <div className="bg-white rounded-xl shadow p-6">
+
+    <p className="text-gray-500 text-sm">
+      Target Progress
+    </p>
+
+    <h2 className="text-2xl font-bold text-black mt-2">
+      {targetProgress.toFixed(1)}%
+    </h2>
+
+  </div>
+
+</div>
+
+{/* Matched Listings & Buyers */}
+
+<MatchedListings />
 
       {/* Recent */}
 

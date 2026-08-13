@@ -706,7 +706,7 @@ Generate the FINAL POSTER IMAGE.
         prompt,
 
         size:
-          "1024x1536",
+          "1280x960",
 
         quality:
           "medium",
