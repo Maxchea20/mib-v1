@@ -14,6 +14,7 @@ import AIDescriptionButton from "@/components/ai/AIDescriptionButton";
 import AIHighlightsButton from "@/components/ai/AIHighlightsButton";
 import AIGeneratePropertyPosterButton from "@/components/ai/AIGeneratePropertyPosterButton";
 import AIDesignTab from "@/components/ai/AIDesignTab";
+import AIVideoTab from "@/components/ai/AIVideoTab";
 
 type Props = {
   params: Promise<{
@@ -818,7 +819,16 @@ export default async function ListingProfilePage({
   />
 }
 
-      />
+ aiVideo={
+
+          <AIVideoTab
+            key={`ai-video-${listing.id}`}
+            listing={listing}
+          />
+
+        }
+
+           />
 
       {/* ================================= */}
       {/* MATCHING BUYERS */}

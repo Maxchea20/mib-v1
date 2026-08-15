@@ -6,15 +6,17 @@ type Props = {
   details: React.ReactNode;
   gallery: React.ReactNode;
   aiDesign: React.ReactNode;
+  aiVideo: React.ReactNode;
 };
 
 export default function ListingTabs({
   details,
   gallery,
   aiDesign,
+  aiVideo,
 }: Props) {
   const [tab, setTab] = useState<
-    "details" | "gallery" | "ai"
+    "details" | "gallery" | "ai" | "video"
   >("details");
 
   return (
@@ -32,9 +34,7 @@ export default function ListingTabs({
 
           <button
             type="button"
-            onClick={() =>
-              setTab("details")
-            }
+            onClick={() => setTab("details")}
             className={`px-8 py-4 font-semibold transition-all border-b-4 whitespace-nowrap ${
               tab === "details"
                 ? "border-blue-600 text-blue-600 bg-blue-50"
@@ -44,13 +44,12 @@ export default function ListingTabs({
             📋 Property Details
           </button>
 
+
           {/* PROPERTY GALLERY */}
 
           <button
             type="button"
-            onClick={() =>
-              setTab("gallery")
-            }
+            onClick={() => setTab("gallery")}
             className={`px-8 py-4 font-semibold transition-all border-b-4 whitespace-nowrap ${
               tab === "gallery"
                 ? "border-blue-600 text-blue-600 bg-blue-50"
@@ -60,13 +59,12 @@ export default function ListingTabs({
             📷 Property Gallery
           </button>
 
+
           {/* AI DESIGN */}
 
           <button
             type="button"
-            onClick={() =>
-              setTab("ai")
-            }
+            onClick={() => setTab("ai")}
             className={`px-8 py-4 font-semibold transition-all border-b-4 whitespace-nowrap ${
               tab === "ai"
                 ? "border-purple-600 text-purple-600 bg-purple-50"
@@ -76,9 +74,25 @@ export default function ListingTabs({
             🎨 AI Design
           </button>
 
+
+          {/* AI VIDEO */}
+
+          <button
+            type="button"
+            onClick={() => setTab("video")}
+            className={`px-8 py-4 font-semibold transition-all border-b-4 whitespace-nowrap ${
+              tab === "video"
+                ? "border-red-600 text-red-600 bg-red-50"
+                : "border-transparent text-gray-500 hover:bg-gray-50"
+            }`}
+          >
+            🎬 AI Video
+          </button>
+
         </div>
 
       </div>
+
 
       {/* ================================= */}
       {/* TAB CONTENT */}
@@ -89,6 +103,8 @@ export default function ListingTabs({
       {tab === "gallery" && gallery}
 
       {tab === "ai" && aiDesign}
+
+      {tab === "video" && aiVideo}
 
     </div>
   );

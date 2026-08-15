@@ -1,4 +1,5 @@
 import OpenAI, { toFile } from "openai";
+import RunwayML from "@runwayml/sdk";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import sharp from "sharp";
@@ -11,6 +12,16 @@ import sharp from "sharp";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+});
+
+/*
+|--------------------------------------------------------------------------
+| RUNWAY
+|--------------------------------------------------------------------------
+*/
+
+const runway = new RunwayML({
+  apiKey: process.env.RUNWAYML_API_SECRET,
 });
 
 /*
@@ -997,6 +1008,12 @@ export async function POST(
 |--------------------------------------------------------------------------
 */
 
+/*
+|--------------------------------------------------------------------------
+| GET — CHECK RUNWAY STATUS / DOWNLOAD / SAVE VIDEO
+|--------------------------------------------------------------------------
+*/
+
 export async function GET(
   request: Request
 ) {
@@ -1076,7 +1093,7 @@ export async function GET(
 
     /*
     |--------------------------------------------------------------------------
-    | CHECK SORA JOBS
+    | CHECK RUNWAY TASKS
     |--------------------------------------------------------------------------
     */
 
@@ -1106,28 +1123,32 @@ export async function GET(
 
       try {
         console.log(
-          "AI VIDEO: checking Sora job:",
+          "=================================================="
+        );
+
+        console.log(
+          "AI VIDEO: checking Runway task:",
           record.video_id
         );
 
-        const soraVideo =
-          await openai.videos.retrieve(
+        /*
+        |--------------------------------------------------------------------------
+        | RETRIEVE RUNWAY TASK
+        |--------------------------------------------------------------------------
+        */
+
+        const runwayTask =
+          await runway.tasks.retrieve(
             record.video_id
           );
 
-        const status =
-          soraVideo.status ||
-          "queued";
-
-        const progress =
-          soraVideo.progress ??
-          0;
+        const runwayStatus =
+          runwayTask.status;
 
         console.log(
-          "AI VIDEO STATUS:",
+          "AI VIDEO RUNWAY STATUS:",
           record.video_id,
-          status,
-          progress
+          runwayStatus
         );
 
         /*
@@ -1137,11 +1158,24 @@ export async function GET(
         */
 
         if (
-          status === "failed"
+          runwayStatus ===
+          "FAILED"
         ) {
-          const errorMessage =
-            soraVideo.error?.message ||
-            "Sora video generation failed.";
+          const failureCode =
+            (runwayTask as any)
+              ?.failureCode;
+
+          const failureMessage =
+            (runwayTask as any)
+              ?.failure ||
+            failureCode ||
+            "Runway video generation failed.";
+
+          console.error(
+            "AI VIDEO RUNWAY FAILED:",
+            record.video_id,
+            failureMessage
+          );
 
           await supabaseAdmin
             .from("ai_videos")
@@ -1150,7 +1184,62 @@ export async function GET(
                 "failed",
 
               progress:
-                progress,
+                0,
+
+              error_message:
+                String(
+                  failureMessage
+                ),
+            })
+            .eq(
+              "id",
+              record.id
+            );
+
+          updatedVideos.push({
+            ...record,
+
+            status:
+              "failed",
+
+            progress:
+              0,
+
+            error_message:
+              String(
+                failureMessage
+              ),
+          });
+
+          continue;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | CANCELED
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+          runwayStatus ===
+          "CANCELLED"
+        ) {
+          const errorMessage =
+            "Runway video generation was canceled.";
+
+          console.error(
+            "AI VIDEO RUNWAY CANCELED:",
+            record.video_id
+          );
+
+          await supabaseAdmin
+            .from("ai_videos")
+            .update({
+              status:
+                "failed",
+
+              progress:
+                0,
 
               error_message:
                 errorMessage,
@@ -1166,7 +1255,8 @@ export async function GET(
             status:
               "failed",
 
-            progress,
+            progress:
+              0,
 
             error_message:
               errorMessage,
@@ -1182,22 +1272,50 @@ export async function GET(
         */
 
         if (
-          status ===
-          "completed"
+          runwayStatus ===
+          "SUCCEEDED"
         ) {
           console.log(
-            "AI VIDEO: Sora completed:",
+            "AI VIDEO: Runway completed:",
             record.video_id
           );
 
+          const outputUrl =
+            (runwayTask as any)
+              ?.output?.[0];
+
+          if (!outputUrl) {
+            throw new Error(
+              "Runway task completed but no output video URL was returned."
+            );
+          }
+
           console.log(
-            "AI VIDEO: downloading MP4 from OpenAI..."
+            "AI VIDEO: Runway output URL received."
+          );
+
+          /*
+          |--------------------------------------------------------------------------
+          | DOWNLOAD MP4 FROM RUNWAY
+          |--------------------------------------------------------------------------
+          */
+
+          console.log(
+            "AI VIDEO: downloading MP4 from Runway..."
           );
 
           const videoResponse =
-            await openai.videos.downloadContent(
-              record.video_id
+            await fetch(
+              outputUrl
             );
+
+          if (
+            !videoResponse.ok
+          ) {
+            throw new Error(
+              `Failed to download Runway video (${videoResponse.status}).`
+            );
+          }
 
           const videoArrayBuffer =
             await videoResponse.arrayBuffer();
@@ -1228,12 +1346,13 @@ export async function GET(
           );
 
           const {
-            error:
-              uploadError,
+            error: uploadError,
           } =
             await supabaseAdmin
               .storage
-              .from("ai-videos")
+              .from(
+                "ai-videos"
+              )
               .upload(
                 fileName,
                 videoBuffer,
@@ -1258,7 +1377,9 @@ export async function GET(
             );
 
             await supabaseAdmin
-              .from("ai_videos")
+              .from(
+                "ai_videos"
+              )
               .update({
                 status:
                   "completed",
@@ -1302,13 +1423,16 @@ export async function GET(
           } =
             supabaseAdmin
               .storage
-              .from("ai-videos")
+              .from(
+                "ai-videos"
+              )
               .getPublicUrl(
                 fileName
               );
 
           const videoUrl =
-            publicUrlData?.publicUrl;
+            publicUrlData
+              ?.publicUrl;
 
           if (!videoUrl) {
             throw new Error(
@@ -1334,7 +1458,9 @@ export async function GET(
               updateError,
           } =
             await supabaseAdmin
-              .from("ai_videos")
+              .from(
+                "ai_videos"
+              )
               .update({
                 status:
                   "completed",
@@ -1346,7 +1472,8 @@ export async function GET(
                   videoUrl,
 
                 completed_at:
-                  new Date().toISOString(),
+                  new Date()
+                    .toISOString(),
 
                 error_message:
                   null,
@@ -1367,7 +1494,7 @@ export async function GET(
           }
 
           console.log(
-            "AI VIDEO: SAVED SUCCESSFULLY"
+            "AI VIDEO: RUNWAY VIDEO SAVED SUCCESSFULLY"
           );
 
           updatedVideos.push(
@@ -1381,16 +1508,44 @@ export async function GET(
         |--------------------------------------------------------------------------
         | STILL PROCESSING
         |--------------------------------------------------------------------------
+        |
+        | Runway uses:
+        |
+        | PENDING
+        | RUNNING
+        |
+        | We map both into MIB's existing
+        | processing state.
+        |
         */
+
+        let mappedStatus =
+          "processing";
+
+        if (
+          runwayStatus ===
+          "PENDING"
+        ) {
+          mappedStatus =
+            "queued";
+        }
+
+        if (
+          runwayStatus ===
+          "RUNNING"
+        ) {
+          mappedStatus =
+            "processing";
+        }
 
         await supabaseAdmin
           .from("ai_videos")
           .update({
             status:
-              status,
+              mappedStatus,
 
             progress:
-              progress,
+              0,
           })
           .eq(
             "id",
@@ -1400,23 +1555,28 @@ export async function GET(
         updatedVideos.push({
           ...record,
 
-          status,
+          status:
+            mappedStatus,
 
-          progress,
+          progress:
+            0,
         });
 
-      } catch (soraError: any) {
+      } catch (
+        runwayError: any
+      ) {
         console.error(
-          "AI VIDEO SORA CHECK ERROR:",
-          soraError
+          "AI VIDEO RUNWAY CHECK ERROR:",
+          runwayError
         );
 
         updatedVideos.push({
           ...record,
 
           error_message:
-            soraError?.message ||
-            "Failed to check Sora video.",
+            runwayError
+              ?.message ||
+            "Failed to check Runway video.",
         });
       }
     }
@@ -1434,7 +1594,9 @@ export async function GET(
         updatedVideos,
     });
 
-  } catch (error: any) {
+  } catch (
+    error: any
+  ) {
     console.error(
       "AI PROPERTY VIDEO GET ERROR:",
       error
