@@ -19,78 +19,93 @@ export default function ListingTabs({
     "details" | "gallery" | "ai" | "video"
   >("details");
 
+  const tabs = [
+    {
+      id: "details" as const,
+      label: "Property Details",
+      icon: "📋",
+      active: "border-blue-600 text-blue-600 bg-blue-50",
+    },
+    {
+      id: "gallery" as const,
+      label: "Property Gallery",
+      icon: "📷",
+      active: "border-blue-600 text-blue-600 bg-blue-50",
+    },
+    {
+      id: "ai" as const,
+      label: "AI Design",
+      icon: "🎨",
+      active: "border-purple-600 text-purple-600 bg-purple-50",
+    },
+    {
+      id: "video" as const,
+      label: "AI Video",
+      icon: "🎬",
+      active: "border-red-600 text-red-600 bg-red-50",
+    },
+  ];
+
   return (
-    <div>
+    <div className="w-full min-w-0 max-w-full overflow-hidden">
 
       {/* ================================= */}
       {/* TAB NAVIGATION */}
       {/* ================================= */}
 
-      <div className="bg-white rounded-xl shadow border mb-6">
+      <div className="w-full min-w-0 max-w-full bg-white rounded-xl shadow border mb-4 sm:mb-6 overflow-hidden">
 
-        <div className="flex overflow-x-auto">
+        <div className="grid grid-cols-4 w-full min-w-0">
 
-          {/* PROPERTY DETAILS */}
+          {tabs.map((item) => {
+            const active = tab === item.id;
 
-          <button
-            type="button"
-            onClick={() => setTab("details")}
-            className={`px-8 py-4 font-semibold transition-all border-b-4 whitespace-nowrap ${
-              tab === "details"
-                ? "border-blue-600 text-blue-600 bg-blue-50"
-                : "border-transparent text-gray-500 hover:bg-gray-50"
-            }`}
-          >
-            📋 Property Details
-          </button>
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setTab(item.id)}
+                className={`
+                  min-w-0
+                  w-full
+                  px-1
+                  sm:px-3
+                  md:px-6
+                  py-3
+                  sm:py-4
+                  font-semibold
+                  text-[10px]
+                  sm:text-xs
+                  md:text-sm
+                  leading-tight
+                  transition-all
+                  border-b-4
+                  flex
+                  items-center
+                  justify-center
+                  gap-1
+                  sm:gap-2
+                  text-center
+                  break-words
+                  ${
+                    active
+                      ? item.active
+                      : "border-transparent text-gray-500 hover:bg-gray-50"
+                  }
+                `}
+              >
+                <span className="shrink-0">
+                  {item.icon}
+                </span>
 
-
-          {/* PROPERTY GALLERY */}
-
-          <button
-            type="button"
-            onClick={() => setTab("gallery")}
-            className={`px-8 py-4 font-semibold transition-all border-b-4 whitespace-nowrap ${
-              tab === "gallery"
-                ? "border-blue-600 text-blue-600 bg-blue-50"
-                : "border-transparent text-gray-500 hover:bg-gray-50"
-            }`}
-          >
-            📷 Property Gallery
-          </button>
-
-
-          {/* AI DESIGN */}
-
-          <button
-            type="button"
-            onClick={() => setTab("ai")}
-            className={`px-8 py-4 font-semibold transition-all border-b-4 whitespace-nowrap ${
-              tab === "ai"
-                ? "border-purple-600 text-purple-600 bg-purple-50"
-                : "border-transparent text-gray-500 hover:bg-gray-50"
-            }`}
-          >
-            🎨 AI Design
-          </button>
-
-
-          {/* AI VIDEO */}
-
-          <button
-            type="button"
-            onClick={() => setTab("video")}
-            className={`px-8 py-4 font-semibold transition-all border-b-4 whitespace-nowrap ${
-              tab === "video"
-                ? "border-red-600 text-red-600 bg-red-50"
-                : "border-transparent text-gray-500 hover:bg-gray-50"
-            }`}
-          >
-            🎬 AI Video
-          </button>
+                <span className="min-w-0">
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
 
         </div>
-
       </div>
 
 
@@ -98,13 +113,17 @@ export default function ListingTabs({
       {/* TAB CONTENT */}
       {/* ================================= */}
 
-      {tab === "details" && details}
+      <div className="w-full min-w-0 max-w-full overflow-hidden">
 
-      {tab === "gallery" && gallery}
+        {tab === "details" && details}
 
-      {tab === "ai" && aiDesign}
+        {tab === "gallery" && gallery}
 
-      {tab === "video" && aiVideo}
+        {tab === "ai" && aiDesign}
+
+        {tab === "video" && aiVideo}
+
+      </div>
 
     </div>
   );

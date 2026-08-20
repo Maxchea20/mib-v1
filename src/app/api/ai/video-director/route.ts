@@ -318,6 +318,144 @@ Do not make photographs morph into completely different
 scenes.
 
 ============================================================
+AI LIVING ENVIRONMENT INTELLIGENCE
+============================================================
+
+This is a core requirement of MIB.
+
+You are not only directing the camera.
+
+You are also directing how the visible environment can feel
+naturally ALIVE during the shot.
+
+For EACH selected photograph, inspect the actual image and
+identify only visible elements that could realistically move.
+
+Examples when visibly present:
+- television screen content
+- ceiling / wall / pedestal fans
+- curtains or blinds
+- visible plants or leaves
+- trees and vegetation outside
+- distant vehicles on visible roads
+- people already visible in the scene
+- cleaning robots already visible
+- water or other visibly moving elements
+- subtle lighting or illumination changes when physically plausible
+- reflections that naturally respond to movement
+- clouds or other clearly visible environmental motion
+
+CRITICAL TRUTH RULES:
+
+1. Never invent an object just to create motion.
+2. Never add furniture, appliances, people, cars, plants or architecture
+   that are not visible in the source photograph.
+3. Never change the property's design, materials, proportions or layout.
+4. Keep all static property objects locked to their real positions.
+5. Motion must be subtle, physically believable and consistent with
+   the camera movement.
+6. Do not make every object move.
+7. Prioritize 1-4 believable living elements rather than many effects.
+8. Distant environmental motion should remain subtle.
+9. TV screens may show natural screen activity only when a TV is visible.
+10. Fans may rotate only when a fan is actually visible.
+11. Curtains may move gently only when curtains/blinds are visible.
+12. Vehicles may move only when a road/vehicle area is actually visible.
+13. A cleaning robot may move only when one is actually visible.
+14. Do not animate framed photos, paintings, furniture, walls,
+    cabinets or other inherently static objects.
+
+The goal is:
+
+PHOTO → LIVING ENVIRONMENT
+
+The result should feel like a real property was filmed for several
+seconds, not like a still photograph receiving a generic zoom.
+
+============================================================
+LIVING ENVIRONMENT PLAN
+============================================================
+
+For every selected shot, return:
+
+livingEnvironmentPlan:
+{
+  "overallLifeDirection": "",
+  "elements": [
+    {
+      "element": "",
+      "location": "",
+      "motion": "",
+      "intensity": "",
+      "reason": ""
+    }
+  ]
+}
+
+overallLifeDirection:
+One short sentence describing the natural environmental activity
+that should make the photograph feel alive.
+
+elements:
+Only include elements that are actually visible in the supplied
+photograph.
+
+element:
+Specific visible object or environmental feature.
+
+location:
+Where it appears in the photograph.
+
+motion:
+Concrete natural motion instruction.
+
+intensity:
+SUBTLE, NATURAL or NOTICEABLE.
+
+reason:
+Why the motion is appropriate and believable.
+
+If there are no suitable moving elements, return an empty elements
+array and explain that the scene should remain naturally still.
+
+The camera movement remains the primary cinematic action.
+Environmental movement supports it; it must never destroy property truth.
+
+============================================================
+CINEMATIC EDITING INTELLIGENCE
+============================================================
+
+You are also the EDITOR of the complete property reel.
+
+Do not treat the shots as unrelated clips. Design a simple
+editorial plan for the whole sequence.
+
+Choose a role for each shot:
+HOOK, INTRO, REVEAL, BUILD, DETAIL_BEAT, HERO.
+
+Choose energy:
+LOW, MEDIUM, HIGH, VERY_HIGH, LOW_TO_HIGH.
+
+Choose cut style:
+HARD_CUT, MOTIVATED_CUT, RHYTHM_CUT, SOFT_CUT, FINAL_HOLD.
+
+Recommend a practical duration from 2 to 6 seconds.
+
+Social Reel / Quick Property Reveal:
+strong opening hook, shorter detail beats, clearer energy changes.
+
+Professional / Luxury:
+more breathing room and restrained rhythm.
+
+POV:
+natural progression and motivated cuts.
+
+Cinematic Tour:
+deliberate pacing and visual continuity.
+
+This is an EDIT PLAN only. Do not regenerate or alter Runway footage.
+
+============================================================
 OUTPUT
 ============================================================
 
@@ -334,6 +472,21 @@ The JSON must follow this exact structure:
   "styleName": "",
   "overallDirection": "",
   "pacing": "",
+  "editingPlan": {
+    "overallEditDirection": "",
+    "rhythm": "",
+    "totalTargetDuration": 0,
+    "shots": [
+      {
+        "shotOrder": 1,
+        "role": "",
+        "recommendedDuration": 4,
+        "energy": "",
+        "cutStyle": "",
+        "editorReason": ""
+      }
+    ]
+  },
   "shotCount": 0,
   "recommendations": [
     {
@@ -345,6 +498,43 @@ The JSON must follow this exact structure:
     }
   ]
 }
+
+============================================================
+EDITING PLAN FIELD RULES
+============================================================
+
+editingPlan:
+The editorial plan for the complete sequence.
+
+overallEditDirection:
+One concise sentence describing how the sequence should feel
+when edited together.
+
+rhythm:
+Describe the overall cutting rhythm.
+
+totalTargetDuration:
+Recommended total duration in seconds.
+
+editingPlan.shots:
+One object for every selected shot, matching shotOrder.
+
+role:
+HOOK, INTRO, REVEAL, BUILD, DETAIL_BEAT or HERO.
+
+recommendedDuration:
+Recommended duration in seconds. Use a practical value between
+2 and 6 seconds.
+
+energy:
+LOW, MEDIUM, HIGH, VERY_HIGH or LOW_TO_HIGH.
+
+cutStyle:
+HARD_CUT, MOTIVATED_CUT, RHYTHM_CUT, SOFT_CUT or FINAL_HOLD.
+
+editorReason:
+Explain why this shot should occupy this role and rhythm
+position in the sequence.
 
 ============================================================
 FIELD RULES
@@ -390,6 +580,35 @@ that can be passed directly to a video-generation model.
 reason:
 Explain why this photograph and movement were chosen.
 
+============================================================
+LIVING ENVIRONMENT FIELD RULES
+============================================================
+
+livingEnvironmentPlan:
+Required for every selected shot.
+
+overallLifeDirection:
+Short description of the natural environmental life in the shot.
+
+elements:
+Only visible elements that can realistically move.
+
+element:
+Name the visible element.
+
+location:
+Describe its visible position in the frame.
+
+motion:
+Concrete, physically believable motion.
+
+intensity:
+SUBTLE, NATURAL or NOTICEABLE.
+
+reason:
+Why this motion is appropriate.
+
+============================================================
 ============================================================
 DO NOT
 ============================================================
@@ -540,7 +759,13 @@ ${photos
 
 Now study all photographs together.
 
+For every selected photograph, inspect the actual image for
+visible environmental elements that could naturally move.
+
 Create ONE coherent professional video plan.
+
+The livingEnvironmentPlan must be based on what is visibly present
+in each photograph, never on assumptions.
 
 Do not generate video.
 
@@ -637,6 +862,92 @@ by the system instructions.
                     "integer",
                 },
 
+                editingPlan: {
+                  type:
+                    "object",
+
+                  additionalProperties:
+                    false,
+
+                  properties: {
+                    overallEditDirection: {
+                      type:
+                        "string",
+                    },
+
+                    rhythm: {
+                      type:
+                        "string",
+                    },
+
+                    totalTargetDuration: {
+                      type:
+                        "number",
+                    },
+
+                    shots: {
+                      type:
+                        "array",
+
+                      items: {
+                        type:
+                          "object",
+
+                        additionalProperties:
+                          false,
+
+                        properties: {
+                          shotOrder: {
+                            type:
+                              "integer",
+                          },
+
+                          role: {
+                            type:
+                              "string",
+                          },
+
+                          recommendedDuration: {
+                            type:
+                              "number",
+                          },
+
+                          energy: {
+                            type:
+                              "string",
+                          },
+
+                          cutStyle: {
+                            type:
+                              "string",
+                          },
+
+                          editorReason: {
+                            type:
+                              "string",
+                          },
+                        },
+
+                        required: [
+                          "shotOrder",
+                          "role",
+                          "recommendedDuration",
+                          "energy",
+                          "cutStyle",
+                          "editorReason",
+                        ],
+                      },
+                    },
+                  },
+
+                  required: [
+                    "overallEditDirection",
+                    "rhythm",
+                    "totalTargetDuration",
+                    "shots",
+                  ],
+                },
+
                 recommendations: {
                   type:
                     "array",
@@ -664,6 +975,84 @@ by the system instructions.
                           "string",
                       },
 
+                      cameraAction: {
+                        type:
+                          "string",
+                      },
+
+                      visualAnalysis: {
+                        type:
+                          "string",
+                      },
+
+                      livingEnvironmentPlan: {
+                        type:
+                          "object",
+
+                        additionalProperties:
+                          false,
+
+                        properties: {
+                          overallLifeDirection: {
+                            type:
+                              "string",
+                          },
+
+                          elements: {
+                            type:
+                              "array",
+
+                            items: {
+                              type:
+                                "object",
+
+                              additionalProperties:
+                                false,
+
+                              properties: {
+                                element: {
+                                  type:
+                                    "string",
+                                },
+
+                                location: {
+                                  type:
+                                    "string",
+                                },
+
+                                motion: {
+                                  type:
+                                    "string",
+                                },
+
+                                intensity: {
+                                  type:
+                                    "string",
+                                },
+
+                                reason: {
+                                  type:
+                                    "string",
+                                },
+                              },
+
+                              required: [
+                                "element",
+                                "location",
+                                "motion",
+                                "intensity",
+                                "reason",
+                              ],
+                            },
+                          },
+                        },
+
+                        required: [
+                          "overallLifeDirection",
+                          "elements",
+                        ],
+                      },
+
                       actionScript: {
                         type:
                           "string",
@@ -679,6 +1068,9 @@ by the system instructions.
                       "photoIndex",
                       "shotOrder",
                       "shotType",
+                      "cameraAction",
+                      "visualAnalysis",
+                      "livingEnvironmentPlan",
                       "actionScript",
                       "reason",
                     ],
@@ -691,6 +1083,7 @@ by the system instructions.
                 "styleName",
                 "overallDirection",
                 "pacing",
+                "editingPlan",
                 "shotCount",
                 "recommendations",
               ],
@@ -827,6 +1220,67 @@ by the system instructions.
                 "Property Cinematic Shot"
             ),
 
+          cameraAction:
+            String(
+              shot.cameraAction ||
+                "SLOW_PUSH"
+            ),
+
+          visualAnalysis:
+            String(
+              shot.visualAnalysis ||
+                "Selected from the visible composition and available depth."
+            ),
+
+          livingEnvironmentPlan: {
+            overallLifeDirection:
+              String(
+                shot.livingEnvironmentPlan
+                  ?.overallLifeDirection ||
+                  "Keep the environment naturally alive with only subtle motion from elements that are visibly present."
+              ),
+
+            elements:
+              Array.isArray(
+                shot.livingEnvironmentPlan
+                  ?.elements
+              )
+                ? shot.livingEnvironmentPlan.elements.map(
+                    (element: any) => ({
+                      element:
+                        String(
+                          element?.element ||
+                            ""
+                        ),
+
+                      location:
+                        String(
+                          element?.location ||
+                            ""
+                        ),
+
+                      motion:
+                        String(
+                          element?.motion ||
+                            ""
+                        ),
+
+                      intensity:
+                        String(
+                          element?.intensity ||
+                            "SUBTLE"
+                        ),
+
+                      reason:
+                        String(
+                          element?.reason ||
+                            ""
+                        ),
+                    })
+                  )
+                : [],
+          },
+
           actionScript:
             String(
               shot.actionScript ||
@@ -840,6 +1294,109 @@ by the system instructions.
             ),
         })
       );
+
+    const rawEditingPlan =
+      plan.editingPlan || {};
+
+    const rawEditingShots =
+      Array.isArray(
+        rawEditingPlan.shots
+      )
+        ? rawEditingPlan.shots
+        : [];
+
+    plan.editingPlan = {
+      overallEditDirection:
+        String(
+          rawEditingPlan.overallEditDirection ||
+            "Create a coherent property sequence with purposeful energy changes and a strong final hero."
+        ),
+
+      rhythm:
+        String(
+          rawEditingPlan.rhythm ||
+            plan.pacing ||
+            "Natural cinematic"
+        ),
+
+      totalTargetDuration:
+        Number(
+          rawEditingPlan.totalTargetDuration ||
+            plan.recommendations.length * 4
+        ),
+
+      shots:
+        plan.recommendations.map(
+          (
+            shot: any,
+            index: number
+          ) => {
+            const planned =
+              rawEditingShots.find(
+                (
+                  item: any
+                ) =>
+                  Number(
+                    item?.shotOrder
+                  ) ===
+                  Number(
+                    shot.shotOrder
+                  )
+              ) ||
+              rawEditingShots[index] ||
+              {};
+
+            return {
+              shotOrder:
+                Number(
+                  shot.shotOrder
+                ),
+
+              role:
+                String(
+                  planned.role ||
+                    (
+                      index === 0
+                        ? "HOOK"
+                        : index ===
+                            plan.recommendations.length - 1
+                        ? "HERO"
+                        : "REVEAL"
+                    )
+                ),
+
+              recommendedDuration:
+                Number(
+                  planned.recommendedDuration ||
+                    4
+                ),
+
+              energy:
+                String(
+                  planned.energy ||
+                    "MEDIUM"
+                ),
+
+              cutStyle:
+                String(
+                  planned.cutStyle ||
+                    (
+                      index ===
+                      plan.recommendations.length - 1
+                        ? "FINAL_HOLD"
+                        : "MOTIVATED_CUT"
+                    )
+                ),
+
+              editorReason:
+                String(
+                  planned.editorReason ||
+                    "Selected to maintain a coherent visual progression."
+                ),
+            };
+          }
+        ),
+    };
 
     plan.shotCount =
       plan.recommendations.length;

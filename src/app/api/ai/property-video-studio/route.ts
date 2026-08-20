@@ -337,6 +337,101 @@ specified ending composition.
 
     /*
     |--------------------------------------------------------------------------
+    | AI LIVING ENVIRONMENT
+    |--------------------------------------------------------------------------
+    |
+    | Phase 2.3:
+    | The Director identifies visible elements that can naturally move.
+    | Runway is instructed to bring those visible elements to life while
+    | preserving the property as the exact visual source of truth.
+    |
+    */
+
+    const livingEnvironmentPlan =
+      director?.livingEnvironmentPlan || {};
+
+    const livingElements =
+      Array.isArray(
+        livingEnvironmentPlan?.elements
+      )
+        ? livingEnvironmentPlan.elements
+        : [];
+
+    const livingEnvironmentInstruction = `
+MIB AI LIVING ENVIRONMENT
+
+The supplied photograph is the exact property and absolute visual source of truth.
+
+The goal is to make the photograph feel ALIVE, as if a real camera filmed this
+property for several seconds.
+
+Do NOT treat the image as a generic photo animation.
+
+Do NOT invent or add objects.
+
+Do NOT add furniture, appliances, people, vehicles, plants, architecture,
+decorations, rooms, views or scenery that are not visibly present.
+
+Keep the property's architecture, layout, furniture, materials, fixtures,
+appliances, proportions, colors and all static objects exactly faithful to
+the supplied photograph.
+
+Only animate visible elements identified by the AI Director below.
+
+Overall life direction:
+${
+  String(
+    livingEnvironmentPlan?.overallLifeDirection ||
+      "Keep the environment naturally alive with subtle, believable motion."
+  )
+}
+
+VISIBLE LIVING ELEMENTS:
+${
+  livingElements.length > 0
+    ? livingElements
+        .map(
+          (item: any) =>
+            `- ${String(item?.element || "")} | location: ${String(item?.location || "")} | motion: ${String(item?.motion || "")} | intensity: ${String(item?.intensity || "SUBTLE")}`
+        )
+        .join("\n")
+    : "- No suitable moving environmental elements were identified. Keep the environment naturally still."
+}
+
+ENVIRONMENT MOTION RULES:
+
+1. Animate ONLY elements visibly present in the photograph.
+2. Keep every static property object locked to its real position.
+3. Motion must be physically believable and spatially consistent.
+4. Environmental movement must remain subtle and support the camera movement.
+5. Do not morph, distort, redesign or change the property.
+6. Do not make every object move.
+7. Preserve realistic perspective, depth, reflections and lighting.
+8. The result must feel like genuine filmed footage, not a still image with a
+   generic digital zoom.
+
+When the corresponding object is actually visible:
+- TV screens may show subtle natural screen activity.
+- Fans may rotate naturally.
+- Curtains or blinds may move gently.
+- Trees and leaves may sway naturally.
+- Visible distant vehicles may move naturally.
+- Visible people may move naturally.
+- A visible cleaning robot may move naturally.
+- Visible water may move naturally.
+- Clouds may move subtly.
+- Existing lights may have subtle realistic illumination.
+- Reflections may respond naturally to the scene.
+
+The camera movement from the AI Director remains the PRIMARY cinematic action.
+Environmental life is SECONDARY and must never overpower the property.
+
+Do not create environmental motion for elements that are not listed or not
+actually visible in the source photograph.
+`;
+
+    /*
+    |--------------------------------------------------------------------------
     | FINAL PROMPT
     |--------------------------------------------------------------------------
     */
@@ -344,7 +439,9 @@ specified ending composition.
     const prompt =
       MASTER_PROMPT +
       "\n\n" +
-      directorInstruction;
+      directorInstruction +
+      "\n\n" +
+      livingEnvironmentInstruction;
 
     /*
     |--------------------------------------------------------------------------
@@ -424,6 +521,11 @@ Preserve the property and finish on the Director's
 specified ending composition.
 `;
 
+      const compactLivingEnvironment = `
+LIVING ENVIRONMENT:
+${livingEnvironmentInstruction}
+`;
+
       const combined =
         compactMaster +
         "\n" +
@@ -476,6 +578,8 @@ objects exactly.
 Do not add, remove, redesign or invent anything.
 The PROPERTY remains stable.
 The CAMERA physically moves.
+Only visibly present environmental elements may move naturally.
+Do not invent objects or change the property.
 No digital zoom. No cuts. No scene changes.
 No teleporting. No impossible movement.
 
@@ -568,6 +672,17 @@ ${endingInstruction}
     console.log(
       "Runway Prompt Length:",
       finalPrompt.length
+    );
+
+    console.log(
+      "Living Environment Direction:",
+      livingEnvironmentPlan?.overallLifeDirection ||
+        "None"
+    );
+
+    console.log(
+      "Living Environment Elements:",
+      livingElements
     );
 
     console.log(

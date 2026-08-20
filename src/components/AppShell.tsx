@@ -18,26 +18,36 @@ export default function AppShell({
 
   return (
 
-    <div className="flex min-h-screen bg-slate-100">
+    <div className="flex min-h-screen w-full min-w-0 bg-slate-100">
 
-      {/* Desktop Sidebar */}
+      {/* ================================= */}
+      {/* DESKTOP SIDEBAR */}
+      {/* ================================= */}
 
-      <div className="hidden md:block">
+      <div className="hidden md:block shrink-0">
 
         <Sidebar />
 
       </div>
 
-      {/* Mobile Sidebar */}
+
+      {/* ================================= */}
+      {/* MOBILE SIDEBAR */}
+      {/* ================================= */}
 
       <MobileSidebar
         open={mobileOpen}
-        onClose={() => setMobileOpen(false)}
+        onClose={() =>
+          setMobileOpen(false)
+        }
       />
 
-      {/* Main */}
 
-      <main className="flex-1">
+      {/* ================================= */}
+      {/* MAIN CONTENT */}
+      {/* ================================= */}
+
+      <main className="flex-1 min-w-0 w-full">
 
         <TopBar
           onMenuClick={() =>
@@ -45,7 +55,12 @@ export default function AppShell({
           }
         />
 
-        <div className="p-8">
+
+        {/* ================================= */}
+        {/* PAGE CONTENT */}
+        {/* ================================= */}
+
+        <div className="w-full min-w-0 px-3 py-4 sm:px-4 sm:py-5 md:p-8">
 
           {children}
 
@@ -56,5 +71,4 @@ export default function AppShell({
     </div>
 
   );
-
 }

@@ -56,6 +56,12 @@ export default function ListingForm({
       ""
     );
 
+    const [cobrokeAgentName, setCobrokeAgentName] =
+  useState(
+    listing?.cobroke_agent_name ??
+    ""
+  );
+
   const [address, setAddress] =
     useState(
       listing?.address ??
@@ -226,6 +232,11 @@ export default function ListingForm({
 
       listing_agent:
         listingAgent || null,
+
+        cobroke_agent_name:
+  listingAgent === "Cobroke Agent"
+    ? cobrokeAgentName.trim() || null
+    : null,
 
       address:
         address || null,
@@ -439,13 +450,33 @@ highlights:
           <option>Inactive</option>
         </select>
 
-        <input
-          type="text"
-          placeholder="Listing Agent"
-          value={listingAgent}
-          onChange={(e) => setListingAgent(e.target.value)}
-          className="w-full border rounded p-2 text-black"
-        />
+        <select
+  value={listingAgent}
+  onChange={(e) => {
+    setListingAgent(e.target.value);
+
+    if (e.target.value !== "Cobroke Agent") {
+      setCobrokeAgentName("");
+    }
+  }}
+  className="w-full border rounded p-2 text-black"
+>
+  <option value="">Select Listing Agent</option>
+  <option value="Max">Max</option>
+  <option value="Cobroke Agent">Cobroke Agent</option>
+</select>
+
+{listingAgent === "Cobroke Agent" && (
+  <input
+    type="text"
+    placeholder="Cobroke Agent Name"
+    value={cobrokeAgentName}
+    onChange={(e) =>
+      setCobrokeAgentName(e.target.value)
+    }
+    className="w-full border rounded p-2 text-black"
+  />
+)}
 
         <input
           type="text"

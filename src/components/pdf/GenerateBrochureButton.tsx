@@ -26,6 +26,35 @@ export default function GenerateBrochureButton({
 
       /*
        * =========================================
+       * PDF-SAFE LISTING DATA
+       * =========================================
+       *
+       * Cobroke Agent information is INTERNAL ONLY.
+       * It must NEVER be sent to the PDF AI planner
+       * or displayed inside the generated brochure.
+       *
+       * If the listing is handled by a Cobroke Agent,
+       * the PDF still shows MAX CHEA as the listing
+       * agent.
+       */
+
+      const pdfListing = {
+        ...listing,
+
+        listing_agent:
+          listing.listing_agent === "Cobroke Agent"
+            ? "MAX CHEA"
+            : listing.listing_agent,
+
+        /*
+         * Explicitly remove internal cobroke information
+         * from the object used for PDF generation.
+         */
+        cobroke_agent_name: undefined,
+      };
+
+      /*
+       * =========================================
        * STEP 1
        * GET AI PDF DESIGN PLAN
        * =========================================
@@ -45,7 +74,7 @@ export default function GenerateBrochureButton({
             },
 
             body: JSON.stringify({
-              listing,
+              listing: pdfListing,
             }),
           }
         );
@@ -76,7 +105,7 @@ export default function GenerateBrochureButton({
 
       const pdfDocument = (
         <ListingBrochure
-          listing={listing}
+          listing={pdfListing}
           aiPlan={designPlan}
         />
       ) as React.ReactElement<DocumentProps>;

@@ -2030,8 +2030,10 @@ if (keyFacts.length === 0) {
 
             <View>
               <Text style={styles.agentName}>
-                {listing.listing_agent || "MAX CHEA"}
-              </Text>
+  {listing.listing_agent === "Cobroke Agent"
+    ? "MAX CHEA"
+    : listing.listing_agent || "MAX CHEA"}
+</Text>
               <Text style={styles.agentReg}>
                 {listing.agent_reg_no || "REN 31953"}
               </Text>

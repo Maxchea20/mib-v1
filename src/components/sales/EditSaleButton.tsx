@@ -16,9 +16,9 @@ export default function EditSaleButton({ deal }: Props) {
   const [message, setMessage] = useState("");
 
   const [form, setForm] = useState({
-    year: deal.year ?? "",
-    deal_no: deal.deal_no ?? "",
-    area: deal.area ?? "",
+  year: deal.year ?? "",
+  deal_no: deal.deal_no ?? "",
+  area: deal.area ?? "",
     property: deal.property ?? "",
     selling_price: deal.selling_price ?? "",
     banker: deal.banker ?? "",
@@ -165,10 +165,9 @@ export default function EditSaleButton({ deal }: Props) {
                     Deal No.
                   </label>
                   <input
-                    name="deal_no"
-                    value={form.deal_no}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border px-3 py-2"
+                    value={form.deal_no || "Auto"}
+                    readOnly
+                    className="w-full rounded-lg border bg-gray-50 px-3 py-2 text-gray-500"
                   />
                 </div>
 
@@ -294,12 +293,107 @@ export default function EditSaleButton({ deal }: Props) {
                   <label className="mb-1 block text-sm font-medium">
                     Claim Month
                   </label>
-                  <input
+                  <select
                     name="claim_month"
                     value={form.claim_month}
                     onChange={handleChange}
                     className="w-full rounded-lg border px-3 py-2"
-                  />
+                  >
+                    <option value="">
+                      Select Claim Month
+                    </option>
+
+                    {(() => {
+                      const now = new Date();
+                      const currentYear =
+                        now.getFullYear();
+                      const currentMonth =
+                        now.getMonth();
+
+                      const months = Array.from(
+                        {
+                          length:
+                            12 - currentMonth,
+                        },
+                        (_, index) => {
+                          const monthIndex =
+                            currentMonth +
+                            index;
+
+                          const value =
+                            `${currentYear}-${String(
+                              monthIndex + 1
+                            ).padStart(2, "0")}`;
+
+                          const label =
+                            new Date(
+                              currentYear,
+                              monthIndex,
+                              1
+                            ).toLocaleDateString(
+                              "en-MY",
+                              {
+                                month:
+                                  "long",
+                                year:
+                                  "numeric",
+                              }
+                            );
+
+                          return {
+                            value,
+                            label,
+                          };
+                        }
+                      );
+
+                      if (
+                        form.claim_month &&
+                        !months.some(
+                          (month) =>
+                            month.value ===
+                            form.claim_month
+                        )
+                      ) {
+                        const parsed =
+                          new Date(
+                            `${form.claim_month}-01T00:00:00`
+                          );
+
+                        if (
+                          !Number.isNaN(
+                            parsed.getTime()
+                          )
+                        ) {
+                          months.unshift({
+                            value:
+                              form.claim_month,
+                            label:
+                              parsed.toLocaleDateString(
+                                "en-MY",
+                                {
+                                  month:
+                                    "long",
+                                  year:
+                                    "numeric",
+                                }
+                              ),
+                          });
+                        }
+                      }
+
+                      return months.map(
+                        (month) => (
+                          <option
+                            key={month.value}
+                            value={month.value}
+                          >
+                            {month.label}
+                          </option>
+                        )
+                      );
+                    })()}
+                  </select>
                 </div>
 
                 <div>
@@ -320,12 +414,23 @@ export default function EditSaleButton({ deal }: Props) {
                   <label className="mb-1 block text-sm font-medium">
                     Deal Type
                   </label>
-                  <input
+                  <select
                     name="deal_type"
                     value={form.deal_type}
                     onChange={handleChange}
                     className="w-full rounded-lg border px-3 py-2"
-                  />
+                    required
+                  >
+                    <option value="">
+                      Select Deal Type
+                    </option>
+                    <option value="Sale">
+                      Sale
+                    </option>
+                    <option value="Rent">
+                      Rent
+                    </option>
+                  </select>
                 </div>
               </div>
 

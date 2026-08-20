@@ -12,7 +12,7 @@ export default function AddSaleButton() {
 
   const [form, setForm] = useState({
     year: new Date().getFullYear(),
-    deal_no: "",
+    
     area: "",
     property: "",
     selling_price: "",
@@ -48,9 +48,37 @@ export default function AddSaleButton() {
     setSaving(true);
     setMessage("");
 
-    const { error } = await supabase.from("deals").insert({
+    const { data: existingDeals, error: dealLookupError } =
+        await supabase
+          .from("deals")
+          .select("deal_no")
+          .eq("year", Number(form.year));
+
+      if (dealLookupError) {
+        console.error(dealLookupError);
+        setMessage(
+          "Unable to determine the next Deal No."
+        );
+        return;
+      }
+
+      const nextDealNo =
+        (existingDeals || [])
+          .map((deal) =>
+            Number(
+              String(deal.deal_no ?? "")
+                .replace(/\D/g, "")
+            )
+          )
+          .filter((n) => Number.isFinite(n))
+          .reduce(
+            (max, n) => Math.max(max, n),
+            0
+          ) + 1;
+
+      const { error } = await supabase.from("deals").insert({
       year: Number(form.year),
-      deal_no: form.deal_no || null,
+      deal_no: String(nextDealNo),
       area: form.area || null,
       property: form.property,
       selling_price: form.selling_price
@@ -146,10 +174,9 @@ setTimeout(() => {
                     Deal No.
                   </label>
                   <input
-                    name="deal_no"
-                    value={form.deal_no}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border px-3 py-2"
+                    value="Auto"
+                    readOnly
+                    className="w-full rounded-lg border bg-gray-50 px-3 py-2 text-gray-500"
                   />
                 </div>
 
@@ -276,12 +303,55 @@ setTimeout(() => {
                   <label className="mb-1 block text-sm font-medium">
                     Claim Month
                   </label>
-                  <input
+                  <select
                     name="claim_month"
                     value={form.claim_month}
                     onChange={handleChange}
                     className="w-full rounded-lg border px-3 py-2"
-                  />
+                  >
+                    <option value="">
+                      Select Claim Month
+                    </option>
+                    {Array.from(
+                      {
+                        length:
+                          12 -
+                          new Date().getMonth(),
+                      },
+                      (_, index) => {
+                        const monthIndex =
+                          new Date().getMonth() +
+                          index;
+                        const year =
+                          new Date().getFullYear();
+                        const value =
+                          `${year}-${String(
+                            monthIndex + 1
+                          ).padStart(2, "0")}`;
+                        const label =
+                          new Date(
+                            year,
+                            monthIndex,
+                            1
+                          ).toLocaleDateString(
+                            "en-MY",
+                            {
+                              month: "long",
+                              year: "numeric",
+                            }
+                          );
+
+                        return (
+                          <option
+                            key={value}
+                            value={value}
+                          >
+                            {label}
+                          </option>
+                        );
+                      }
+                    )}
+                  </select>
                 </div>
 
                 <div>
@@ -302,12 +372,23 @@ setTimeout(() => {
                   <label className="mb-1 block text-sm font-medium">
                     Deal Type
                   </label>
-                  <input
+                  <select
                     name="deal_type"
                     value={form.deal_type}
                     onChange={handleChange}
                     className="w-full rounded-lg border px-3 py-2"
-                  />
+                    required
+                  >
+                    <option value="">
+                      Select Deal Type
+                    </option>
+                    <option value="Sale">
+                      Sale
+                    </option>
+                    <option value="Rent">
+                      Rent
+                    </option>
+                  </select>
                 </div>
 
               </div>

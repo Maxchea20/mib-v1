@@ -31,8 +31,26 @@ type DirectorShot = {
   photoIndex: number;
   shotOrder: number;
   shotType: string;
+  cameraAction?: string;
+  visualAnalysis?: string;
   actionScript: string;
   reason: string;
+};
+
+type EditingPlanShot = {
+  shotOrder: number;
+  role: string;
+  recommendedDuration: number;
+  energy: string;
+  cutStyle: string;
+  editorReason: string;
+};
+
+type EditingPlan = {
+  overallEditDirection: string;
+  rhythm: string;
+  totalTargetDuration: number;
+  shots: EditingPlanShot[];
 };
 
 type VideoPlan = {
@@ -40,6 +58,7 @@ type VideoPlan = {
   styleName: string;
   overallDirection: string;
   pacing: string;
+  editingPlan?: EditingPlan;
   shotCount: number;
   recommendations: DirectorShot[];
 };
@@ -70,6 +89,35 @@ type VideoProject = {
   completed_at?: string | null;
   error_message?: string | null;
 };
+
+/*
+|--------------------------------------------------------------------------
+| FINAL VIDEO CACHE BUSTER
+|--------------------------------------------------------------------------
+|
+| Supabase Storage reuses the same final-video.mp4 URL.
+| Add the project's completion timestamp so every newly assembled MP4
+| gets a fresh browser/CDN URL without changing the storage path.
+|
+*/
+function getFreshFinalVideoUrl(
+  url?: string | null,
+  completedAt?: string | null
+) {
+  if (!url) {
+    return null;
+  }
+
+  const separator =
+    url.includes("?") ? "&" : "?";
+
+  const cacheKey =
+    completedAt
+      ? encodeURIComponent(completedAt)
+      : Date.now().toString();
+
+  return `${url}${separator}v=${cacheKey}`;
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -274,6 +322,11 @@ export default function AIVideoTab({
   ] = useState<string | null>(null);
 
   const [
+    reassemblingProjectId,
+    setReassemblingProjectId,
+  ] = useState<string | null>(null);
+
+  const [
     loadingVideoProject,
     setLoadingVideoProject,
   ] = useState(true);
@@ -387,6 +440,7 @@ export default function AIVideoTab({
     setVideoProject(null);
     setVideoProjects([]);
     setDeletingProjectId(null);
+    setReassemblingProjectId(null);
 
     setError("");
   }, [
@@ -564,24 +618,37 @@ export default function AIVideoTab({
 
       const projects:
         VideoProject[] =
-        Array.isArray(
-          data.projects
+        (
+          Array.isArray(
+            data.projects
+          )
+            ? data.projects
+            : data.project?.final_video_url
+            ? [data.project]
+            : []
         )
-          ? data.projects.filter(
-              (
-                project: VideoProject
-              ) =>
-                project.status ===
-                  "completed" &&
-                Boolean(
-                  project.final_video_url
-                )
-            )
-          : data.project?.final_video_url
-          ? [
-              data.project,
-            ]
-          : [];
+          .filter(
+            (
+              project: VideoProject
+            ) =>
+              project.status ===
+                "completed" &&
+              Boolean(
+                project.final_video_url
+              )
+          )
+          .map(
+            (
+              project: VideoProject
+            ) => ({
+              ...project,
+              final_video_url:
+                getFreshFinalVideoUrl(
+                  project.final_video_url,
+                  project.completed_at
+                ),
+            })
+          );
 
       setVideoProjects(
         projects
@@ -949,6 +1016,18 @@ export default function AIVideoTab({
                     "Property Cinematic Shot"
                 ),
 
+              cameraAction:
+                String(
+                  shot.cameraAction ||
+                    "SLOW_PUSH"
+                ),
+
+              visualAnalysis:
+                String(
+                  shot.visualAnalysis ||
+                    ""
+                ),
+
               actionScript:
                 String(
                   shot.actionScript ||
@@ -969,6 +1048,109 @@ export default function AIVideoTab({
       | VALIDATE ACTION SCRIPTS
       |--------------------------------------------------------------------------
       */
+
+      const rawEditingPlan =
+        rawPlan.editingPlan;
+
+      const rawEditingShots =
+        Array.isArray(
+          rawEditingPlan?.shots
+        )
+          ? rawEditingPlan.shots
+          : [];
+
+      plan.editingPlan = {
+        overallEditDirection:
+          String(
+            rawEditingPlan?.overallEditDirection ||
+              "Create a coherent property sequence with purposeful energy changes and a strong final hero."
+          ),
+
+        rhythm:
+          String(
+            rawEditingPlan?.rhythm ||
+              plan.pacing ||
+              "Natural cinematic"
+          ),
+
+        totalTargetDuration:
+          Number(
+            rawEditingPlan?.totalTargetDuration ||
+              plan.recommendations.length * 4
+          ),
+
+        shots:
+          plan.recommendations.map(
+            (
+              shot: DirectorShot,
+              index: number
+            ) => {
+              const planned =
+                rawEditingShots.find(
+                  (
+                    item: any
+                  ) =>
+                    Number(
+                      item?.shotOrder
+                    ) ===
+                    Number(
+                      shot.shotOrder
+                    )
+                ) ||
+                rawEditingShots[index] ||
+                {};
+
+              return {
+                shotOrder:
+                  Number(
+                    shot.shotOrder
+                  ),
+
+                role:
+                  String(
+                    planned.role ||
+                      (
+                        index === 0
+                          ? "HOOK"
+                          : index ===
+                              plan.recommendations.length - 1
+                          ? "HERO"
+                          : "REVEAL"
+                      )
+                  ),
+
+                recommendedDuration:
+                  Number(
+                    planned.recommendedDuration ||
+                      4
+                  ),
+
+                energy:
+                  String(
+                    planned.energy ||
+                      "MEDIUM"
+                  ),
+
+                cutStyle:
+                  String(
+                    planned.cutStyle ||
+                      (
+                        index ===
+                        plan.recommendations.length - 1
+                          ? "FINAL_HOLD"
+                          : "MOTIVATED_CUT"
+                      )
+                  ),
+
+                editorReason:
+                  String(
+                    planned.editorReason ||
+                      "Selected to maintain a coherent visual progression."
+                  ),
+              };
+            }
+          ),
+      };
 
       const invalidShot =
         plan.recommendations.find(
@@ -1156,7 +1338,8 @@ export default function AIVideoTab({
   */
 
   async function assembleProject(
-    projectId: string
+    projectId: string,
+    editingPlanOverride?: EditingPlan
   ) {
     /*
     |--------------------------------------------------------------------------
@@ -1210,6 +1393,11 @@ export default function AIVideoTab({
 
             body: JSON.stringify({
               projectId,
+
+              editingPlan:
+                editingPlanOverride ||
+                videoPlan?.editingPlan ||
+                null,
             }),
           }
         );
@@ -1283,7 +1471,10 @@ export default function AIVideoTab({
                 "completed",
 
               final_video_url:
-                data.finalVideoUrl,
+                getFreshFinalVideoUrl(
+                  data.finalVideoUrl,
+                  new Date().toISOString()
+                ),
 
               completed_at:
                 new Date().toISOString(),
@@ -1512,7 +1703,8 @@ export default function AIVideoTab({
           );
 
           await assembleProject(
-            projectId
+            projectId,
+            videoPlan?.editingPlan
           );
 
           /*
@@ -1889,7 +2081,8 @@ export default function AIVideoTab({
       */
 
       await assembleProject(
-        projectId
+        projectId,
+        videoPlan?.editingPlan
       );
 
       /*
@@ -1926,6 +2119,124 @@ export default function AIVideoTab({
         current: 0,
         total: 0,
       });
+    }
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | RE-ASSEMBLE EXISTING PROJECT
+  |--------------------------------------------------------------------------
+  |
+  | Rebuilds the final MP4 from the already-generated Runway shots.
+  | This NEVER calls Runway and therefore does not consume Runway credits.
+  |
+  */
+
+  async function reassembleExistingProject(
+    project: VideoProject
+  ) {
+    if (
+      !project?.id ||
+      reassemblingProjectId
+    ) {
+      return;
+    }
+
+    try {
+      setReassemblingProjectId(
+        project.id
+      );
+
+      setError("");
+
+      console.log(
+        "AI VIDEO STUDIO: RE-ASSEMBLING EXISTING PROJECT:",
+        project.id
+      );
+
+      const response =
+        await fetch(
+          "/api/ai/video-assemble",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              projectId:
+                project.id,
+
+              editingPlan:
+                videoPlan?.editingPlan ||
+                null,
+            }),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (
+        !response.ok &&
+        response.status !==
+          409
+      ) {
+        throw new Error(
+          data.error ||
+            "Failed to re-assemble the existing video."
+        );
+      }
+
+      if (
+        data.success &&
+        data.finalVideoUrl
+      ) {
+        setVideoProject(
+          (
+            current
+          ) =>
+            current?.id ===
+            project.id
+              ? {
+                  ...current,
+                  status:
+                    "completed",
+                  final_video_url:
+                    data.finalVideoUrl,
+                  completed_at:
+                    new Date().toISOString(),
+                }
+              : current
+        );
+      }
+
+      await loadVideoProject(
+        project.id
+      );
+
+      console.log(
+        "AI VIDEO STUDIO: EXISTING PROJECT RE-ASSEMBLED:",
+        project.id
+      );
+    } catch (
+      error: any
+    ) {
+      console.error(
+        "AI VIDEO STUDIO RE-ASSEMBLY ERROR:",
+        error
+      );
+
+      setError(
+        error?.message ||
+          "Failed to re-assemble the existing video."
+      );
+    } finally {
+      setReassemblingProjectId(
+        null
+      );
     }
   }
 
@@ -2361,6 +2672,63 @@ export default function AIVideoTab({
 
           </div>
 
+          {videoPlan.editingPlan ? (
+            <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[11px] uppercase tracking-wide font-semibold text-amber-700">
+                    🎬 AI Editing Plan
+                  </p>
+                  <p className="text-sm font-semibold text-gray-900 mt-1">
+                    {videoPlan.editingPlan.overallEditDirection}
+                  </p>
+                </div>
+
+                <div className="text-right shrink-0">
+                  <p className="text-[10px] uppercase tracking-wide text-gray-500">
+                    Target
+                  </p>
+                  <p className="text-sm font-bold text-gray-900">
+                    {videoPlan.editingPlan.totalTargetDuration.toFixed(1)}s
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-600 mt-2">
+                Rhythm: {videoPlan.editingPlan.rhythm}
+              </p>
+
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {videoPlan.editingPlan.shots.map(
+                  (editShot) => (
+                    <div
+                      key={editShot.shotOrder}
+                      className="rounded-lg bg-white border border-amber-100 px-3 py-2"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-bold text-gray-900">
+                          Shot {editShot.shotOrder}
+                        </span>
+
+                        <span className="text-[10px] uppercase tracking-wide text-amber-700 font-semibold">
+                          {editShot.role}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 mt-1 text-[11px] text-gray-500">
+                        <span>{editShot.recommendedDuration}s</span>
+                        <span>•</span>
+                        <span>{editShot.energy}</span>
+                        <span>•</span>
+                        <span>{editShot.cutStyle}</span>
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          ) : null}
+
           {/* SHOTS */}
 
           <div className="mt-6">
@@ -2688,6 +3056,25 @@ export default function AIVideoTab({
                       >
                         Download
                       </a>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          reassembleExistingProject(
+                            project
+                          )
+                        }
+                        disabled={
+                          reassemblingProjectId ===
+                          project.id
+                        }
+                        className="flex-1 px-2 py-1.5 rounded border border-purple-300 bg-white hover:bg-purple-50 text-purple-700 text-xs font-semibold disabled:opacity-50"
+                      >
+                        {reassemblingProjectId ===
+                        project.id
+                          ? "Rebuilding..."
+                          : "Rebuild"}
+                      </button>
 
                       <button
                         type="button"
