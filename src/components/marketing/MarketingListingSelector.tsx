@@ -19,6 +19,9 @@ export default function MarketingListingSelector({
   const [platform, setPlatform] =
     useState("page");
 
+  const [groupUrl, setGroupUrl] =
+    useState("");
+
   const [content, setContent] =
     useState("");
 
@@ -334,14 +337,50 @@ export default function MarketingListingSelector({
       return;
     }
 
+    if (
+      platform === "group" &&
+      !groupUrl.trim()
+    ) {
+      setError(
+        "Please enter a Facebook Group URL."
+      );
+
+      return;
+    }
+
     setPosting(true);
     setError("");
     setSuccess("");
 
     try {
+      const endpoint =
+        platform === "group"
+          ? "/api/marketing/facebook/group-post"
+          : "/api/marketing/facebook/post";
+
+      const body =
+        platform === "group"
+          ? {
+              groupUrl:
+                groupUrl.trim(),
+
+              message:
+                content,
+
+              imageUrls:
+                selectedPhotos,
+            }
+          : {
+              message:
+                content,
+
+              imageUrls:
+                selectedPhotos,
+            };
+
       const response =
         await fetch(
-          "/api/marketing/facebook/post",
+          endpoint,
           {
             method: "POST",
 
@@ -350,13 +389,8 @@ export default function MarketingListingSelector({
                 "application/json",
             },
 
-            body: JSON.stringify({
-              message:
-                content,
-
-              imageUrls:
-                selectedPhotos,
-            }),
+            body:
+              JSON.stringify(body),
           }
         );
 
@@ -373,12 +407,23 @@ export default function MarketingListingSelector({
         );
       }
 
-      setSuccess(
-        `✅ Posted successfully to Maxchea Property with ${
-          data.photoCount ||
-          selectedPhotos.length
-        } photo(s)!`
-      );
+      if (
+        platform === "group"
+      ) {
+        setSuccess(
+          `✅ Facebook Group posting job queued successfully. ${
+            data.imageCount ??
+            selectedPhotos.length
+          } photo(s) included.`
+        );
+      } else {
+        setSuccess(
+          `✅ Posted successfully to Maxchea Property with ${
+            data.photoCount ||
+            selectedPhotos.length
+          } photo(s)!`
+        );
+      }
 
     } catch (err: any) {
       console.error(
@@ -660,9 +705,19 @@ export default function MarketingListingSelector({
               value={platform}
               onChange={(e) => {
 
+                const nextPlatform =
+                  e.target.value;
+
                 setPlatform(
-                  e.target.value
+                  nextPlatform
                 );
+
+                if (
+                  nextPlatform !==
+                  "group"
+                ) {
+                  setGroupUrl("");
+                }
 
                 setContent("");
                 setError("");
@@ -686,7 +741,7 @@ export default function MarketingListingSelector({
               </option>
 
               <option value="group">
-                Facebook Group — Manual
+                Facebook Group — Desktop Worker
               </option>
 
               <option value="marketplace">
@@ -694,6 +749,38 @@ export default function MarketingListingSelector({
               </option>
 
             </select>
+
+            {platform === "group" && (
+
+              <div className="mt-4">
+
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Facebook Group URL
+                </label>
+
+                <input
+                  type="url"
+                  value={groupUrl}
+                  onChange={(e) =>
+                    setGroupUrl(
+                      e.target.value
+                    )
+                  }
+                  placeholder="https://www.facebook.com/groups/..."
+                  disabled={
+                    generating ||
+                    posting
+                  }
+                  className="w-full border rounded-lg px-4 py-3 text-black bg-white outline-none focus:ring-2 focus:ring-blue-500"
+                />
+
+                <p className="text-xs text-gray-500 mt-1">
+                  MIB Desktop will publish this listing to the selected Group.
+                </p>
+
+              </div>
+
+            )}
 
           </div>
 
@@ -986,13 +1073,17 @@ export default function MarketingListingSelector({
                     generating ||
                     !content.trim() ||
                     selectedPhotos.length ===
-                      0
+                      0 ||
+                    (platform === "group" &&
+                      !groupUrl.trim())
                   }
                   className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-5 py-2 rounded-lg font-semibold"
                 >
 
                   {posting
                     ? "🚀 Posting..."
+                    : platform === "group"
+                    ? "🚀 Queue Facebook Group Post"
                     : "🚀 Post to Facebook"}
 
                 </button>
