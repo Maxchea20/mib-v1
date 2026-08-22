@@ -5,6 +5,7 @@ const menus = [
   { name: "Contacts", href: "/contacts", emoji: "🛒" },
   { name: "AI Cobroke Match", href: "/cobroke-match", emoji: "🤝" },
   { name: "Listings", href: "/listings", emoji: "🏡" },
+  { name: "Marketing", href: "/marketing", emoji: "📣" },
   { name: "Sales", href: "/sales", emoji: "💰" },
   { name: "Settings", href: "/settings", emoji: "⚙️" },
 ];
