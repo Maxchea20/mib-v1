@@ -1,0 +1,9 @@
+node_modules/
+.next/
+mib-v1-share.zip
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.tsbuildinfo
