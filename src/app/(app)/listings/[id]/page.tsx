@@ -297,8 +297,9 @@ export default async function ListingProfilePage({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 md:gap-x-16 gap-y-4 sm:gap-y-6">
 
-                <div>
+                {/* CATEGORY */}
 
+                <div>
                   <p className="text-xs sm:text-sm text-gray-500">
                     Category
                   </p>
@@ -306,11 +307,25 @@ export default async function ListingProfilePage({
                   <p className="text-base sm:text-lg font-semibold">
                     {listing.category || "-"}
                   </p>
-
                 </div>
 
-                <div>
 
+                {/* PROPERTY TYPE */}
+
+                <div>
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    Property Type
+                  </p>
+
+                  <p className="text-base sm:text-lg font-semibold break-words">
+                    {listing.property_type || "-"}
+                  </p>
+                </div>
+
+
+                {/* PROPERTY SUB TYPE */}
+
+                <div>
                   <p className="text-xs sm:text-sm text-gray-500">
                     Property Sub Type
                   </p>
@@ -318,52 +333,23 @@ export default async function ListingProfilePage({
                   <p className="text-base sm:text-lg font-semibold break-words">
                     {listing.property_sub_type || "-"}
                   </p>
-
                 </div>
 
-                <div>
 
+                {/* PROPERTY UNIT TYPE */}
+
+                <div>
                   <p className="text-xs sm:text-sm text-gray-500">
                     Property Unit Type
                   </p>
 
                   <p className="text-base sm:text-lg font-semibold break-words">
-                    {listing.property_unit_type || "-"}
+                    {listing.unit_type || "-"}
                   </p>
-
                 </div>
 
-                {listing.category === "Residential" && (
 
-                  <>
-
-                    <div>
-
-                      <p className="text-xs sm:text-sm text-gray-500">
-                        Residential Type
-                      </p>
-
-                      <p className="text-base sm:text-lg font-semibold break-words">
-                        {listing.residential_type || "-"}
-                      </p>
-
-                    </div>
-
-                    <div>
-
-                      <p className="text-xs sm:text-sm text-gray-500">
-                        Storey
-                      </p>
-
-                      <p className="text-base sm:text-lg font-semibold">
-                        {listing.residential_storey || "-"}
-                      </p>
-
-                    </div>
-
-                  </>
-
-                )}
+                {/* COMMERCIAL */}
 
                 {listing.category === "Commercial" && (
 
@@ -381,37 +367,29 @@ export default async function ListingProfilePage({
 
                 )}
 
+
+                {/* ================================= */}
+                {/* INDUSTRIAL */}
+                {/* ================================= */}
+
                 {listing.category === "Industrial" && (
 
-                  <>
+                  <div>
 
-                    <div>
+                    <p className="text-xs sm:text-sm text-gray-500">
+                      Industrial Zoning
+                    </p>
 
-                      <p className="text-xs sm:text-sm text-gray-500">
-                        Industrial Property Type
-                      </p>
+                    <p className="text-base sm:text-lg font-semibold break-words">
+                      {listing.industrial_zoning || "-"}
+                    </p>
 
-                      <p className="text-base sm:text-lg font-semibold break-words">
-                        {listing.industrial_property_type || "-"}
-                      </p>
-
-                    </div>
-
-                    <div>
-
-                      <p className="text-xs sm:text-sm text-gray-500">
-                        Industrial Zoning
-                      </p>
-
-                      <p className="text-base sm:text-lg font-semibold break-words">
-                        {listing.industrial_zoning || "-"}
-                      </p>
-
-                    </div>
-
-                  </>
+                  </div>
 
                 )}
+
+
+                {/* LAND */}
 
                 {listing.category === "Land" && (
 
@@ -446,135 +424,222 @@ export default async function ListingProfilePage({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 md:gap-x-16 gap-y-4 sm:gap-y-6">
 
-                {/* BEDROOMS */}
 
-                {listing.bedrooms !== null &&
-                  listing.bedrooms !== undefined && (
+                {/* ================================= */}
+                {/* RESIDENTIAL */}
+                {/* ================================= */}
 
-                  <div>
-
-                    <p className="text-xs sm:text-sm text-gray-500">
-                      Bedrooms
-                    </p>
-
-                    <p className="text-base sm:text-lg font-semibold">
-                      {listing.bedrooms}
-                    </p>
-
-                  </div>
-
-                )}
-
-                {/* BATHROOMS */}
-
-                {listing.bathrooms !== null &&
-                  listing.bathrooms !== undefined && (
-
-                  <div>
-
-                    <p className="text-xs sm:text-sm text-gray-500">
-                      Bathrooms
-                    </p>
-
-                    <p className="text-base sm:text-lg font-semibold">
-                      {listing.bathrooms}
-                    </p>
-
-                  </div>
-
-                )}
-
-                {/* PARKING */}
-
-                <div>
-
-                  <p className="text-xs sm:text-sm text-gray-500">
-                    Parking
-                  </p>
-
-                  <p className="text-base sm:text-lg font-semibold">
-                    {listing.parking ?? "-"}
-                  </p>
-
-                </div>
-
-                {/* BUILT-UP */}
-
-                <div>
-
-                  <p className="text-xs sm:text-sm text-gray-500">
-                    Built-up
-                  </p>
-
-                  <p className="text-base sm:text-lg font-semibold break-words">
-                    {listing.built_up || "-"}
-                  </p>
-
-                </div>
-
-                {/* LAND SIZE */}
-
-                <div>
-
-                  <p className="text-xs sm:text-sm text-gray-500">
-                    Land Size
-                  </p>
-
-                  <p className="text-base sm:text-lg font-semibold break-words">
-                    {listing.land_size || "-"}
-                  </p>
-
-                </div>
-
-                {/* FURNISHING */}
-
-                <div>
-
-                  <p className="text-xs sm:text-sm text-gray-500">
-                    Furnishing
-                  </p>
-
-                  <p className="text-base sm:text-lg font-semibold break-words">
-                    {listing.furnishing || "-"}
-                  </p>
-
-                </div>
-
-                {/* FURNISHING DETAILS */}
-
-                {listing.furnishing_details && (
-
-                  <div className="sm:col-span-2">
-
-                    <p className="text-xs sm:text-sm text-gray-500">
-                      Furnishing Details
-                    </p>
-
-                    <p className="text-base sm:text-lg font-semibold break-words">
-                      {listing.furnishing_details}
-                    </p>
-
-                  </div>
-
-                )}
-
-                {/* INDUSTRIAL CEILING */}
-
-                {listing.category === "Industrial" && (
+                {listing.category === "Residential" && (
 
                   <>
+
+                    {/* BEDROOMS */}
+
+                    {listing.bedrooms !== null &&
+                      listing.bedrooms !== undefined && (
+
+                      <div>
+
+                        <p className="text-xs sm:text-sm text-gray-500">
+                          Bedrooms
+                        </p>
+
+                        <p className="text-base sm:text-lg font-semibold">
+                          {listing.bedrooms}
+                        </p>
+
+                      </div>
+
+                    )}
+
+
+                    {/* BATHROOMS */}
+
+                    {listing.bathrooms !== null &&
+                      listing.bathrooms !== undefined && (
+
+                      <div>
+
+                        <p className="text-xs sm:text-sm text-gray-500">
+                          Bathrooms
+                        </p>
+
+                        <p className="text-base sm:text-lg font-semibold">
+                          {listing.bathrooms}
+                        </p>
+
+                      </div>
+
+                    )}
+
+
+                    {/* PARKING */}
 
                     <div>
 
                       <p className="text-xs sm:text-sm text-gray-500">
-                        Ceiling Height
+                        Parking
                       </p>
 
-                      <p className="text-base sm:text-lg font-semibold break-words">
-                        {listing.industrial_ceiling_height || "-"}
+                      <p className="text-base sm:text-lg font-semibold">
+                        {listing.parking_spaces ?? "-"}
                       </p>
 
                     </div>
+
+
+                    {/* BUILT-UP */}
+
+                    <div>
+
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Built-up
+                      </p>
+
+                      <p className="text-base sm:text-lg font-semibold break-words">
+                        {listing.built_up || "-"}
+                      </p>
+
+                    </div>
+
+
+                    {/* LAND SIZE */}
+
+                    <div>
+
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Land Size
+                      </p>
+
+                      <p className="text-base sm:text-lg font-semibold break-words">
+                        {listing.land_size || "-"}
+                      </p>
+
+                    </div>
+
+
+                    {/* FURNISHING */}
+
+                    <div>
+
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Furnishing
+                      </p>
+
+                      <p className="text-base sm:text-lg font-semibold break-words">
+
+                        {listing.furnishing
+                          ? listing.furnishing
+                              .replace(/_/g, " ")
+                              .replace(
+                                /\b\w/g,
+                                (char: string) =>
+                                  char.toUpperCase()
+                              )
+                          : "-"}
+
+                      </p>
+
+                    </div>
+
+
+                    {/* FURNISHING DETAILS */}
+
+                    {listing.furnishing_details && (
+
+                      <div className="sm:col-span-2">
+
+                        <p className="text-xs sm:text-sm text-gray-500">
+                          Furnishing Details
+                        </p>
+
+                        <p className="text-base sm:text-lg font-semibold break-words">
+                          {listing.furnishing_details}
+                        </p>
+
+                      </div>
+
+                    )}
+
+                  </>
+
+                )}
+
+
+                {/* ================================= */}
+                {/* COMMERCIAL */}
+                {/* ================================= */}
+
+                {listing.category === "Commercial" && (
+
+                  <>
+
+                    {/* BATHROOMS */}
+
+                    {listing.bathrooms !== null &&
+                      listing.bathrooms !== undefined && (
+
+                      <div>
+
+                        <p className="text-xs sm:text-sm text-gray-500">
+                          Bathrooms
+                        </p>
+
+                        <p className="text-base sm:text-lg font-semibold">
+                          {listing.bathrooms}
+                        </p>
+
+                      </div>
+
+                    )}
+
+
+                    {/* BUILT-UP */}
+
+                    <div>
+
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Built-up
+                      </p>
+
+                      <p className="text-base sm:text-lg font-semibold break-words">
+                        {listing.built_up || "-"}
+                      </p>
+
+                    </div>
+
+
+                    {/* CONDITION */}
+
+                    <div>
+
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Condition
+                      </p>
+
+                      <p className="text-base sm:text-lg font-semibold break-words">
+                        {listing.condition || "-"}
+                      </p>
+
+                    </div>
+
+
+                    {/* ELECTRICITY PHASE */}
+
+                    <div>
+
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Electricity Phase
+                      </p>
+
+                      <p className="text-base sm:text-lg font-semibold break-words">
+                        {listing.electricity_phase || "-"}
+                      </p>
+
+                    </div>
+
+
+                    {/* POWER SUPPLY */}
 
                     <div>
 
@@ -589,6 +654,164 @@ export default async function ListingProfilePage({
                     </div>
 
                   </>
+
+                )}
+
+
+                {/* ================================= */}
+                {/* INDUSTRIAL */}
+                {/* ================================= */}
+
+                {listing.category === "Industrial" && (
+
+                  <>
+
+                    {/* BATHROOMS */}
+
+                    {listing.bathrooms !== null &&
+                      listing.bathrooms !== undefined && (
+
+                      <div>
+
+                        <p className="text-xs sm:text-sm text-gray-500">
+                          Bathrooms
+                        </p>
+
+                        <p className="text-base sm:text-lg font-semibold">
+                          {listing.bathrooms}
+                        </p>
+
+                      </div>
+
+                    )}
+
+
+                    {/* PARKING */}
+
+                    <div>
+
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Parking
+                      </p>
+
+                      <p className="text-base sm:text-lg font-semibold">
+                        {listing.parking_spaces ?? "-"}
+                      </p>
+
+                    </div>
+
+
+                    {/* BUILT-UP */}
+
+                    <div>
+
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Built-up
+                      </p>
+
+                      <p className="text-base sm:text-lg font-semibold break-words">
+                        {listing.built_up || "-"}
+                      </p>
+
+                    </div>
+
+
+                    {/* LAND SIZE */}
+
+                    <div>
+
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Land Size
+                      </p>
+
+                      <p className="text-base sm:text-lg font-semibold break-words">
+                        {listing.land_size || "-"}
+                      </p>
+
+                    </div>
+
+
+                    {/* CONDITION */}
+
+                    <div>
+
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Condition
+                      </p>
+
+                      <p className="text-base sm:text-lg font-semibold break-words">
+                        {listing.condition || "-"}
+                      </p>
+
+                    </div>
+
+
+                    {/* CEILING HEIGHT */}
+
+                    <div>
+
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Ceiling Height
+                      </p>
+
+                      <p className="text-base sm:text-lg font-semibold break-words">
+                        {listing.industrial_ceiling_height || "-"}
+                      </p>
+
+                    </div>
+
+
+                    {/* ELECTRICITY PHASE */}
+
+                    <div>
+
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Electricity Phase
+                      </p>
+
+                      <p className="text-base sm:text-lg font-semibold break-words">
+                        {listing.electricity_phase || "-"}
+                      </p>
+
+                    </div>
+
+
+                    {/* POWER SUPPLY */}
+
+                    <div>
+
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Power Supply
+                      </p>
+
+                      <p className="text-base sm:text-lg font-semibold break-words">
+                        {listing.industrial_power_supply || "-"}
+                      </p>
+
+                    </div>
+
+                  </>
+
+                )}
+
+
+                {/* ================================= */}
+                {/* LAND */}
+                {/* ================================= */}
+
+                {listing.category === "Land" && (
+
+                  <div>
+
+                    <p className="text-xs sm:text-sm text-gray-500">
+                      Land Size
+                    </p>
+
+                    <p className="text-base sm:text-lg font-semibold break-words">
+                      {listing.land_size || "-"}
+                    </p>
+
+                  </div>
 
                 )}
 
