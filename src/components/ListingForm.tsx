@@ -1084,6 +1084,10 @@ export default function ListingForm({
           </option>
 
           <option>
+            Lahat
+          </option>
+
+          <option>
             Chemor
           </option>
 
@@ -1482,6 +1486,10 @@ export default function ListingForm({
 
           <option>
             Seri Beringin
+          </option>
+
+          <option>
+            Tambun
           </option>
 
           <option>
