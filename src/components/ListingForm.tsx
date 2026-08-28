@@ -2229,6 +2229,14 @@ export default function ListingForm({
           </option>
 
           <option>
+            Taman Shatin
+          </option>
+
+          <option>
+            Taman Shatin Baru
+          </option>
+
+          <option>
             Taman Sri Wangsa
           </option>
 
