@@ -2415,39 +2415,43 @@ export default function ListingForm({
               }
             >
               <option value="">
-                Residential Storey
+                Terrace House
               </option>
 
               <option>
-                Single Storey
+                1-storey Terraced House
               </option>
 
               <option>
-                1.5 Storey
+                1.5-storey Terraced House
               </option>
 
               <option>
-                Double Storey
+                2-storey Terraced House
               </option>
 
               <option>
-                2.5 Storey
+                2.5-storey Terraced House
               </option>
 
               <option>
-                Triple Storey
+                3-storey Terraced House
               </option>
 
               <option>
-                3.5 Storey
+                3.5-storey Terraced House
               </option>
 
               <option>
-                4 Storey
+                4-storey Terraced House
               </option>
 
               <option>
-                4.5 Storey
+                4.5-storey Terraced House
+              </option>
+
+              <option>
+                Townhouse
               </option>
             </select>
 
