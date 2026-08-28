@@ -1477,6 +1477,18 @@ export default function ListingForm({
           </option>
 
           <option>
+            New Pasir Puteh
+          </option>
+
+          <option>
+           Taman Pasir Puteh
+          </option>
+
+          <option>
+           Taman Pasir Puteh Selatan
+          </option>
+
+          <option>
             Puncak Anggerik
           </option>
 
@@ -1490,6 +1502,10 @@ export default function ListingForm({
 
           <option>
             Tambun
+          </option>
+
+          <option>
+            Taman Mansion
           </option>
 
           <option>
