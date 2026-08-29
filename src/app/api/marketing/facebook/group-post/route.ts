@@ -6,10 +6,34 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const groupUrl =
-      typeof body?.groupUrl === "string"
-        ? body.groupUrl.trim()
-        : "";
+    /*
+    |--------------------------------------------------------------------------
+    | INPUT
+    |--------------------------------------------------------------------------
+    */
+
+    const listingId =
+      body?.listingId !== undefined &&
+      body?.listingId !== null
+        ? Number(body.listingId)
+        : null;
+
+    const groupUrls = Array.isArray(
+      body?.groupUrls
+    )
+      ? Array.from(
+          new Set(
+            body.groupUrls.filter(
+              (url: unknown): url is string =>
+                typeof url === "string" &&
+                url.trim() !== ""
+            ).map(
+              (url: string) =>
+                url.trim()
+            )
+          )
+        )
+      : [];
 
     const message =
       typeof body?.message === "string"
@@ -26,12 +50,40 @@ export async function POST(request: Request) {
         )
       : [];
 
-    if (!groupUrl) {
+    const scheduledAt =
+      typeof body?.scheduledAt === "string" &&
+      body.scheduledAt.trim() !== ""
+        ? body.scheduledAt.trim()
+        : null;
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDATION
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+      listingId === null ||
+      !Number.isFinite(listingId)
+    ) {
       return NextResponse.json(
         {
           success: false,
           error:
-            "Facebook Group URL is required.",
+            "Listing ID is required.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (
+      groupUrls.length === 0
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Please select at least one Facebook Group.",
         },
         { status: 400 }
       );
@@ -48,6 +100,65 @@ export async function POST(request: Request) {
       );
     }
 
+    if (
+      imageUrls.length === 0
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "At least one image is required.",
+        },
+        { status: 400 }
+      );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDATE SCHEDULE
+    |--------------------------------------------------------------------------
+    */
+
+    let scheduledTimestamp:
+      string | null = null;
+
+    if (scheduledAt) {
+      const parsed =
+        new Date(scheduledAt);
+
+      if (
+        Number.isNaN(
+          parsed.getTime()
+        )
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "Invalid scheduled date/time.",
+          },
+          { status: 400 }
+        );
+      }
+
+      scheduledTimestamp =
+        parsed.toISOString();
+
+      if (
+        parsed.getTime() <=
+        Date.now()
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "Scheduled time must be in the future.",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     /*
     |--------------------------------------------------------------------------
     | FIND ONLINE DESKTOP WORKER
@@ -62,7 +173,10 @@ export async function POST(request: Request) {
       .select(
         "id, worker_name, status, last_seen"
       )
-      .eq("status", "online")
+      .eq(
+        "status",
+        "online"
+      )
       .order(
         "last_seen",
         {
@@ -106,67 +220,104 @@ export async function POST(request: Request) {
 
     /*
     |--------------------------------------------------------------------------
-    | CREATE DESKTOP JOB
+    | CREATE ONE JOB PER FACEBOOK GROUP
     |--------------------------------------------------------------------------
     */
 
-    const payload = {
-      group_url: groupUrl,
-      message,
-      image_urls: imageUrls,
-    };
+    const jobs = groupUrls.map(
+      (groupUrl) => ({
+        worker_id:
+          worker.id,
 
-    const {
-      data: job,
-      error: jobError,
-    } = await supabase
-      .from("desktop_jobs")
-      .insert({
-        worker_id: worker.id,
         job_type:
           "facebook_group_post",
-        payload,
-        status: "queued",
-      })
-      .select(
-        "id, worker_id, job_type, payload, status, created_at"
-      )
-      .single();
 
-    if (jobError) {
+        payload: {
+          listing_id:
+            listingId,
+
+          group_url:
+            groupUrl,
+
+          message,
+
+          image_urls:
+            imageUrls,
+        },
+
+        status:
+          "queued",
+
+        scheduled_at:
+          scheduledTimestamp,
+      })
+    );
+
+    const {
+      data: createdJobs,
+      error: jobsError,
+    } = await supabase
+      .from("desktop_jobs")
+      .insert(jobs)
+      .select(
+        "id, worker_id, job_type, payload, status, scheduled_at, created_at"
+      );
+
+    if (jobsError) {
       console.error(
-        "Desktop job creation error:",
-        jobError
+        "Desktop jobs creation error:",
+        jobsError
       );
 
       return NextResponse.json(
         {
           success: false,
           error:
-            "Failed to create Facebook Group posting job.",
-          details: jobError.message,
+            "Failed to create Facebook Group posting jobs.",
+          details:
+            jobsError.message,
         },
         { status: 500 }
       );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | SUCCESS
+    |--------------------------------------------------------------------------
+    */
+
     console.log(
-      "Facebook Group desktop job created:",
-      job.id
+      `Created ${createdJobs?.length ?? 0} Facebook Group jobs.`
     );
 
     return NextResponse.json({
       success: true,
-      jobId: job.id,
-      workerId: worker.id,
+
+      jobCount:
+        createdJobs?.length ?? 0,
+
+      workerId:
+        worker.id,
+
       workerName:
         worker.worker_name,
-      status: job.status,
-      groupUrl,
-      imageCount:
-        imageUrls.length,
+
+      status:
+        "queued",
+
+      scheduledAt:
+        scheduledTimestamp,
+
+      listingId,
+
+      groupCount:
+        groupUrls.length,
+
       message:
-        "Facebook Group posting job queued successfully.",
+        scheduledTimestamp
+          ? "Facebook Group posting jobs scheduled successfully."
+          : "Facebook Group posting jobs queued successfully.",
     });
   } catch (error) {
     console.error(
@@ -178,7 +329,7 @@ export async function POST(request: Request) {
       {
         success: false,
         error:
-          "Unexpected error while creating Facebook Group posting job.",
+          "Unexpected error while creating Facebook Group posting jobs.",
       },
       { status: 500 }
     );

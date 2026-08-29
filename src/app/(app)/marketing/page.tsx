@@ -6,19 +6,49 @@ import { supabase } from "@/lib/supabase";
 import MarketingListingSelector from "@/components/marketing/MarketingListingSelector";
 
 export default async function MarketingPage() {
-  const { data: listings, error } = await supabase
-    .from("properties")
-    .select(`
-      *,
-      property_photos (
-        photo_type,
-        image_url
-      )
-    `)
-    .order("created_at", { ascending: false });
+  const [
+    { data: listings, error: listingsError },
+    { data: facebookGroups, error: groupsError },
+  ] = await Promise.all([
+    supabase
+      .from("properties")
+      .select(`
+        *,
+        property_photos (
+  photo_type,
+  image_url,
+  sort_order,
+  created_at
+)
+      `)
+      .order("created_at", { ascending: false }),
 
-  if (error) {
-    console.error("Marketing listings error:", error);
+    supabase
+      .from("facebook_groups")
+      .select(`
+        id,
+        name,
+        group_url,
+        language,
+        region,
+        is_active
+      `)
+      .eq("is_active", true)
+      .order("name", { ascending: true }),
+  ]);
+
+  if (listingsError) {
+    console.error(
+      "Marketing listings error:",
+      listingsError
+    );
+  }
+
+  if (groupsError) {
+    console.error(
+      "Facebook groups error:",
+      groupsError
+    );
   }
 
   return (
@@ -42,6 +72,7 @@ export default async function MarketingPage() {
 
       <MarketingListingSelector
         listings={listings ?? []}
+        facebookGroups={facebookGroups ?? []}
       />
 
     </div>
