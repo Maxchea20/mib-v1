@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { supabase } from "@/lib/supabase";
-import MarketingListingSelector from "@/components/marketing/MarketingListingSelector";
+import MarketingTabs from "@/components/marketing/MarketingTabs";
 
 export default async function MarketingPage() {
   const [
@@ -70,10 +70,10 @@ export default async function MarketingPage() {
 
       {/* LISTING SELECTOR */}
 
-      <MarketingListingSelector
-        listings={listings ?? []}
-        facebookGroups={facebookGroups ?? []}
-      />
+      <MarketingTabs
+  listings={listings ?? []}
+  facebookGroups={facebookGroups ?? []}
+/>
 
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { coverPhotoMap } from "@/lib/photoTemplates";
 
 type FacebookGroup = {
@@ -72,6 +72,35 @@ export default function MarketingListingSelector({
 
   const [selectedPhotos, setSelectedPhotos] =
     useState<string[]>([]);
+
+  /*
+  |--------------------------------------------------------------------------
+  | CLOSE DROPDOWN WHEN CLICKING OUTSIDE
+  |--------------------------------------------------------------------------
+  */
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    function handleOutsideClick(event: MouseEvent) {
+      const target = event.target as HTMLElement;
+
+      if (!target.closest("[data-facebook-dropdown]")) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleOutsideClick
+      );
+    };
+  }, [open]);
 
   /*
   |--------------------------------------------------------------------------
@@ -720,7 +749,11 @@ export default function MarketingListingSelector({
 
       {/* SELECT LISTING */}
 
-      <div className="bg-white border rounded-xl shadow-sm p-6">
+      <div
+        className="relative"
+        data-facebook-dropdown
+      >
+        <div className="bg-white border rounded-xl shadow-sm p-6">
 
         <h2 className="text-lg font-semibold text-black mb-2">
           Select Listing
@@ -921,6 +954,7 @@ export default function MarketingListingSelector({
           </div>
         )}
 
+        </div>
       </div>
 
       {/* FACEBOOK MARKETING */}

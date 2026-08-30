@@ -2470,7 +2470,7 @@ export default function ListingForm({
     </option>
 
     <option>
-      2-storey Terraced House
+      2-storey Terrace House
     </option>
 
     <option>
