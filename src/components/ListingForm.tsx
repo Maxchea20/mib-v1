@@ -2437,59 +2437,68 @@ export default function ListingForm({
 
             )}
 
-            <select
-              value={
-                residentialStorey
-              }
-              onChange={(e) =>
-                setResidentialStorey(
-                  e.target.value
-                )
-              }
-              className={
-                inputClass
-              }
-            >
-              <option value="">
-                Terrace House
-              </option>
+            {propertyType ===
+  "Terrace / Link House" && (
 
-              <option>
-                1-storey Terraced House
-              </option>
+  <select
+    value={
+      propertySubType
+    }
+    onChange={(e) =>
+      setPropertySubType(
+        e.target.value
+      )
+    }
+    className={
+      inputClass
+    }
+  >
+    <option value="">
+      Property Sub Type
+    </option>
 
-              <option>
-                1.5-storey Terraced House
-              </option>
+    <option>
+      Terrace House
+    </option>
 
-              <option>
-                2-storey Terraced House
-              </option>
+    <option>
+      1-storey Terraced House
+    </option>
 
-              <option>
-                2.5-storey Terraced House
-              </option>
+    <option>
+      1.5-storey Terraced House
+    </option>
 
-              <option>
-                3-storey Terraced House
-              </option>
+    <option>
+      2-storey Terraced House
+    </option>
 
-              <option>
-                3.5-storey Terraced House
-              </option>
+    <option>
+      2.5-storey Terraced House
+    </option>
 
-              <option>
-                4-storey Terraced House
-              </option>
+    <option>
+      3-storey Terraced House
+    </option>
 
-              <option>
-                4.5-storey Terraced House
-              </option>
+    <option>
+      3.5-storey Terraced House
+    </option>
 
-              <option>
-                Townhouse
-              </option>
-            </select>
+    <option>
+      4-storey Terraced House
+    </option>
+
+    <option>
+      4.5-storey Terraced House
+    </option>
+
+    <option>
+      Townhouse
+    </option>
+
+  </select>
+)}
 
             <select
               value={
