@@ -34,20 +34,14 @@ function runFFmpeg(
       resolve,
       reject
     ) => {
-      const ffmpegPath =
-  process.platform === "win32"
-    ? path.join(
-        process.cwd(),
-        "node_modules",
-        "ffmpeg-static",
-        "ffmpeg.exe"
-      )
-    : path.join(
-        process.cwd(),
-        "node_modules",
-        "ffmpeg-static",
-        "ffmpeg"
-      );
+      const ffmpegPath = ffmpegStatic;
+
+if (!ffmpegPath) {
+  reject(
+    new Error("FFmpeg executable was not found.")
+  );
+  return;
+}
 
 if (!ffmpegPath) {
         reject(
