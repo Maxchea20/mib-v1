@@ -80,29 +80,42 @@ export async function updateSession(request: NextRequest) {
   );
 
   let tokenErrorMessage = null;
+  let tokenUserPresent = false;
+  let tokenUserIsAnonymous = null;
+  let thrownError = null;
 
   if (bearerToken) {
-    const tokenClient = createSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    try {
+      const tokenClient = createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
 
-    const {
-      data: { user: tokenUser },
-      error: tokenError,
-    } = await tokenClient.auth.getUser(bearerToken);
+      const {
+        data: { user: tokenUser },
+        error: tokenError,
+      } = await tokenClient.auth.getUser(bearerToken);
 
-    if (tokenError) {
+      tokenUserPresent = Boolean(tokenUser);
+      tokenUserIsAnonymous = tokenUser ? tokenUser.is_anonymous : null;
+
+      if (tokenError) {
+        // TEMPORARY DEBUG LOG - remove once worker auth is confirmed working.
+        console.error("PROXY: bearer token validation failed:", tokenError.message);
+        tokenErrorMessage = tokenError.message;
+      }
+
+      if (!tokenError && tokenUser && !tokenUser.is_anonymous) {
+        return {
+          supabaseResponse,
+          user: tokenUser,
+        };
+      }
+    } catch (caughtError) {
       // TEMPORARY DEBUG LOG - remove once worker auth is confirmed working.
-      console.error("PROXY: bearer token validation failed:", tokenError.message);
-      tokenErrorMessage = tokenError.message;
-    }
-
-    if (!tokenError && tokenUser && !tokenUser.is_anonymous) {
-      return {
-        supabaseResponse,
-        user: tokenUser,
-      };
+      console.error("PROXY: bearer validation threw:", caughtError);
+      thrownError =
+        caughtError instanceof Error ? caughtError.message : String(caughtError);
     }
   }
 
@@ -114,5 +127,8 @@ export async function updateSession(request: NextRequest) {
     _tokenError: tokenErrorMessage,
     _authHeaderPresent: Boolean(authHeader),
     _authHeaderPrefix: authHeader ? authHeader.slice(0, 20) : null,
+    _tokenUserPresent: tokenUserPresent,
+    _tokenUserIsAnonymous: tokenUserIsAnonymous,
+    _thrownError: thrownError,
   };
 }

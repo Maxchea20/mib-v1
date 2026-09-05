@@ -27,6 +27,9 @@ export async function proxy(request: NextRequest) {
     _tokenError,
     _authHeaderPresent,
     _authHeaderPrefix,
+    _tokenUserPresent,
+    _tokenUserIsAnonymous,
+    _thrownError,
   } = await updateSession(request);
 
   const path = request.nextUrl.pathname;
@@ -46,6 +49,9 @@ export async function proxy(request: NextRequest) {
         _tokenError: _tokenError || null,
         _authHeaderPresent: _authHeaderPresent ?? null,
         _authHeaderPrefix: _authHeaderPrefix ?? null,
+        _tokenUserPresent: _tokenUserPresent ?? null,
+        _tokenUserIsAnonymous: _tokenUserIsAnonymous ?? null,
+        _thrownError: _thrownError ?? null,
       },
       { status: 401 }
     );
