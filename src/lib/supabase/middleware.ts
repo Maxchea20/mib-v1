@@ -82,6 +82,11 @@ export async function updateSession(request: NextRequest) {
       error: tokenError,
     } = await tokenClient.auth.getUser(bearerToken);
 
+    if (tokenError) {
+      // TEMPORARY DEBUG LOG - remove once worker auth is confirmed working.
+      console.error("PROXY: bearer token validation failed:", tokenError.message);
+    }
+
     if (!tokenError && tokenUser && !tokenUser.is_anonymous) {
       return {
         supabaseResponse,
@@ -93,5 +98,7 @@ export async function updateSession(request: NextRequest) {
   return {
     supabaseResponse,
     user: null,
+    // TEMPORARY DEBUG FIELD - remove once worker auth is confirmed working.
+    _rejectedBy: "proxy.ts",
   };
 }

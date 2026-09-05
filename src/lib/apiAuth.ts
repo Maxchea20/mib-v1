@@ -77,7 +77,11 @@ export async function requireUser() {
   return {
     user: null,
     response: NextResponse.json(
-      { error: "Unauthorized. Please log in." },
+      {
+        error: "Unauthorized. Please log in.",
+        // TEMPORARY DEBUG FIELD - remove once worker auth is confirmed working.
+        _rejectedBy: "apiAuth.ts",
+      },
       { status: 401 }
     ),
   };
