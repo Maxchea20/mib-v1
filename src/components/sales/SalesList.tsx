@@ -1,50 +1,47 @@
+// File: src/components/sales/SalesList.tsx
 "use client";
 
 import { useMemo, useState } from "react";
 import DeleteSaleButton from "@/components/sales/DeleteSaleButton";
 import EditSaleButton from "@/components/sales/EditSaleButton";
+import Card, { CardHeader } from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
 
 type Props = {
   deals: any[];
 };
 
 export default function SalesList({ deals }: Props) {
-  // Get all available years from the sales data
   const years = useMemo(() => {
     return Array.from(
-      new Set(
-        deals
-          .map((deal) => Number(deal.year))
-          .filter((year) => !isNaN(year))
-      )
+      new Set(deals.map((deal) => Number(deal.year)).filter((year) => !isNaN(year)))
     ).sort((a, b) => b - a);
   }, [deals]);
 
-  // Default to the latest year
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
-
   const activeYear = selectedYear ?? years[0];
 
-  // Show only deals from the selected year
   const filteredDeals = useMemo(() => {
-  if (!activeYear) return [];
+    if (!activeYear) return [];
+    return deals
+      .filter((deal) => Number(deal.year) === Number(activeYear))
+      .sort((a, b) => Number(a.deal_no) - Number(b.deal_no));
+  }, [deals, activeYear]);
 
-  return deals
-    .filter(
-      (deal) => Number(deal.year) === Number(activeYear)
-    )
-    .sort(
-      (a, b) => Number(a.deal_no) - Number(b.deal_no)
+  const totals = useMemo(() => {
+    return filteredDeals.reduce(
+      (acc, deal) => {
+        acc.selling += Number(deal.selling_price) || 0;
+        acc.commission += Number(deal.gross_commission) || 0;
+        return acc;
+      },
+      { selling: 0, commission: 0 }
     );
-}, [deals, activeYear]);
+  }, [filteredDeals]);
 
   const formatMoney = (value: any) => {
     const number = Number(value);
-
-    if (isNaN(number)) {
-      return "-";
-    }
-
+    if (isNaN(number)) return "-";
     return `RM ${number.toLocaleString("en-MY", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -52,94 +49,93 @@ export default function SalesList({ deals }: Props) {
   };
 
   return (
-    <div className="bg-white rounded-xl border p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-semibold">Sales List</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            {filteredDeals.length} deals in {activeYear || "-"}
+    <Card>
+      <CardHeader
+        title="Sales list"
+        subtitle={`${filteredDeals.length} deals in ${activeYear || "-"}`}
+        action={
+          <select
+            value={activeYear || ""}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            className="border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white text-slate-900"
+          >
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        }
+      />
+
+      {/* TOTALS SUMMARY */}
+      <div className="grid grid-cols-2 gap-3 px-6 pt-5">
+        <div className="bg-slate-50 rounded-lg p-4">
+          <p className="text-xs text-slate-500 mb-1">Total selling price</p>
+          <p className="text-xl font-semibold text-slate-900">
+            {formatMoney(totals.selling)}
           </p>
         </div>
-
-        {/* Year Selector */}
-        <select
-          value={activeYear || ""}
-          onChange={(e) => setSelectedYear(Number(e.target.value))}
-          className="border rounded-lg px-3 py-2 text-sm bg-white"
-        >
-          {years.map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select>
+        <div className="bg-slate-50 rounded-lg p-4">
+          <p className="text-xs text-slate-500 mb-1">Total commission</p>
+          <p className="text-xl font-semibold text-slate-900">
+            {formatMoney(totals.commission)}
+          </p>
+        </div>
       </div>
 
-      {/* Sales Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto px-6 py-5">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b text-left">
-              <th className="py-3 pr-4 font-semibold">Deal</th>
-              <th className="py-3 pr-4 font-semibold">Area</th>
-              <th className="py-3 pr-4 font-semibold">Property</th>
-              <th className="py-3 pr-4 font-semibold text-right">
-                Selling Price
-              </th>
-              <th className="py-3 pr-4 font-semibold text-right">
-                Gross Commission
-              </th>
-              <th className="py-3 font-semibold">Status</th>
-              <th className="py-3 font-semibold">Actions</th>
+            <tr className="border-b border-slate-200 text-left text-slate-500">
+              <th className="py-3 pr-4 font-medium">Deal</th>
+              <th className="py-3 pr-4 font-medium">Area</th>
+              <th className="py-3 pr-4 font-medium">Property</th>
+              <th className="py-3 pr-4 font-medium text-right">Selling price</th>
+              <th className="py-3 pr-4 font-medium text-right">Gross commission</th>
+              <th className="py-3 font-medium">Status</th>
+              <th className="py-3 font-medium">Actions</th>
             </tr>
           </thead>
-
           <tbody>
             {filteredDeals.map((deal, index) => (
               <tr
                 key={`${deal.year}-${deal.deal_no}-${index}`}
-                className="border-b last:border-b-0 hover:bg-gray-50"
+                className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50"
               >
-                <td className="py-3 pr-4">
-                  #{deal.deal_no ?? "-"}
-                </td>
-
-                <td className="py-3 pr-4">
-                  {deal.area || "-"}
-                </td>
-
-                <td className="py-3 pr-4">
-                  {deal.property || "-"}
-                </td>
-
-                <td className="py-3 pr-4 text-right whitespace-nowrap">
+                <td className="py-3 pr-4 text-slate-900">#{deal.deal_no ?? "-"}</td>
+                <td className="py-3 pr-4 text-slate-600">{deal.area || "-"}</td>
+                <td className="py-3 pr-4 text-slate-600">{deal.property || "-"}</td>
+                <td className="py-3 pr-4 text-right whitespace-nowrap text-slate-900">
                   {formatMoney(deal.selling_price)}
                 </td>
-
-                <td className="py-3 pr-4 text-right whitespace-nowrap">
+                <td className="py-3 pr-4 text-right whitespace-nowrap text-slate-900">
                   {formatMoney(deal.gross_commission)}
                 </td>
-
                 <td className="py-3">
-                  {deal.remarks || deal.status || "-"}
+                  {deal.remarks || deal.status ? (
+                    <Badge status={deal.status}>{deal.remarks || deal.status}</Badge>
+                  ) : (
+                    "-"
+                  )}
                 </td>
                 <td className="py-3">
-                   <EditSaleButton deal={deal} />
-  <DeleteSaleButton id={deal.id} />
-</td>
+                  <div className="flex items-center gap-1">
+                    <EditSaleButton deal={deal} />
+                    <DeleteSaleButton id={deal.id} />
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
 
-      {/* Empty State */}
-      {filteredDeals.length === 0 && (
-        <div className="text-center py-10 text-gray-500">
-          No sales found for {activeYear || "this year"}.
-        </div>
-      )}
-    </div>
+        {filteredDeals.length === 0 && (
+          <div className="text-center py-10 text-slate-500 text-sm">
+            No sales found for {activeYear || "this year"}.
+          </div>
+        )}
+      </div>
+    </Card>
   );
 }

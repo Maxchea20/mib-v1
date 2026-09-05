@@ -14,18 +14,6 @@ type AIDesign = {
   created_at: string;
 };
 
-type AIVideo = {
-  id: string;
-  property_id: number;
-  video_id: string;
-  status: string;
-  progress: number;
-  video_url?: string | null;
-  created_at: string;
-  completed_at?: string | null;
-  error_message?: string | null;
-};
-
 export default function AIDesignTab({
   listing,
 }: Props) {
@@ -33,23 +21,11 @@ export default function AIDesignTab({
   const [designs, setDesigns] =
     useState<AIDesign[]>([]);
 
-  const [videos, setVideos] =
-    useState<AIVideo[]>([]);
-
   const [loadingDesigns, setLoadingDesigns] =
-    useState(true);
-
-  const [loadingVideos, setLoadingVideos] =
     useState(true);
 
   const [loadingPoster, setLoadingPoster] =
     useState(false);
-
-  const [generatingVideo, setGeneratingVideo] =
-    useState(false);
-
-  const [deletingVideoId, setDeletingVideoId] =
-    useState<string | null>(null);
 
   const [error, setError] =
     useState("");
@@ -111,54 +87,6 @@ export default function AIDesignTab({
 
   /*
   |--------------------------------------------------------------------------
-  | LOAD VIDEOS
-  |--------------------------------------------------------------------------
-  */
-
-  async function loadVideos() {
-    if (!listing?.id) {
-      return;
-    }
-
-    try {
-      const response =
-        await fetch(
-          `/api/ai/property-video?property_id=${listing.id}`,
-          {
-            cache: "no-store",
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (
-        !response.ok ||
-        !data.success
-      ) {
-        throw new Error(
-          data.error ||
-            "Failed to load AI videos."
-        );
-      }
-
-      setVideos(
-        data.videos || []
-      );
-
-    } catch (error: any) {
-      console.error(
-        "AI VIDEO LOAD ERROR:",
-        error
-      );
-
-    } finally {
-      setLoadingVideos(false);
-    }
-  }
-
-  /*
-  |--------------------------------------------------------------------------
   | INITIAL LOAD
   |--------------------------------------------------------------------------
   */
@@ -169,45 +97,8 @@ export default function AIDesignTab({
     }
 
     loadDesigns();
-    loadVideos();
 
   }, [listing?.id]);
-
-  /*
-  |--------------------------------------------------------------------------
-  | AUTO POLLING
-  |--------------------------------------------------------------------------
-  */
-
-  useEffect(() => {
-    if (!listing?.id) {
-      return;
-    }
-
-    const hasProcessingVideo =
-      videos.some(
-        (video) =>
-          video.status === "queued" ||
-          video.status === "in_progress"
-      );
-
-    if (!hasProcessingVideo) {
-      return;
-    }
-
-    const timer =
-      setTimeout(() => {
-        loadVideos();
-      }, 10000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-
-  }, [
-    listing?.id,
-    videos,
-  ]);
 
   /*
   |--------------------------------------------------------------------------
@@ -218,8 +109,7 @@ export default function AIDesignTab({
   async function generatePoster() {
     if (
       !listing ||
-      loadingPoster ||
-      generatingVideo
+      loadingPoster
     ) {
       return;
     }
@@ -273,211 +163,6 @@ export default function AIDesignTab({
 
     } finally {
       setLoadingPoster(false);
-    }
-  }
-
-  /*
-  |--------------------------------------------------------------------------
-  | GET FIRST PROPERTY PHOTO
-  |--------------------------------------------------------------------------
-  */
-
-  function getVideoPhotoUrl() {
-    const photos =
-      Array.isArray(
-        listing?.property_photos
-      )
-        ? listing.property_photos
-        : [];
-
-    const usablePhoto =
-      photos.find(
-        (photo: any) =>
-          typeof photo?.image_url ===
-            "string" &&
-          photo.image_url.trim() !== ""
-      );
-
-    return (
-      usablePhoto?.image_url ||
-      ""
-    );
-  }
-
-  /*
-  |--------------------------------------------------------------------------
-  | GENERATE VIDEO
-  |--------------------------------------------------------------------------
-  */
-
-  async function generateVideo() {
-    if (
-      !listing ||
-      generatingVideo ||
-      loadingPoster
-    ) {
-      return;
-    }
-
-    try {
-      setGeneratingVideo(true);
-      setError("");
-
-      const imageUrl =
-        getVideoPhotoUrl();
-
-      if (!imageUrl) {
-        throw new Error(
-          "This property does not have a usable property photo."
-        );
-      }
-
-      const response =
-        await fetch(
-          "/api/ai/property-video",
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body: JSON.stringify({
-              propertyId:
-                listing.id,
-
-              imageUrl:
-                imageUrl,
-            }),
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (
-        !response.ok ||
-        !data.success
-      ) {
-        throw new Error(
-          data.error ||
-            "Failed to create AI video."
-        );
-      }
-
-      await loadVideos();
-
-    } catch (error: any) {
-      console.error(
-        "AI VIDEO ERROR:",
-        error
-      );
-
-      setError(
-        error?.message ||
-          "Failed to generate AI video."
-      );
-
-    } finally {
-      setGeneratingVideo(false);
-    }
-  }
-
-  /*
-  |--------------------------------------------------------------------------
-  | DELETE VIDEO
-  |--------------------------------------------------------------------------
-  */
-
-  async function deleteVideo(
-    video: AIVideo
-  ) {
-    const confirmed =
-      window.confirm(
-        "Delete this AI video?\n\nThis will permanently delete the video from Supabase Storage and remove its database record.\n\nThis cannot be undone."
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      setDeletingVideoId(
-        video.id
-      );
-
-      setError("");
-
-      console.log(
-        "AI VIDEO DELETE:",
-        video.id
-      );
-
-      const response =
-        await fetch(
-          "/api/ai/property-video",
-          {
-            method: "DELETE",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body: JSON.stringify({
-              id: video.id,
-            }),
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (
-        !response.ok ||
-        !data.success
-      ) {
-        throw new Error(
-          data.error ||
-            "Failed to delete AI video."
-        );
-      }
-
-      /*
-      |--------------------------------------------------------------------------
-      | REMOVE FROM UI IMMEDIATELY
-      |--------------------------------------------------------------------------
-      */
-
-      setVideos(
-        (current) =>
-          current.filter(
-            (item) =>
-              item.id !==
-              video.id
-          )
-      );
-
-      console.log(
-        "AI VIDEO DELETE: SUCCESS"
-      );
-
-    } catch (error: any) {
-      console.error(
-        "AI VIDEO DELETE ERROR:",
-        error
-      );
-
-      setError(
-        error?.message ||
-          "Failed to delete AI video."
-      );
-
-    } finally {
-      setDeletingVideoId(
-        null
-      );
     }
   }
 
@@ -609,8 +294,8 @@ export default function AIDesignTab({
             </h2>
 
             <p className="text-sm text-gray-500 mt-1">
-              AI-generated marketing designs
-              and videos for this property.
+              AI-generated marketing posters
+              for this property.
             </p>
 
           </div>
@@ -623,30 +308,13 @@ export default function AIDesignTab({
                 generatePoster
               }
               disabled={
-                loadingPoster ||
-                generatingVideo
+                loadingPoster
               }
               className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-5 py-3 rounded-lg font-semibold"
             >
               {loadingPoster
                 ? "🎨 AI Designing..."
                 : "🎨 Generate AI Poster"}
-            </button>
-
-            <button
-              type="button"
-              onClick={
-                generateVideo
-              }
-              disabled={
-                generatingVideo ||
-                loadingPoster
-              }
-              className="bg-black hover:bg-gray-800 disabled:bg-gray-400 text-white px-5 py-3 rounded-lg font-semibold"
-            >
-              {generatingVideo
-                ? "🎬 Creating Video..."
-                : "🎬 Generate AI Video"}
             </button>
 
           </div>
@@ -673,25 +341,6 @@ export default function AIDesignTab({
         ) : null}
 
         {/* ================================================= */}
-        {/* VIDEO LOADING */}
-        {/* ================================================= */}
-
-        {generatingVideo ? (
-          <div className="mt-5 p-4 rounded-lg bg-gray-50 border border-gray-200">
-
-            <p className="text-sm font-semibold text-gray-800">
-              🎬 AI is creating the property video...
-            </p>
-
-            <p className="text-xs text-gray-600 mt-1">
-              MIB is sending the property photo
-              to Sora.
-            </p>
-
-          </div>
-        ) : null}
-
-        {/* ================================================= */}
         {/* ERROR */}
         {/* ================================================= */}
 
@@ -702,8 +351,6 @@ export default function AIDesignTab({
         ) : null}
 
       </div>
-
-      
 
       {/* ===================================================== */}
       {/* POSTERS */}

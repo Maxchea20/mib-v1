@@ -1,8 +1,35 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Dark terminal base */
+  --background: #0a0e16;
+  --foreground: #e7ecf3;
+
+  --surface: #10151f;
+  --surface-raised: #151b26;
+  --border: #1e2733;
+  --border-strong: #2a3441;
+
+  /* Electric cyan - primary interactive accent */
+  --accent: #22d3ee;
+  --accent-dim: #0e7490;
+  --accent-glow: rgba(34, 211, 238, 0.15);
+
+  /* Status - bright/saturated, not pastel */
+  --success: #22c55e;
+  --success-bg: rgba(34, 197, 94, 0.12);
+  --warning: #fbbf24;
+  --warning-bg: rgba(251, 191, 36, 0.12);
+  --danger: #ff4d4d;
+  --danger-bg: rgba(255, 77, 77, 0.12);
+
+  /* Text hierarchy */
+  --text-primary: #e7ecf3;
+  --text-secondary: #8b95a5;
+  --text-muted: #5a6472;
+
+  --font-serif: "Fraunces", Georgia, serif;
 }
 
 @theme inline {
@@ -10,10 +37,43 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-serif);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Numbers/data - monospace, like a trading terminal */
+.font-data {
+  font-family: var(--font-mono), "SF Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Section eyebrow labels - "MARKET DATA / LAYER 1" style */
+.label-caption {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a4657;
 }

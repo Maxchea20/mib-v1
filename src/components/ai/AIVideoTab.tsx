@@ -1525,6 +1525,62 @@ export default function AIVideoTab({
   |
   */
 
+  /*
+  |--------------------------------------------------------------------------
+  | WAIT FOR THE WORKER TO CREATE THE PROJECT
+  |--------------------------------------------------------------------------
+  |
+  | After a job is queued, the MIB Desktop worker picks it up, loads the
+  | property, runs the AI Director, and creates the ai_video_projects row.
+  | It writes project_id into this job's payload as soon as that happens
+  | (see videoGeneration.mjs), so this just polls the job row until that
+  | shows up.
+  |
+  */
+
+  async function waitForJobProjectId(
+    jobId: string
+  ): Promise<string> {
+    const maxAttempts = 60; // ~5 minutes waiting for the worker to pick up the job
+
+    for (
+      let attempt = 0;
+      attempt < maxAttempts;
+      attempt++
+    ) {
+      const response = await fetch(
+        `/api/ai/video-generate-job?id=${jobId}`,
+        { cache: "no-store" }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.error || "Failed to check video generation job status."
+        );
+      }
+
+      const job = data.job;
+
+      if (job.status === "failed") {
+        throw new Error(
+          job.error || "Video generation job failed on the worker."
+        );
+      }
+
+      if (job.payload?.project_id) {
+        return job.payload.project_id as string;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 4000));
+    }
+
+    throw new Error(
+      "Timed out waiting for the MIB Desktop worker to start this job. Is MIB Desktop running?"
+    );
+  }
+
   async function waitForProjectAndAssemble(
     projectId: string
   ) {
@@ -1680,8 +1736,15 @@ export default function AIVideoTab({
 
         /*
         |--------------------------------------------------------------------------
-        | ALL SHOTS COMPLETED
+        | ALL SHOTS COMPLETED - WAITING ON THE WORKER TO ASSEMBLE
         |--------------------------------------------------------------------------
+        |
+        | The MIB Desktop worker owns assembly now (see videoGeneration.mjs).
+        | This tab does NOT call assembleProject itself anymore - calling it
+        | here too would race the worker's own assemble call. We just keep
+        | polling; the top-of-loop check above will break once the worker
+        | has written final_video_url.
+        |
         */
 
         const expectedCount =
@@ -1699,29 +1762,8 @@ export default function AIVideoTab({
             expectedCount
         ) {
           console.log(
-            "AI VIDEO STUDIO: ALL SHOTS COMPLETED"
+            "AI VIDEO STUDIO: all shots completed, waiting for worker to assemble..."
           );
-
-          await assembleProject(
-            projectId,
-            videoPlan?.editingPlan
-          );
-
-          /*
-          |--------------------------------------------------------------------------
-          | FINAL REFRESH
-          |--------------------------------------------------------------------------
-          */
-
-          await loadVideos(
-            projectId
-          );
-
-          await loadVideoProject(
-            projectId
-          );
-
-          break;
         }
 
         /*
@@ -1816,17 +1858,27 @@ export default function AIVideoTab({
 
       /*
       |--------------------------------------------------------------------------
-      | CREATE PROJECT
+      | SUBMIT ONE JOB TO THE MIB DESKTOP WORKER
       |--------------------------------------------------------------------------
+      |
+      | The worker now owns the entire pipeline: it creates the project,
+      | submits shots to Runway one at a time (respecting the 1-concurrency
+      | limit), and assembles the final video. This tab just submits the
+      | job and then watches ai_video_projects / ai_videos, same as it
+      | already does elsewhere (reassembleExistingProject, history gallery).
+      |
+      | This is what lets generation survive closing this tab/phone - the
+      | worker keeps running on the PC independently of this browser.
+      |
       */
 
       console.log(
-        "AI VIDEO STUDIO: creating video project..."
+        "AI VIDEO STUDIO: queuing video generation job on MIB Desktop worker..."
       );
 
-      const projectResponse =
+      const jobResponse =
         await fetch(
-          "/api/ai/video-project",
+          "/api/ai/video-generate-job",
           {
             method: "POST",
 
@@ -1839,35 +1891,42 @@ export default function AIVideoTab({
               propertyId:
                 listing.id,
 
-              clipCount:
-                videoPlan
-                  .recommendations
-                  .length,
+              videoStyle,
             }),
           }
         );
 
-      const projectData =
-        await projectResponse.json();
+      const jobData =
+        await jobResponse.json();
 
       if (
-        !projectResponse.ok ||
-        !projectData.success
+        !jobResponse.ok ||
+        !jobData.success
       ) {
         throw new Error(
-          projectData.error ||
-            "Failed to create AI video project."
+          jobData.error ||
+            "Failed to queue video generation job."
         );
       }
 
-      const projectId =
-        projectData.project.id;
+      const jobId =
+        jobData.job.id;
+
+      console.log(
+        "AI VIDEO STUDIO: job queued:",
+        jobId
+      );
 
       /*
       |--------------------------------------------------------------------------
-      | STORE ACTIVE PROJECT
+      | WAIT FOR THE WORKER TO CREATE THE PROJECT
       |--------------------------------------------------------------------------
       */
+
+      const projectId =
+        await waitForJobProjectId(
+          jobId
+        );
 
       setActiveProjectId(
         projectId
@@ -1876,226 +1935,13 @@ export default function AIVideoTab({
       activeProjectRef.current =
         projectId;
 
-      console.log(
-        "=================================================="
-      );
-
-      console.log(
-        "AI VIDEO STUDIO: ACTIVE PROJECT:"
-      );
-
-      console.log(
-        projectId
-      );
-
-      console.log(
-        "=================================================="
-      );
-
       /*
       |--------------------------------------------------------------------------
-      | GENERATE SHOTS
-      |--------------------------------------------------------------------------
-      |
-      | IMPORTANT:
-      |
-      | ONE RUNWAY JOB AT A TIME.
-      |
-      | We submit Shot 1.
-      | Wait for completion.
-      | Then submit Shot 2.
-      |
-      | This respects the 1-concurrency limit.
-      |
-      */
-
-      const shots =
-        videoPlan
-          .recommendations;
-
-      for (
-        let i = 0;
-        i < shots.length;
-        i++
-      ) {
-        const shot =
-          shots[i];
-
-        const photo =
-          photos.find(
-            (
-              item: Photo
-            ) =>
-              item.index ===
-              shot.photoIndex
-          );
-
-        if (!photo) {
-          throw new Error(
-            `Photo ${shot.photoIndex} could not be found.`
-          );
-        }
-
-        console.log(
-          "=================================================="
-        );
-
-        console.log(
-          "AI VIDEO STUDIO: GENERATING SHOT"
-        );
-
-        console.log(
-          `Shot ${i + 1}/${shots.length}`
-        );
-
-        console.log(
-          "Project:",
-          projectId
-        );
-
-        console.log(
-          "Photo:",
-          shot.photoIndex
-        );
-
-        console.log(
-          "Type:",
-          shot.shotType
-        );
-
-        console.log(
-          "Action:",
-          shot.actionScript
-        );
-
-        console.log(
-          "=================================================="
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | SEND ONE SHOT TO RUNWAY
-        |--------------------------------------------------------------------------
-        */
-
-        const response =
-          await fetch(
-            "/api/ai/property-video-studio",
-            {
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json",
-              },
-
-              body: JSON.stringify({
-                propertyId:
-                  listing.id,
-
-                projectId,
-
-                imageUrl:
-                  photo.image_url,
-
-                photoIndex:
-                  shot.photoIndex,
-
-                shotOrder:
-                  shot.shotOrder,
-
-                videoStyle,
-
-                director:
-                  shot,
-              }),
-            }
-          );
-
-        const data =
-          await response.json();
-
-        if (
-          !response.ok ||
-          !data.success
-        ) {
-          throw new Error(
-            data.error ||
-              `Failed to create Shot ${i + 1}.`
-          );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | WAIT FOR THIS SHOT
-        |--------------------------------------------------------------------------
-        */
-
-        await waitForShotCompletion(
-          projectId,
-          shot.shotOrder
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | UPDATE PROGRESS
-        |--------------------------------------------------------------------------
-        */
-
-        setGenerationProgress({
-          current:
-            i + 1,
-
-          total:
-            shots.length,
-        });
-      }
-
-      /*
-      |--------------------------------------------------------------------------
-      | ALL SHOTS HAVE FINISHED
+      | WATCH THE PROJECT UNTIL THE FINAL VIDEO EXISTS
       |--------------------------------------------------------------------------
       */
 
-      console.log(
-        "=================================================="
-      );
-
-      console.log(
-        "AI VIDEO STUDIO: ALL RUNWAY SHOTS COMPLETE"
-      );
-
-      console.log(
-        "Project:",
-        projectId
-      );
-
-      console.log(
-        "=================================================="
-      );
-
-      /*
-      |--------------------------------------------------------------------------
-      | AUTO ASSEMBLE
-      |--------------------------------------------------------------------------
-      */
-
-      await assembleProject(
-        projectId,
-        videoPlan?.editingPlan
-      );
-
-      /*
-      |--------------------------------------------------------------------------
-      | FINAL INTERNAL REFRESH
-      |--------------------------------------------------------------------------
-      */
-
-      await loadVideos(
-        projectId
-      );
-
-      await loadVideoProject(
+      await waitForProjectAndAssemble(
         projectId
       );
     } catch (
