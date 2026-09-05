@@ -1,5 +1,4 @@
 import { createServerClient } from "@supabase/ssr";
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 
 /*
@@ -10,12 +9,9 @@ import { NextResponse, type NextRequest } from "next/server";
 | Refreshes the Supabase auth session on every request, and returns
 | both the response and the logged-in user (or null).
 |
-| AUTH SOURCES:
-| 1. Cookie-based session (normal browser requests).
-| 2. Bearer token (the MIB Desktop worker, which has no browser cookies
-|    but authenticates with a real Supabase access token). Without this,
-|    every worker request to /api/ai/* gets rejected here before the
-|    route handler - and its own apiAuth.ts Bearer support - ever runs.
+| Worker requests are handled separately in proxy.ts via a shared secret
+| header, before this function is ever called - this stays purely
+| cookie-based for real browser sessions.
 |
 */
 
@@ -52,83 +48,13 @@ export async function updateSession(request: NextRequest) {
   // IMPORTANT: do not remove this call. It refreshes the session
   // and keeps the user logged in across requests.
   const {
-    data: { user: cookieUser },
+    data: { user },
   } = await supabase.auth.getUser();
 
-  if (cookieUser && !cookieUser.is_anonymous) {
-    return {
-      supabaseResponse,
-      user: cookieUser,
-    };
-  }
-
-  // No valid cookie session - check for a Bearer token (worker requests).
-  const authHeader =
-    request.headers.get("authorization") ||
-    request.headers.get("Authorization");
-
-  const bearerToken = authHeader?.startsWith("Bearer ")
-    ? authHeader.slice(7).trim()
-    : null;
-
-  // TEMPORARY DEBUG - remove once worker auth is confirmed working.
-  console.log(
-    "PROXY: authHeader present:",
-    Boolean(authHeader),
-    "| raw prefix:",
-    authHeader ? authHeader.slice(0, 20) : "NONE"
-  );
-
-  let tokenErrorMessage = null;
-  let tokenUserPresent = false;
-  let tokenUserIsAnonymous = null;
-  let thrownError = null;
-
-  if (bearerToken) {
-    try {
-      const tokenClient = createSupabaseClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-
-      const {
-        data: { user: tokenUser },
-        error: tokenError,
-      } = await tokenClient.auth.getUser(bearerToken);
-
-      tokenUserPresent = Boolean(tokenUser);
-      tokenUserIsAnonymous = tokenUser ? tokenUser.is_anonymous : null;
-
-      if (tokenError) {
-        // TEMPORARY DEBUG LOG - remove once worker auth is confirmed working.
-        console.error("PROXY: bearer token validation failed:", tokenError.message);
-        tokenErrorMessage = tokenError.message;
-      }
-
-      if (!tokenError && tokenUser && !tokenUser.is_anonymous) {
-        return {
-          supabaseResponse,
-          user: tokenUser,
-        };
-      }
-    } catch (caughtError) {
-      // TEMPORARY DEBUG LOG - remove once worker auth is confirmed working.
-      console.error("PROXY: bearer validation threw:", caughtError);
-      thrownError =
-        caughtError instanceof Error ? caughtError.message : String(caughtError);
-    }
-  }
+  const isAnonymous = user?.is_anonymous === true;
 
   return {
     supabaseResponse,
-    user: null,
-    // TEMPORARY DEBUG FIELDS - remove once worker auth is confirmed working.
-    _rejectedBy: "proxy.ts",
-    _tokenError: tokenErrorMessage,
-    _authHeaderPresent: Boolean(authHeader),
-    _authHeaderPrefix: authHeader ? authHeader.slice(0, 20) : null,
-    _tokenUserPresent: tokenUserPresent,
-    _tokenUserIsAnonymous: tokenUserIsAnonymous,
-    _thrownError: thrownError,
+    user: isAnonymous ? null : user,
   };
 }

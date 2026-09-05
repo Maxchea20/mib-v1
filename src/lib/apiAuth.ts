@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { headers } from "next/headers";
 
 /*
@@ -9,29 +8,44 @@ import { headers } from "next/headers";
 |--------------------------------------------------------------------------
 |
 | Call this at the top of any API route that uses the Supabase service
-| role key. Middleware already blocks logged-out requests, but this is
-| a second, explicit check directly in the routes that touch the admin
-| key - defense in depth, in case middleware config ever changes.
+| role key. Middleware/proxy.ts already blocks logged-out requests, but
+| this is a second, explicit check directly in the routes that touch the
+| admin key - defense in depth, in case the proxy config ever changes.
 |
 | Usage:
 |
 |   const auth = await requireUser();
 |   if (!auth.user) return auth.response;
 |
-| AUTH SOURCES:
-| 1. Cookie-based session (normal browser requests).
-| 2. Bearer token (the MIB Desktop worker, which has no browser cookies
-|    but authenticates with a real Supabase access token obtained via
-|    MIB_WORKER_ACCESS_TOKEN / MIB_WORKER_REFRESH_TOKEN).
+| WORKER TRUST:
+| The MIB Desktop worker calls these routes as a trusted background
+| service (see proxy.ts for why it can't use a real Supabase user
+| session). It sends the same shared secret header proxy.ts checks;
+| this route-level guard honors it too so the two stay consistent.
 |
 */
 
+const WORKER_USER = {
+  id: "mib-desktop-worker",
+  email: "worker@mib.internal",
+  is_anonymous: false,
+} as const;
+
+function isTrustedWorkerRequest(headerList: Awaited<ReturnType<typeof headers>>): boolean {
+  const workerSecret = headerList.get("x-mib-worker-secret");
+  const expectedSecret = process.env.MIB_WORKER_SECRET;
+
+  return Boolean(
+    expectedSecret && workerSecret && workerSecret === expectedSecret
+  );
+}
+
 export async function requireUser() {
-  /*
-  |--------------------------------------------------------------------------
-  | 1. COOKIE SESSION (BROWSER)
-  |--------------------------------------------------------------------------
-  */
+  const headerList = await headers();
+
+  if (isTrustedWorkerRequest(headerList)) {
+    return { user: WORKER_USER as any, response: null };
+  }
 
   const supabase = await createClient();
 
@@ -40,49 +54,15 @@ export async function requireUser() {
     error,
   } = await supabase.auth.getUser();
 
-  if (!error && user && !user.is_anonymous) {
-    return { user, response: null };
+  if (error || !user || user.is_anonymous) {
+    return {
+      user: null,
+      response: NextResponse.json(
+        { error: "Unauthorized. Please log in." },
+        { status: 401 }
+      ),
+    };
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | 2. BEARER TOKEN (WORKER / NON-BROWSER CALLERS)
-  |--------------------------------------------------------------------------
-  */
-
-  const headerList = await headers();
-  const authHeader =
-    headerList.get("authorization") || headerList.get("Authorization");
-
-  const bearerToken = authHeader?.startsWith("Bearer ")
-    ? authHeader.slice(7).trim()
-    : null;
-
-  if (bearerToken) {
-    const tokenClient = createSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-
-    const {
-      data: { user: tokenUser },
-      error: tokenError,
-    } = await tokenClient.auth.getUser(bearerToken);
-
-    if (!tokenError && tokenUser && !tokenUser.is_anonymous) {
-      return { user: tokenUser, response: null };
-    }
-  }
-
-  return {
-    user: null,
-    response: NextResponse.json(
-      {
-        error: "Unauthorized. Please log in.",
-        // TEMPORARY DEBUG FIELD - remove once worker auth is confirmed working.
-        _rejectedBy: "apiAuth.ts",
-      },
-      { status: 401 }
-    ),
-  };
+  return { user, response: null };
 }

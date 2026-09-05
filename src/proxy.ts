@@ -10,49 +10,56 @@ import { updateSession } from "@/lib/supabase/middleware";
 | `config.matcher` below - static files, images, favicon).
 |
 | - /login and /api/auth stay open, everything else requires a
-|   logged-in (non-anonymous) Supabase user.
+|   logged-in (non-anonymous) Supabase user OR the MIB Desktop worker
+|   secret header.
 | - Page requests without a session are redirected to /login.
 | - API requests without a session get a 401 JSON response instead
 |   of a redirect, since the frontend fetch() calls expect JSON.
+|
+| WORKER TRUST:
+| MIB Desktop's Tauri webview has no real login flow - it only ever
+| produces an anonymous Supabase session, which correctly can't act as
+| a real user. Rather than build a full login screen for a background
+| process, the worker instead sends a shared secret header. This is
+| standard practice for trusted machine-to-machine calls: the worker is
+| a background service acting on behalf of the app's single owner, not
+| a separate "user" that needs its own session.
 |
 */
 
 const PUBLIC_PATHS = ["/login"];
 
-export async function proxy(request: NextRequest) {
-  const {
-    supabaseResponse,
-    user,
-    _rejectedBy,
-    _tokenError,
-    _authHeaderPresent,
-    _authHeaderPrefix,
-    _tokenUserPresent,
-    _tokenUserIsAnonymous,
-    _thrownError,
-  } = await updateSession(request);
+function isTrustedWorkerRequest(request: NextRequest): boolean {
+  const workerSecret = request.headers.get("x-mib-worker-secret");
+  const expectedSecret = process.env.MIB_WORKER_SECRET;
 
+  return Boolean(
+    expectedSecret && workerSecret && workerSecret === expectedSecret
+  );
+}
+
+export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isPublicPath = PUBLIC_PATHS.some((p) => path.startsWith(p));
 
-  if (user || isPublicPath) {
+  if (isPublicPath) {
+    return NextResponse.next({ request });
+  }
+
+  if (isTrustedWorkerRequest(request)) {
+    return NextResponse.next({ request });
+  }
+
+  const { supabaseResponse, user } = await updateSession(request);
+
+  if (user) {
     return supabaseResponse;
   }
 
   // Not logged in and hitting a protected route.
   if (path.startsWith("/api/")) {
     return NextResponse.json(
-      {
-        error: "Unauthorized. Please log in.",
-        // TEMPORARY DEBUG FIELDS - remove once worker auth is confirmed working.
-        _rejectedBy: _rejectedBy || "proxy.ts",
-        _tokenError: _tokenError || null,
-        _authHeaderPresent: _authHeaderPresent ?? null,
-        _authHeaderPrefix: _authHeaderPrefix ?? null,
-        _tokenUserPresent: _tokenUserPresent ?? null,
-        _tokenUserIsAnonymous: _tokenUserIsAnonymous ?? null,
-        _thrownError: _thrownError ?? null,
-      },
+      { error: "Unauthorized. Please log in." },
       { status: 401 }
     );
   }
