@@ -71,6 +71,14 @@ export async function updateSession(request: NextRequest) {
     ? authHeader.slice(7).trim()
     : null;
 
+  // TEMPORARY DEBUG - remove once worker auth is confirmed working.
+  console.log(
+    "PROXY: authHeader present:",
+    Boolean(authHeader),
+    "| raw prefix:",
+    authHeader ? authHeader.slice(0, 20) : "NONE"
+  );
+
   let tokenErrorMessage = null;
 
   if (bearerToken) {
@@ -104,5 +112,7 @@ export async function updateSession(request: NextRequest) {
     // TEMPORARY DEBUG FIELDS - remove once worker auth is confirmed working.
     _rejectedBy: "proxy.ts",
     _tokenError: tokenErrorMessage,
+    _authHeaderPresent: Boolean(authHeader),
+    _authHeaderPrefix: authHeader ? authHeader.slice(0, 20) : null,
   };
 }
