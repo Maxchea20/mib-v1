@@ -71,6 +71,8 @@ export async function updateSession(request: NextRequest) {
     ? authHeader.slice(7).trim()
     : null;
 
+  let tokenErrorMessage = null;
+
   if (bearerToken) {
     const tokenClient = createSupabaseClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -85,6 +87,7 @@ export async function updateSession(request: NextRequest) {
     if (tokenError) {
       // TEMPORARY DEBUG LOG - remove once worker auth is confirmed working.
       console.error("PROXY: bearer token validation failed:", tokenError.message);
+      tokenErrorMessage = tokenError.message;
     }
 
     if (!tokenError && tokenUser && !tokenUser.is_anonymous) {
@@ -98,7 +101,8 @@ export async function updateSession(request: NextRequest) {
   return {
     supabaseResponse,
     user: null,
-    // TEMPORARY DEBUG FIELD - remove once worker auth is confirmed working.
+    // TEMPORARY DEBUG FIELDS - remove once worker auth is confirmed working.
     _rejectedBy: "proxy.ts",
+    _tokenError: tokenErrorMessage,
   };
 }

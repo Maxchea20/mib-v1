@@ -20,7 +20,8 @@ import { updateSession } from "@/lib/supabase/middleware";
 const PUBLIC_PATHS = ["/login"];
 
 export async function proxy(request: NextRequest) {
-  const { supabaseResponse, user, _rejectedBy } = await updateSession(request);
+  const { supabaseResponse, user, _rejectedBy, _tokenError } =
+    await updateSession(request);
 
   const path = request.nextUrl.pathname;
   const isPublicPath = PUBLIC_PATHS.some((p) => path.startsWith(p));
@@ -34,8 +35,9 @@ export async function proxy(request: NextRequest) {
     return NextResponse.json(
       {
         error: "Unauthorized. Please log in.",
-        // TEMPORARY DEBUG FIELD - remove once worker auth is confirmed working.
+        // TEMPORARY DEBUG FIELDS - remove once worker auth is confirmed working.
         _rejectedBy: _rejectedBy || "proxy.ts",
+        _tokenError: _tokenError || null,
       },
       { status: 401 }
     );
