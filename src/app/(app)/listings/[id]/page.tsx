@@ -110,16 +110,16 @@ export default async function ListingProfilePage({ params }: Props) {
               <p className="text-lg font-semibold mb-4">{listing.purpose || "-"}</p>
               <p className="text-sm text-[var(--ink-soft)]">Status</p>
               <p className="text-lg font-semibold mb-4">{listing.status || "-"}</p>
-              <BuyerMatches listingId={listing.id} />
-              <div className="mt-4 flex flex-wrap gap-2">
-                <AIDescriptionButton listing={listing} />
-                <AIHighlightsButton listing={listing} />
-                <AIFacebookContentButton listing={listing} />
-              </div>
+              <AIDescriptionButton listing={listing} />
+              <AIHighlightsButton listing={listing} />
+              <AIFacebookContentButton listing={listing} />
             </div>
+            <BuyerMatches listing={listing} />
           </div>
         }
-        gallery={<MediaManager listingId={listing.id} category={listing.category} />}
+        gallery={
+          <MediaManager propertyId={listing.id} category={listing.category} />
+        }
         aiDesign={<AIDesignTab listing={listing} />}
         aiVideo={<AIVideoTab listing={listing} />}
       />
