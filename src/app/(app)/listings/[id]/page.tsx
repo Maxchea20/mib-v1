@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic";
 
 import ListingActionsMenu from "@/components/listings/ListingActionsMenu";
-import ShareListingSheet from "@/components/listings/ShareListingSheet";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -73,7 +72,6 @@ export default async function ListingProfilePage({ params }: Props) {
               <span><strong>Listing Agent:</strong> {listing.listing_agent || "-"}</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
-              <ShareListingSheet listing={listing} />
               <ListingActionsMenu listing={listing} />
               <Link href="/listings" className="shrink-0 bg-stone-800 text-white px-4 py-2 rounded text-sm text-center">Back</Link>
             </div>
