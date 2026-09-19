@@ -3,9 +3,9 @@ import {
   Page,
   Text,
   View,
+  Image,
   StyleSheet,
 } from "@react-pdf/renderer";
-import SaveablePhoto from "./SaveablePhoto";
 
 type Props = {
   listing: any;
@@ -29,14 +29,10 @@ const styles = StyleSheet.create({
     color: "#D9A62E",
     marginBottom: 8,
   },
-  hint: {
-    fontSize: 9,
-    color: "#6B7280",
-    marginBottom: 10,
-  },
   hero: {
     width: "100%",
     height: 280,
+    objectFit: "cover",
     marginBottom: 12,
   },
   grid: {
@@ -46,6 +42,7 @@ const styles = StyleSheet.create({
   photo: {
     width: "32%",
     height: 120,
+    objectFit: "cover",
     marginRight: "2%",
     marginBottom: 8,
   },
@@ -76,15 +73,10 @@ export default function ListingBrochure({ listing }: Props) {
         <Text style={styles.meta}>
           {[listing?.area || listing?.city, listing?.state].filter(Boolean).join(", ")}
         </Text>
-        <Text style={styles.hint}>
-          Tap any photo to open the full image, then tap and hold to save it to your phone.
-        </Text>
-        {cover?.image_url ? (
-          <SaveablePhoto src={cover.image_url} style={styles.hero} />
-        ) : null}
+        {cover?.image_url ? <Image src={cover.image_url} style={styles.hero} /> : null}
         <View style={styles.grid}>
           {gallery.map((photo: any, index: number) => (
-            <SaveablePhoto key={index} src={photo.image_url} style={styles.photo} />
+            <Image key={index} src={photo.image_url} style={styles.photo} />
           ))}
         </View>
         <Text style={styles.meta}>{listing?.description || ""}</Text>
