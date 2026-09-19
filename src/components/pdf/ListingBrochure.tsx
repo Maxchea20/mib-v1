@@ -56,7 +56,7 @@ function CheckIcon() {
 
 const styles = StyleSheet.create({
   page: { backgroundColor: C.white, fontFamily: "Helvetica" },
-  hero: { height: 268, width: "100%", position: "relative" },
+  hero: { height: 300, width: "100%", position: "relative" },
   heroImage: { position: "absolute", width: "100%", height: "100%", objectFit: "cover" },
   heroShade: { position: "absolute", left: 0, right: 0, bottom: 0, height: 150, backgroundColor: "rgba(5,26,46,0.62)" },
   heroContent: { position: "absolute", left: 22, right: 22, top: 16, bottom: 14, justifyContent: "space-between" },
@@ -75,18 +75,19 @@ const styles = StyleSheet.create({
   fact: { width: 78, alignItems: "center" },
   factLabel: { color: C.white, fontSize: 6.5, fontFamily: "Helvetica-Bold" },
   factValue: { color: C.white, fontSize: 8, marginTop: 2, textAlign: "center" },
-  body: { paddingHorizontal: 22, paddingTop: 12 },
+  body: { paddingHorizontal: 22, paddingTop: 14, paddingBottom: 36 },
   sectionHead: { flexDirection: "row", alignItems: "center", marginBottom: 7 },
   goldTick: { width: 18, height: 2, backgroundColor: C.gold, marginRight: 6 },
   sectionTitle: { fontSize: 9, fontFamily: "Helvetica-Bold", color: C.navy, letterSpacing: 0.6 },
   goldLine: { flex: 1, height: 1, backgroundColor: C.gold, marginLeft: 8 },
   grid: { flexDirection: "row", flexWrap: "wrap", borderTopWidth: 1, borderLeftWidth: 1, borderColor: C.line },
-  cell: { width: "20%", height: 44, borderRightWidth: 1, borderBottomWidth: 1, borderColor: C.line, alignItems: "center", justifyContent: "center", paddingHorizontal: 3 },
-  cellLabel: { fontSize: 5.5, fontFamily: "Helvetica-Bold", color: C.navy },
-  cellValue: { fontSize: 7.5, color: C.black, marginTop: 2, textAlign: "center" },
+  cell: { width: "25%", height: 52, borderRightWidth: 1, borderBottomWidth: 1, borderColor: C.line, alignItems: "center", justifyContent: "center", paddingHorizontal: 4 },
+  cellLabel: { fontSize: 6, fontFamily: "Helvetica-Bold", color: C.navy },
+  cellValue: { fontSize: 8.5, color: C.black, marginTop: 2, textAlign: "center" },
   hlGrid: { flexDirection: "row", flexWrap: "wrap" },
-  hlItem: { width: "50%", flexDirection: "row", alignItems: "flex-start", marginBottom: 5, paddingRight: 8 },
+  hlItem: { width: "50%", flexDirection: "row", alignItems: "flex-start", marginBottom: 6, paddingRight: 8 },
   hlText: { flex: 1, fontSize: 8.5, color: C.black, marginLeft: 4, lineHeight: 1.25 },
+  pageDesc: { fontSize: 9, color: C.slate, lineHeight: 1.45 },
   footer: { position: "absolute", left: 0, right: 0, bottom: 0, height: 24, backgroundColor: C.navyDark, flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 22 },
   footerText: { color: C.white, fontSize: 6.5 },
   pageTwo: { paddingTop: 20, paddingHorizontal: 20, paddingBottom: 36, backgroundColor: C.white, fontFamily: "Helvetica" },
@@ -142,6 +143,17 @@ function wrapTitle(title: string): string[] {
   return lines.slice(0, 2);
 }
 
+function linesFrom(value: any): string[] {
+  if (!value) return [];
+  if (Array.isArray(value)) {
+    return value.map((item: any) => String(item).replace(/^[-*]+\s*/, "").trim()).filter(Boolean);
+  }
+  return String(value)
+    .split(/\n/)
+    .map((line) => line.replace(/^[-*]+\s*/, "").trim())
+    .filter((line) => line.length > 2 && line.length < 160);
+}
+
 export default function ListingBrochure({ listing, aiPlan }: Props) {
   const photos = Array.isArray(listing?.property_photos)
     ? listing.property_photos.filter((photo: any) => photo?.image_url)
@@ -168,11 +180,13 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
     subTitle = parts[1].trim();
   }
   const titleLines = wrapTitle(mainTitle);
-  const purpose = String(listing?.purpose || "Sell").toLowerCase();
+  const purpose = String(listing?.purpose || listing?.listing_purpose || "Sell").toLowerCase();
+  const isRent = purpose.includes("rent");
 
   const overview = [
     { label: "Property Type", value: clean(listing?.property_type || listing?.commercial_type || listing?.residential_type || listing?.land_type) },
     { label: "Built-up", value: clean(listing?.built_up) },
+    { label: "Land Area", value: clean(listing?.land_size || listing?.land_area || listing?.land) },
     { label: "Bathrooms", value: clean(listing?.bathrooms) },
     { label: "Tenure", value: clean(listing?.tenure) },
     { label: "Facing", value: clean(listing?.facing) },
@@ -180,8 +194,8 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
     { label: "Status", value: clean(listing?.status) },
     { label: "Purpose", value: clean(listing?.purpose) },
     { label: "Category", value: clean(listing?.category) },
-    { label: "Land Area", value: clean(listing?.land_size) },
-  ].filter((item): item is { label: string; value: string } => Boolean(item.value)).slice(0, 10);
+    { label: "Rooms", value: clean(listing?.rooms || listing?.bedrooms) },
+  ].filter((item): item is { label: string; value: string } => Boolean(item.value)).slice(0, 12);
 
   const keyFacts = [
     { label: "Built-up", value: clean(listing?.built_up) },
@@ -189,14 +203,17 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
     { label: "Tenure", value: clean(listing?.tenure) },
   ].filter((item): item is { label: string; value: string } => Boolean(item.value));
 
-  let highlights: string[] = [];
-  if (Array.isArray(listing?.highlights)) {
-    highlights = listing.highlights.map((item: any) => String(item)).filter(Boolean);
-  } else if (listing?.remarks) {
-    highlights = String(listing.remarks)
-      .split("\n")
-      .map((line) => line.replace(/^[-*]+\s*/, "").trim())
-      .filter(Boolean);
+  let highlights: string[] = linesFrom(listing?.highlights);
+  if (!highlights.length) highlights = linesFrom(listing?.remarks);
+  if (!highlights.length) highlights = linesFrom(listing?.description).slice(0, 8);
+  if (!highlights.length) {
+    highlights = [
+      clean(listing?.tenure) ? `${listing.tenure} tenure` : "",
+      clean(listing?.built_up) ? `Built-up ${listing.built_up}` : "",
+      clean(listing?.land_size || listing?.land_area) ? `Land area ${listing.land_size || listing.land_area}` : "",
+      clean(listing?.bathrooms) ? `${listing.bathrooms} bathrooms` : "",
+      listing?.area ? `Located in ${listing.area}` : "",
+    ].filter(Boolean) as string[];
   }
   const aiIndexes = Array.isArray(aiPlan?.highlight_indexes) ? aiPlan.highlight_indexes : [];
   const selected: string[] = aiIndexes.map((index: any) => highlights[Number(index)]).filter(Boolean);
@@ -235,7 +252,7 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
         </View>
         <View style={styles.priceBand}>
           <View>
-            <Text style={styles.priceLabel}>{purpose === "rent" ? "ASKING RENT" : "ASKING PRICE"}</Text>
+            <Text style={styles.priceLabel}>{isRent ? "ASKING RENT" : "ASKING PRICE"}</Text>
             <Text style={styles.price}>{money(listing?.price)}</Text>
             <Text style={styles.negotiable}>(Negotiable)</Text>
           </View>
@@ -267,7 +284,7 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
             </View>
           ) : null}
           {finalHighlights.length > 0 ? (
-            <View style={{ marginTop: 12 }}>
+            <View style={{ marginTop: 14 }}>
               <View style={styles.sectionHead}>
                 <View style={styles.goldTick} />
                 <Text style={styles.sectionTitle}>PROPERTY HIGHLIGHTS</Text>
@@ -281,6 +298,16 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
                   </View>
                 ))}
               </View>
+            </View>
+          ) : null}
+          {listing?.description ? (
+            <View style={{ marginTop: 14 }}>
+              <View style={styles.sectionHead}>
+                <View style={styles.goldTick} />
+                <Text style={styles.sectionTitle}>DESCRIPTION</Text>
+                <View style={styles.goldLine} />
+              </View>
+              <Text style={styles.pageDesc}>{String(listing.description)}</Text>
             </View>
           ) : null}
         </View>
