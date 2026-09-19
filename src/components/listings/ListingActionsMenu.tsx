@@ -6,6 +6,7 @@ import Link from "next/link";
 import GenerateBrochureButton from "@/components/pdf/GenerateBrochureButton";
 import GenerateInternalSheetButton from "@/components/pdf/GenerateInternalSheetButton";
 import AIGeneratePropertyPosterButton from "@/components/ai/AIGeneratePropertyPosterButton";
+import ShareListingSheet from "@/components/listings/ShareListingSheet";
 
 type Props = {
   listing: any;
@@ -53,26 +54,22 @@ export default function ListingActionsMenu({
       ref={menuRef}
       className="relative"
     >
-      {/* 3 DOT BUTTON */}
-
       <button
         type="button"
         onClick={() =>
           setOpen(!open)
         }
-        className="w-9 h-9 flex items-center justify-center rounded hover:bg-gray-100 text-gray-700 text-2xl font-bold"
+        className="w-11 h-11 flex items-center justify-center rounded-full border border-[var(--line)] text-[var(--ink)] text-xl"
         aria-label="Listing actions"
       >
         ⋮
       </button>
 
-      {/* ACTION MENU */}
-
       {open && (
-        <div className="absolute right-0 top-11 z-50 w-60 bg-white border rounded-lg shadow-lg p-1">
-
-          {/* AI PROPERTY POSTER */}
-
+        <div className="absolute right-0 top-12 z-50 w-64 surface p-1">
+          <div className="px-2 py-2">
+            <ShareListingSheet listing={listing} />
+          </div>
           <div className="m-0 p-0">
             <AIGeneratePropertyPosterButton
               listing={listing}
@@ -81,25 +78,16 @@ export default function ListingActionsMenu({
               }
             />
           </div>
-
-          {/* GENERATE BROCHURE */}
-
           <div className="m-0 p-0">
             <GenerateBrochureButton
               listing={listing}
             />
           </div>
-
-          {/* INTERNAL SHEET */}
-
           <div className="m-0 p-0">
             <GenerateInternalSheetButton
               listing={listing}
             />
           </div>
-
-          {/* EDIT LISTING */}
-
           <Link
             href={`/listings/${listing.id}/edit`}
             onClick={() =>
@@ -107,9 +95,8 @@ export default function ListingActionsMenu({
             }
             className="flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded"
           >
-            ✏️ Edit Listing
+            Edit Listing
           </Link>
-
         </div>
       )}
     </div>
