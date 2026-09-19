@@ -1,40 +1,27 @@
 "use client";
 
-import { Bars3Icon } from "@heroicons/react/24/outline";
-
 type Props = {
   onMenuClick?: () => void;
 };
 
-export default function TopBar({
-  onMenuClick,
-}: Props) {
-
+export default function TopBar({ onMenuClick }: Props) {
   return (
-
-    <header className="flex items-center justify-between border-b bg-white px-6 py-4">
-
+    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-[var(--line)] bg-[var(--paper)]/90 backdrop-blur px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
       <div className="flex items-center gap-3">
-
-        {/* Mobile Hamburger */}
-
         <button
           onClick={onMenuClick}
-          className="md:hidden rounded-lg p-2 hover:bg-gray-100"
+          className="md:hidden rounded-full p-2 min-w-11 min-h-11 border border-[var(--line)]"
+          aria-label="Open menu"
         >
-          <Bars3Icon className="w-7 h-7 text-gray-700" />
+          <span className="block w-4 h-px bg-[var(--ink)] mb-1" />
+          <span className="block w-4 h-px bg-[var(--ink)] mb-1" />
+          <span className="block w-3 h-px bg-[var(--ink)]" />
         </button>
-
-        <h1 className="text-2xl font-bold text-slate-800">
-
-          MIB
-
-        </h1>
-
+        <div>
+          <p className="label-caption leading-none">Desk</p>
+          <h1 className="font-display text-xl leading-tight">MIB</h1>
+        </div>
       </div>
-
     </header>
-
   );
-
 }

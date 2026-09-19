@@ -1,4 +1,3 @@
-// File: src/components/ui/Card.tsx
 type Props = {
   children: React.ReactNode;
   className?: string;
@@ -6,9 +5,7 @@ type Props = {
 
 export default function Card({ children, className = "" }: Props) {
   return (
-    <div
-      className={`bg-[#10151f] rounded-lg border border-[#1e2733] ${className}`}
-    >
+    <div className={`surface overflow-hidden ${className}`}>
       {children}
     </div>
   );
@@ -26,11 +23,11 @@ export function CardHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="border-b border-[#1e2733] px-6 py-4 flex items-center justify-between">
+    <div className="border-b border-[var(--line)] px-5 py-4 flex items-center justify-between gap-3">
       <div>
         {caption && <p className="label-caption mb-1">{caption}</p>}
-        <h2 className="text-base font-semibold text-[#e7ecf3]">{title}</h2>
-        {subtitle && <p className="text-sm text-[#8b95a5] mt-0.5">{subtitle}</p>}
+        <h2 className="text-lg font-semibold text-[var(--ink)]">{title}</h2>
+        {subtitle && <p className="text-sm text-[var(--ink-soft)] mt-0.5">{subtitle}</p>}
       </div>
       {action}
     </div>

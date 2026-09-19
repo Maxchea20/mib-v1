@@ -1,71 +1,50 @@
-// File: src/components/layout/Sidebar.tsx
 "use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Users,
-  Sparkles,
-  Building2,
-  Megaphone,
-  Receipt,
-  Settings,
-} from "lucide-react";
+import { NAV_ITEMS } from "@/lib/nav";
 
-const NAV_ITEMS = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Contacts", href: "/contacts", icon: Users },
-  { label: "AI Cobroke Match", href: "/cobroke-match", icon: Sparkles },
-  { label: "Listings", href: "/listings", icon: Building2 },
-  { label: "Marketing", href: "/marketing", icon: Megaphone },
-  { label: "Sales", href: "/sales", icon: Receipt },
-  { label: "Settings", href: "/settings", icon: Settings },
-];
-
-export default function Sidebar({ userInitial = "N" }: { userInitial?: string }) {
+export default function Sidebar({ userInitial = "M" }: { userInitial?: string }) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-60 flex-shrink-0 bg-[#0a0e16] border-r border-[#1e2733] min-h-screen flex flex-col">
-      <div className="px-6 py-6 flex items-center gap-2 border-b border-[#1e2733]">
-        <div className="w-2 h-2 rounded-full bg-[#22d3ee] shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
-        <span className="font-data text-sm font-semibold text-[#e7ecf3] tracking-wide">
-          MIB
-        </span>
+    <aside className="w-60 flex-shrink-0 min-h-screen flex flex-col bg-[#1c1917] text-[#f3eee6]">
+      <div className="px-6 py-7 border-b border-white/10">
+        <p className="label-caption text-[#c46a3a]">Private desk</p>
+        <p className="font-display text-2xl mt-1">MIB</p>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
+      <nav className="flex-1 px-3 py-4 space-y-1">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname?.startsWith(item.href);
-          const Icon = item.icon;
-
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`relative flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
+              className={`flex items-center px-3 py-2.5 rounded-xl text-sm transition ${
                 isActive
-                  ? "bg-[#22d3ee]/[0.08] text-[#e7ecf3]"
-                  : "text-[#5a6472] hover:text-[#8b95a5] hover:bg-white/[0.02]"
+                  ? "bg-[#f3eee6] text-[#1c1917]"
+                  : "text-[#d6d3d1] hover:bg-white/5"
               }`}
             >
-              {isActive && (
-                <span className="absolute left-0 top-1.5 bottom-1.5 w-[2px] rounded-full bg-[#22d3ee] shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
-              )}
-              <Icon
-                size={17}
-                strokeWidth={1.75}
-                className={isActive ? "text-[#22d3ee]" : ""}
-              />
-              <span>{item.label}</span>
+              {item.label}
             </Link>
           );
         })}
+        <Link
+          href="/settings"
+          className={`flex items-center px-3 py-2.5 rounded-xl text-sm ${
+            pathname?.startsWith("/settings")
+              ? "bg-[#f3eee6] text-[#1c1917]"
+              : "text-[#d6d3d1] hover:bg-white/5"
+          }`}
+        >
+          Settings
+        </Link>
       </nav>
 
-      <div className="px-6 py-5 border-t border-[#1e2733]">
-        <div className="w-8 h-8 rounded-full bg-[#22d3ee]/10 border border-[#22d3ee]/30 text-[#22d3ee] text-xs font-medium flex items-center justify-center font-data">
+      <div className="px-6 py-5 border-t border-white/10">
+        <div className="w-9 h-9 rounded-full bg-[#c46a3a] text-white text-sm flex items-center justify-center">
           {userInitial}
         </div>
       </div>
