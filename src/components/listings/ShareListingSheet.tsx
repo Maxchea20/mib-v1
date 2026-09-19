@@ -3,7 +3,6 @@
 import { useState } from "react";
 import {
   buildBrochureBlob,
-  buildShareCardBlob,
   downloadBlob,
   listingDisplayName,
   shareFiles,
@@ -13,15 +12,10 @@ type Props = {
   listing: any;
 };
 
-type ReadyFiles = {
-  pdf: File;
-  photo: File;
-};
-
 export default function ShareListingSheet({ listing }: Props) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
-  const [ready, setReady] = useState<ReadyFiles | null>(null);
+  const [pdf, setPdf] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const baseName = (listingDisplayName(listing) || "property")
@@ -31,63 +25,44 @@ export default function ShareListingSheet({ listing }: Props) {
     .slice(0, 40);
 
   async function prepare() {
-    setBusy("Preparing PDF and photo…");
+    setBusy("Preparing brochure PDF…");
     setError(null);
-    setReady(null);
+    setPdf(null);
     try {
-      const [pdfBlob, imageBlob] = await Promise.all([
-        buildBrochureBlob(listing),
-        buildShareCardBlob(listing),
-      ]);
-      setReady({
-        pdf: new File([pdfBlob], `${baseName}.pdf`, { type: "application/pdf" }),
-        photo: new File([imageBlob], `${baseName}.jpg`, { type: "image/jpeg" }),
-      });
+      const pdfBlob = await buildBrochureBlob(listing);
+      setPdf(new File([pdfBlob], `${baseName}.pdf`, { type: "application/pdf" }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not prepare files.");
+      setError(err instanceof Error ? err.message : "Could not prepare the PDF.");
     } finally {
       setBusy(null);
     }
   }
 
-  async function shareNow(which: "both" | "photo" | "pdf") {
-    if (!ready) return;
-    const files =
-      which === "both"
-        ? [ready.pdf, ready.photo]
-        : which === "photo"
-        ? [ready.photo]
-        : [ready.pdf];
+  async function shareNow() {
+    if (!pdf) return;
     try {
       const shared = await shareFiles(
-        files,
+        [pdf],
         listingDisplayName(listing),
-        `${listingDisplayName(listing)} from MIB`
+        `${listingDisplayName(listing)} brochure`
       );
-      if (!shared) {
-        files.forEach((file) => downloadBlob(file, file.name));
-      }
-    } catch (err) {
-      files.forEach((file) => downloadBlob(file, file.name));
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Share sheet unavailable. Files were downloaded instead."
-      );
+      if (!shared) downloadBlob(pdf, pdf.name);
+    } catch {
+      downloadBlob(pdf, pdf.name);
     }
   }
 
   function close() {
     if (busy) return;
     setOpen(false);
-    setReady(null);
+    setPdf(null);
     setError(null);
   }
 
   return (
     <>
       <button type="button" className="btn-primary w-full sm:w-auto" onClick={() => setOpen(true)}>
-        Send PDF + photo
+        Send PDF
       </button>
 
       {open && (
@@ -99,30 +74,24 @@ export default function ShareListingSheet({ listing }: Props) {
               {listingDisplayName(listing)}
             </h3>
             <p className="text-sm text-[var(--ink-soft)] mt-2">
-              iPhone needs two taps: prepare the files first, then share.
+              Recipients get the PDF. They open it, tap a photo, then tap and hold
+              to save that photo to their phone. Ask them to open the PDF in Files or Safari
+              if WhatsApp preview does not make photos tappable.
             </p>
 
             {busy && <p className="mt-6 text-sm text-[var(--copper)]">{busy}</p>}
             {error && <p className="mt-4 text-sm text-[var(--danger)]">{error}</p>}
 
-            {!busy && !ready && (
+            {!busy && !pdf && (
               <button type="button" className="btn-primary w-full mt-5" onClick={prepare}>
-                Prepare PDF + photo
+                Prepare PDF
               </button>
             )}
 
-            {!busy && ready && (
-              <div className="mt-5 space-y-3">
-                <button type="button" className="btn-primary w-full" onClick={() => shareNow("both")}>
-                  Share PDF + photo now
-                </button>
-                <button type="button" className="btn-secondary w-full" onClick={() => shareNow("photo")}>
-                  Share / save photo only
-                </button>
-                <button type="button" className="btn-secondary w-full" onClick={() => shareNow("pdf")}>
-                  Share PDF only
-                </button>
-              </div>
+            {!busy && pdf && (
+              <button type="button" className="btn-primary w-full mt-5" onClick={shareNow}>
+                Send PDF now
+              </button>
             )}
           </div>
         </div>
