@@ -29,42 +29,42 @@ const C = {
   card: "#EEF2F6",
 };
 
-const Icon = {
-  pin: (
-    <Svg width="9" height="9" viewBox="0 0 24 24">
-      <Path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke={C.white} strokeWidth="2" fill="none" />
-      <Circle cx="12" cy="9" r="2.2" fill={C.white} />
+function Pin({ color }: { color: string }) {
+  return (
+    <Svg width={9} height={9} viewBox="0 0 24 24">
+      <Path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke={color} strokeWidth={2} fill="none" />
+      <Circle cx={12} cy={9} r={2.2} fill={color} />
     </Svg>
-  ),
-  pinNavy: (
-    <Svg width="9" height="9" viewBox="0 0 24 24">
-      <Path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke={C.navy} strokeWidth="2" fill="none" />
-      <Circle cx="12" cy="9" r="2.2" fill={C.navy} />
+  );
+}
+
+function CarIcon() {
+  return (
+    <Svg width={10} height={10} viewBox="0 0 24 24">
+      <Path d="M5 17h14M5 11l2-5h10l2 5M3 11h18v6H3v-6z" stroke={C.navy} strokeWidth={1.8} fill="none" />
     </Svg>
-  ),
-  car: (
-    <Svg width="10" height="10" viewBox="0 0 24 24">
-      <Path d="M5 17h14M5 11l2-5h10l2 5M3 11h18v6H3v-6z" stroke={C.navy} strokeWidth="1.8" fill="none" />
+  );
+}
+
+function CheckIcon() {
+  return (
+    <Svg width={10} height={10} viewBox="0 0 24 24">
+      <Polyline points="20 6 9 17 4 12" stroke={C.gold} strokeWidth={2.4} fill="none" />
     </Svg>
-  ),
-  check: (
-    <Svg width="10" height="10" viewBox="0 0 24 24">
-      <Polyline points="20 6 9 17 4 12" stroke={C.gold} strokeWidth="2.4" fill="none" />
-    </Svg>
-  ),
-};
+  );
+}
 
 const styles = StyleSheet.create({
   page: { backgroundColor: C.white, fontFamily: "Helvetica" },
-  hero: { height: 268, width: "100%", position: "relative", overflow: "hidden" },
+  hero: { height: 268, width: "100%", position: "relative" },
   heroImage: { position: "absolute", width: "100%", height: "100%", objectFit: "cover" },
   heroShade: { position: "absolute", left: 0, right: 0, bottom: 0, height: 150, backgroundColor: "rgba(5,26,46,0.62)" },
   heroContent: { position: "absolute", left: 22, right: 22, top: 16, bottom: 14, justifyContent: "space-between" },
   logo: { width: 62, height: 48, backgroundColor: "rgba(5,26,46,0.88)", borderWidth: 1.2, borderColor: C.white, alignItems: "center", justifyContent: "center" },
   logoText: { color: C.white, fontSize: 16, fontFamily: "Helvetica-Bold", letterSpacing: 1 },
   logoSub: { color: C.white, fontSize: 5.5, letterSpacing: 0.8, marginTop: 1 },
-  heroTitle: { color: C.white, fontSize: 26, fontFamily: "Helvetica-Bold", lineHeight: 1.12, textTransform: "uppercase" },
-  heroSub: { color: C.goldLight, fontSize: 12, fontFamily: "Helvetica-Bold", marginTop: 4, textTransform: "uppercase" },
+  heroTitle: { color: C.white, fontSize: 26, fontFamily: "Helvetica-Bold", lineHeight: 1.12 },
+  heroSub: { color: C.goldLight, fontSize: 12, fontFamily: "Helvetica-Bold", marginTop: 4 },
   locRow: { flexDirection: "row", alignItems: "center", marginTop: 6 },
   locText: { color: C.white, fontSize: 9, marginLeft: 4 },
   priceBand: { height: 72, backgroundColor: C.navyDark, flexDirection: "row", alignItems: "center", paddingHorizontal: 22 },
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   negotiable: { color: C.white, fontSize: 8, marginTop: 2 },
   facts: { flex: 1, flexDirection: "row", justifyContent: "flex-end" },
   fact: { width: 78, alignItems: "center" },
-  factLabel: { color: C.white, fontSize: 6.5, fontFamily: "Helvetica-Bold", textTransform: "uppercase" },
+  factLabel: { color: C.white, fontSize: 6.5, fontFamily: "Helvetica-Bold" },
   factValue: { color: C.white, fontSize: 8, marginTop: 2, textAlign: "center" },
   body: { paddingHorizontal: 22, paddingTop: 12 },
   sectionHead: { flexDirection: "row", alignItems: "center", marginBottom: 7 },
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   goldLine: { flex: 1, height: 1, backgroundColor: C.gold, marginLeft: 8 },
   grid: { flexDirection: "row", flexWrap: "wrap", borderTopWidth: 1, borderLeftWidth: 1, borderColor: C.line },
   cell: { width: "20%", height: 44, borderRightWidth: 1, borderBottomWidth: 1, borderColor: C.line, alignItems: "center", justifyContent: "center", paddingHorizontal: 3 },
-  cellLabel: { fontSize: 5.5, fontFamily: "Helvetica-Bold", color: C.navy, textTransform: "uppercase" },
+  cellLabel: { fontSize: 5.5, fontFamily: "Helvetica-Bold", color: C.navy },
   cellValue: { fontSize: 7.5, color: C.black, marginTop: 2, textAlign: "center" },
   hlGrid: { flexDirection: "row", flexWrap: "wrap" },
   hlItem: { width: "50%", flexDirection: "row", alignItems: "flex-start", marginBottom: 5, paddingRight: 8 },
@@ -91,8 +91,8 @@ const styles = StyleSheet.create({
   footerText: { color: C.white, fontSize: 6.5 },
   pageTwo: { paddingTop: 20, paddingHorizontal: 20, paddingBottom: 36, backgroundColor: C.white, fontFamily: "Helvetica" },
   galleryGrid: { flexDirection: "row", flexWrap: "wrap", marginTop: 8, marginBottom: 12 },
-  galleryPhoto: { width: "49%", height: 148, objectFit: "cover", marginRight: "2%", marginBottom: 8 },
-  galleryPhotoLast: { marginRight: 0 },
+  galleryPhoto: { width: "49%", height: 148, objectFit: "cover", marginBottom: 8 },
+  galleryPhotoOdd: { width: "49%", height: 148, objectFit: "cover", marginBottom: 8, marginRight: "2%" },
   cols: { flexDirection: "row" },
   colLeft: { width: "58%", paddingRight: 14 },
   colRight: { width: "42%" },
@@ -112,20 +112,21 @@ const styles = StyleSheet.create({
   brandBox: { width: 46, height: 36, backgroundColor: C.navy, alignItems: "center", justifyContent: "center", marginLeft: 8 },
   brandText: { color: C.white, fontSize: 9, fontFamily: "Helvetica-Bold" },
   brandSub: { color: C.white, fontSize: 4 },
+  fallbackHero: { position: "absolute", width: "100%", height: "100%", backgroundColor: C.navy },
 });
 
-function clean(value: any) {
+function clean(value: any): string | null {
   if (value === null || value === undefined || value === "") return null;
   return String(value);
 }
 
-function money(value: any) {
+function money(value: any): string {
   const number = Number(value);
   if (!number) return "Price Upon Request";
   return `RM ${number.toLocaleString()}`;
 }
 
-function wrapTitle(title: string) {
+function wrapTitle(title: string): string[] {
   const words = title.toUpperCase().trim().split(/\s+/);
   const lines: string[] = [];
   let current = "";
@@ -142,7 +143,7 @@ function wrapTitle(title: string) {
 }
 
 export default function ListingBrochure({ listing, aiPlan }: Props) {
-  const photos = Array.isArray(listing.property_photos)
+  const photos = Array.isArray(listing?.property_photos)
     ? listing.property_photos.filter((photo: any) => photo?.image_url)
     : [];
 
@@ -151,60 +152,57 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
     ? photos.find((photo: any) => photo.photo_type === coverType) ?? photos[0]
     : photos[0];
 
-  const galleryPhotos = (aiPlan?.gallery?.enabled === false
-    ? []
-    : photos.filter((photo: any) => photo.image_url !== coverPhoto?.image_url)
+  const galleryPhotos = (
+    aiPlan?.gallery?.enabled === false
+      ? []
+      : photos.filter((photo: any) => photo.image_url !== coverPhoto?.image_url)
   ).slice(0, 4);
 
-  const location = [listing.address, listing.area, listing.state].filter(Boolean).join(", ");
-  const rawTitle = String(listing.title || listing.headline || "Property Listing");
+  const location = [listing?.address, listing?.area, listing?.state].filter(Boolean).join(", ");
+  const rawTitle = String(listing?.title || listing?.headline || "Property Listing");
   let mainTitle = rawTitle;
-  let subTitle = listing.area ? String(listing.area) : "";
+  let subTitle = listing?.area ? String(listing.area) : "";
   if (rawTitle.includes("@")) {
     const parts = rawTitle.split("@");
     mainTitle = parts[0].trim();
     subTitle = parts[1].trim();
   }
   const titleLines = wrapTitle(mainTitle);
-  const purpose = String(listing.purpose || "Sell").toLowerCase();
+  const purpose = String(listing?.purpose || "Sell").toLowerCase();
 
-  const overviewPairs: [string, any][] = [
-    ["Property Type", listing.property_type || listing.commercial_type || listing.residential_type || listing.land_type],
-    ["Built-up", listing.built_up],
-    ["Bathrooms", listing.bathrooms],
-    ["Tenure", listing.tenure],
-    ["Facing", listing.facing],
-    ["Power Supply", listing.industrial_power_supply || listing.electricity_phase],
-    ["Status", listing.status],
-    ["Purpose", listing.purpose],
-    ["Category", listing.category],
-    ["Land Area", listing.land_size],
-  ];
-  const overview = overviewPairs
-    .map(([label, value]) => ({ label, value: clean(value) }))
-    .filter((item) => item.value)
-    .slice(0, 10);
+  const overview = [
+    { label: "Property Type", value: clean(listing?.property_type || listing?.commercial_type || listing?.residential_type || listing?.land_type) },
+    { label: "Built-up", value: clean(listing?.built_up) },
+    { label: "Bathrooms", value: clean(listing?.bathrooms) },
+    { label: "Tenure", value: clean(listing?.tenure) },
+    { label: "Facing", value: clean(listing?.facing) },
+    { label: "Power Supply", value: clean(listing?.industrial_power_supply || listing?.electricity_phase) },
+    { label: "Status", value: clean(listing?.status) },
+    { label: "Purpose", value: clean(listing?.purpose) },
+    { label: "Category", value: clean(listing?.category) },
+    { label: "Land Area", value: clean(listing?.land_size) },
+  ].filter((item): item is { label: string; value: string } => Boolean(item.value)).slice(0, 10);
 
   const keyFacts = [
-    { label: "Built-up", value: clean(listing.built_up) },
-    { label: "Type", value: clean(listing.property_type || listing.commercial_type || listing.residential_type) },
-    { label: "Tenure", value: clean(listing.tenure) },
-  ].filter((item) => item.value);
+    { label: "Built-up", value: clean(listing?.built_up) },
+    { label: "Type", value: clean(listing?.property_type || listing?.commercial_type || listing?.residential_type) },
+    { label: "Tenure", value: clean(listing?.tenure) },
+  ].filter((item): item is { label: string; value: string } => Boolean(item.value));
 
   let highlights: string[] = [];
-  if (Array.isArray(listing.highlights)) {
+  if (Array.isArray(listing?.highlights)) {
     highlights = listing.highlights.map((item: any) => String(item)).filter(Boolean);
-  } else if (listing.remarks) {
+  } else if (listing?.remarks) {
     highlights = String(listing.remarks)
       .split("\n")
-      .map((line) => line.replace(/^[-•*✓]+\s*/, "").trim())
+      .map((line) => line.replace(/^[-\\u2022*\\u2713]+\\s*/, "").trim())
       .filter(Boolean);
   }
   const aiIndexes = Array.isArray(aiPlan?.highlight_indexes) ? aiPlan.highlight_indexes : [];
   const selected = aiIndexes.map((index: any) => highlights[Number(index)]).filter(Boolean);
   const finalHighlights = (selected.length ? selected : highlights).slice(0, 8);
   const agentName =
-    listing.listing_agent === "Cobroke Agent" ? "MAX CHEA" : listing.listing_agent || "MAX CHEA";
+    listing?.listing_agent === "Cobroke Agent" ? "MAX CHEA" : listing?.listing_agent || "MAX CHEA";
 
   return (
     <Document>
@@ -213,7 +211,7 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
           {coverPhoto?.image_url ? (
             <Image src={coverPhoto.image_url} style={styles.heroImage} />
           ) : (
-            <View style={{ position: "absolute", width: "100%", height: "100%", backgroundColor: C.navy }} />
+            <View style={styles.fallbackHero} />
           )}
           <View style={styles.heroShade} />
           <View style={styles.heroContent}>
@@ -222,13 +220,13 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
               <Text style={styles.logoSub}>PROPERTIES</Text>
             </View>
             <View>
-              {titleLines.map((line, index) => (
-                <Text key={index} style={styles.heroTitle}>{line}</Text>
+              {titleLines.map((line) => (
+                <Text key={line} style={styles.heroTitle}>{line}</Text>
               ))}
               {subTitle ? <Text style={styles.heroSub}>{subTitle.toUpperCase()}</Text> : null}
               {location ? (
                 <View style={styles.locRow}>
-                  {Icon.pin}
+                  <Pin color={C.white} />
                   <Text style={styles.locText}>{location}</Text>
                 </View>
               ) : null}
@@ -238,7 +236,7 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
         <View style={styles.priceBand}>
           <View>
             <Text style={styles.priceLabel}>{purpose === "rent" ? "ASKING RENT" : "ASKING PRICE"}</Text>
-            <Text style={styles.price}>{money(listing.price)}</Text>
+            <Text style={styles.price}>{money(listing?.price)}</Text>
             <Text style={styles.negotiable}>(Negotiable)</Text>
           </View>
           <View style={styles.facts}>
@@ -251,7 +249,7 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
           </View>
         </View>
         <View style={styles.body}>
-          {overview.length > 0 && (
+          {overview.length > 0 ? (
             <View>
               <View style={styles.sectionHead}>
                 <View style={styles.goldTick} />
@@ -267,8 +265,8 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
                 ))}
               </View>
             </View>
-          )}
-          {finalHighlights.length > 0 && (
+          ) : null}
+          {finalHighlights.length > 0 ? (
             <View style={{ marginTop: 12 }}>
               <View style={styles.sectionHead}>
                 <View style={styles.goldTick} />
@@ -276,15 +274,15 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
                 <View style={styles.goldLine} />
               </View>
               <View style={styles.hlGrid}>
-                {finalHighlights.map((item, index) => (
-                  <View key={index} style={styles.hlItem}>
-                    {Icon.check}
+                {finalHighlights.map((item) => (
+                  <View key={item} style={styles.hlItem}>
+                    <CheckIcon />
                     <Text style={styles.hlText}>{item}</Text>
                   </View>
                 ))}
               </View>
             </View>
-          )}
+          ) : null}
         </View>
         <View style={styles.footer}>
           <Text style={styles.footerText}>maxzchea@gmail.com</Text>
@@ -299,9 +297,9 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
         <View style={styles.galleryGrid}>
           {galleryPhotos.map((photo: any, index: number) => (
             <Image
-              key={index}
+              key={`${photo.image_url}-${index}`}
               src={photo.image_url}
-              style={[styles.galleryPhoto, index % 2 === 1 ? styles.galleryPhotoLast : {}]}
+              style={index % 2 === 0 ? styles.galleryPhotoOdd : styles.galleryPhoto}
             />
           ))}
         </View>
@@ -309,20 +307,20 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
           <View style={styles.colLeft}>
             <Text style={styles.infoTitle}>DESCRIPTION</Text>
             <View style={styles.goldMini} />
-            <Text style={styles.desc}>{listing.description || "Property information available upon request."}</Text>
+            <Text style={styles.desc}>{listing?.description || "Property information available upon request."}</Text>
           </View>
           <View style={styles.colRight}>
             <Text style={styles.infoTitle}>LOCATION</Text>
             <View style={styles.goldMini} />
             {location ? (
               <View style={styles.locItem}>
-                {Icon.pinNavy}
+                <Pin color={C.navy} />
                 <Text style={styles.locItemText}>{location}</Text>
               </View>
             ) : null}
-            {listing.area ? (
+            {listing?.area ? (
               <View style={styles.locItem}>
-                {Icon.car}
+                <CarIcon />
                 <Text style={styles.locItemText}>Convenient access to local amenities and city centre</Text>
               </View>
             ) : null}
@@ -332,8 +330,8 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
           <View style={styles.avatar}><Text style={styles.avatarText}>M</Text></View>
           <View>
             <Text style={styles.agentName}>{agentName}</Text>
-            <Text style={styles.agentMeta}>{listing.agent_reg_no || "REN 31953"}</Text>
-            <Text style={styles.agentMeta}>{"☎ "}{listing.agent_phone || "016-521 0993"}</Text>
+            <Text style={styles.agentMeta}>{listing?.agent_reg_no || "REN 31953"}</Text>
+            <Text style={styles.agentMeta}>{listing?.agent_phone || "016-521 0993"}</Text>
           </View>
           <View style={styles.agentRight}>
             <Text style={styles.interested}>INTERESTED IN THIS PROPERTY?</Text>
@@ -346,7 +344,7 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
         </View>
         <View style={styles.footer}>
           <Text style={styles.footerText}>MAX PROPERTY</Text>
-          <Text style={styles.footerText}>Property Information • Page 2</Text>
+          <Text style={styles.footerText}>Property Information - Page 2</Text>
         </View>
       </Page>
     </Document>
