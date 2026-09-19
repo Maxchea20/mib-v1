@@ -64,10 +64,10 @@ export default async function DashboardPage() {
 
   const progressGlow =
     targetProgress >= 100
-      ? "bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.6)]"
+      ? "bg-[#1f4d2c]"
       : targetProgress >= 50
-      ? "bg-[#22d3ee] shadow-[0_0_10px_rgba(34,211,238,0.6)]"
-      : "bg-[#fbbf24] shadow-[0_0_10px_rgba(251,191,36,0.6)]";
+      ? "bg-[#9a4b24]"
+      : "bg-[#b45309]";
 
   const kpis = [
     { label: "Contacts", value: totalContacts, icon: Users },
@@ -78,41 +78,38 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
-        <p className="label-caption mb-1">MIB / DASHBOARD</p>
-        <h1 className="text-xl font-semibold text-[#e7ecf3]">
+        <p className="label-caption mb-1">MIB / Dashboard</p>
+        <h1 className="text-2xl sm:text-3xl font-display text-[var(--ink)]">
           Welcome back, Max
         </h1>
       </div>
 
-      {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {kpis.map((kpi) => (
           <Card key={kpi.label} className="p-5">
             <div className="flex items-center justify-between mb-3">
               <p className="label-caption">{kpi.label}</p>
-              <kpi.icon size={15} className="text-[#5a6472]" />
+              <kpi.icon size={15} className="text-[var(--ink-muted)]" />
             </div>
-            <p className="font-data text-3xl font-semibold text-[#e7ecf3]">
+            <p className="font-data text-3xl font-semibold text-[var(--ink)]">
               {kpi.value}
             </p>
           </Card>
         ))}
       </div>
 
-      {/* Sales Performance */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-5">
           <p className="label-caption">
-            {CURRENT_YEAR} SALES PERFORMANCE / TARGET TRACKING
+            {CURRENT_YEAR} sales performance / target tracking
           </p>
-          <span className="font-data text-sm font-semibold text-[#22d3ee]">
+          <span className="font-data text-sm font-semibold text-[var(--copper)]">
             {targetProgress.toFixed(1)}%
           </span>
         </div>
 
-        <div className="w-full bg-white/[0.04] rounded-full h-1.5 overflow-hidden mb-6">
+        <div className="w-full bg-[#e8dfd0] rounded-full h-1.5 overflow-hidden mb-6">
           <div
             className={`h-full rounded-full transition-all ${progressGlow}`}
             style={{ width: `${targetProgress}%` }}
@@ -122,47 +119,45 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
             <p className="label-caption mb-1.5">Gross Commission</p>
-            <p className="font-data text-lg font-semibold text-[#e7ecf3]">
+            <p className="font-data text-lg font-semibold text-[var(--ink)]">
               {formatMoney(grossCommission)}
             </p>
           </div>
           <div>
             <p className="label-caption mb-1.5">Target</p>
-            <p className="font-data text-lg font-semibold text-[#e7ecf3]">
+            <p className="font-data text-lg font-semibold text-[var(--ink)]">
               {formatMoney(salesTarget)}
             </p>
           </div>
           <div>
             <p className="label-caption mb-1.5">Remaining</p>
-            <p className="font-data text-lg font-semibold text-[#fbbf24]">
+            <p className="font-data text-lg font-semibold text-[var(--copper)]">
               {formatMoney(remainingToTarget)}
             </p>
           </div>
         </div>
       </Card>
 
-      {/* Matched Listings & Buyers */}
       <MatchedListings />
 
-      {/* Recent */}
       <div className="grid lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader caption="RECENT ACTIVITY" title="Recent Contacts" />
-          <div className="divide-y divide-[#1e2733]">
+          <div className="divide-y divide-[var(--line)]">
             {recentContacts?.map((contact) => (
               <Link
                 key={contact.id}
                 href={`/contacts/${contact.id}`}
-                className="flex justify-between items-center px-6 py-4 hover:bg-white/[0.02] transition-colors"
+                className="flex justify-between items-center px-6 py-4 hover:bg-[#f3eee6] transition-colors"
               >
-                <p className="font-medium text-[#e7ecf3]">{contact.name}</p>
+                <p className="font-medium text-[var(--ink)]">{contact.name}</p>
                 {contact.status && (
                   <Badge status={contact.status}>{contact.status}</Badge>
                 )}
               </Link>
             ))}
             {(!recentContacts || recentContacts.length === 0) && (
-              <div className="px-6 py-8 text-center text-[#5a6472] text-sm">
+              <div className="px-6 py-8 text-center text-[var(--ink-muted)] text-sm">
                 No contacts yet.
               </div>
             )}
@@ -171,28 +166,28 @@ export default async function DashboardPage() {
 
         <Card>
           <CardHeader caption="RECENT ACTIVITY" title="Recent Listings" />
-          <div className="divide-y divide-[#1e2733]">
+          <div className="divide-y divide-[var(--line)]">
             {recentListings?.map((listing) => (
               <Link
                 key={listing.id}
                 href={`/listings/${listing.id}`}
-                className="flex justify-between items-center px-6 py-4 hover:bg-white/[0.02] transition-colors"
+                className="flex justify-between items-center px-6 py-4 hover:bg-[#f3eee6] transition-colors"
               >
                 <div>
-                  <p className="font-medium text-[#e7ecf3]">{listing.title}</p>
+                  <p className="font-medium text-[var(--ink)]">{listing.title}</p>
                   {listing.status && (
                     <Badge status={listing.status} className="mt-1">
                       {listing.status}
                     </Badge>
                   )}
                 </div>
-                <p className="font-data font-semibold text-[#e7ecf3]">
+                <p className="font-data font-semibold text-[var(--ink)]">
                   RM {Number(listing.price).toLocaleString()}
                 </p>
               </Link>
             ))}
             {(!recentListings || recentListings.length === 0) && (
-              <div className="px-6 py-8 text-center text-[#5a6472] text-sm">
+              <div className="px-6 py-8 text-center text-[var(--ink-muted)] text-sm">
                 No listings yet.
               </div>
             )}

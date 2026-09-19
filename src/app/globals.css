@@ -4,14 +4,14 @@
   --paper: #f3eee6;
   --paper-raised: #fffaf3;
   --ink: #1c1917;
-  --ink-soft: #57534e;
-  --ink-muted: #8a847b;
+  --ink-soft: #44403c;
+  --ink-muted: #57534e;
   --line: #e4d9c8;
-  --line-strong: #d2c4ae;
+  --line-strong: #c4b49a;
   --copper: #9a4b24;
   --copper-soft: #c46a3a;
-  --forest: #2f5d3a;
-  --forest-soft: #3f7a4c;
+  --forest: #1f4d2c;
+  --forest-soft: #2f5d3a;
   --danger: #b42318;
   --shadow: 0 10px 30px rgba(28, 25, 23, 0.08);
 
@@ -54,6 +54,7 @@ h2,
 .font-data {
   font-family: var(--font-mono), "SF Mono", monospace;
   font-variant-numeric: tabular-nums;
+  color: var(--ink);
 }
 
 .label-caption {
