@@ -195,11 +195,11 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
   } else if (listing?.remarks) {
     highlights = String(listing.remarks)
       .split("\n")
-      .map((line) => line.replace(/^[-\\u2022*\\u2713]+\\s*/, "").trim())
+      .map((line) => line.replace(/^[-*]+\s*/, "").trim())
       .filter(Boolean);
   }
   const aiIndexes = Array.isArray(aiPlan?.highlight_indexes) ? aiPlan.highlight_indexes : [];
-  const selected = aiIndexes.map((index: any) => highlights[Number(index)]).filter(Boolean);
+  const selected: string[] = aiIndexes.map((index: any) => highlights[Number(index)]).filter(Boolean);
   const finalHighlights = (selected.length ? selected : highlights).slice(0, 8);
   const agentName =
     listing?.listing_agent === "Cobroke Agent" ? "MAX CHEA" : listing?.listing_agent || "MAX CHEA";
@@ -274,7 +274,7 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
                 <View style={styles.goldLine} />
               </View>
               <View style={styles.hlGrid}>
-                {finalHighlights.map((item) => (
+                {finalHighlights.map((item: string) => (
                   <View key={item} style={styles.hlItem}>
                     <CheckIcon />
                     <Text style={styles.hlText}>{item}</Text>
