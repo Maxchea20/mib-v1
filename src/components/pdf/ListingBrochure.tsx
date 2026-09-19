@@ -58,8 +58,10 @@ const styles = StyleSheet.create({
   page: { backgroundColor: C.white, fontFamily: "Helvetica" },
   hero: { height: 300, width: "100%", position: "relative" },
   heroImage: { position: "absolute", width: "100%", height: "100%", objectFit: "cover" },
-  heroShade: { position: "absolute", left: 0, right: 0, bottom: 0, height: 150, backgroundColor: "rgba(5,26,46,0.62)" },
-  heroContent: { position: "absolute", left: 22, right: 22, top: 16, bottom: 14, justifyContent: "space-between" },
+  fade1: { position: "absolute", left: 0, right: 0, bottom: 0, height: 88, backgroundColor: "rgba(5,26,46,0.16)" },
+  fade2: { position: "absolute", left: 0, right: 0, bottom: 0, height: 64, backgroundColor: "rgba(5,26,46,0.22)" },
+  fade3: { position: "absolute", left: 0, right: 0, bottom: 0, height: 40, backgroundColor: "rgba(5,26,46,0.32)" },
+  heroContent: { position: "absolute", left: 22, right: 22, top: 16, bottom: 12, justifyContent: "space-between" },
   logo: { width: 62, height: 48, backgroundColor: "rgba(5,26,46,0.88)", borderWidth: 1.2, borderColor: C.white, alignItems: "center", justifyContent: "center" },
   logoText: { color: C.white, fontSize: 16, fontFamily: "Helvetica-Bold", letterSpacing: 1 },
   logoSub: { color: C.white, fontSize: 5.5, letterSpacing: 0.8, marginTop: 1 },
@@ -230,7 +232,9 @@ export default function ListingBrochure({ listing, aiPlan }: Props) {
           ) : (
             <View style={styles.fallbackHero} />
           )}
-          <View style={styles.heroShade} />
+          <View style={styles.fade1} />
+          <View style={styles.fade2} />
+          <View style={styles.fade3} />
           <View style={styles.heroContent}>
             <View style={styles.logo}>
               <Text style={styles.logoText}>MIB</Text>
