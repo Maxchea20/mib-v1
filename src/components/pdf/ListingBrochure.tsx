@@ -1,19 +1,10 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  Image,
-  StyleSheet,
-  Svg,
-  Path,
-  Circle,
-  Polyline,
-} from "@react-pdf/renderer";
+import { Document, Page, Text, View, Image, StyleSheet } from "@react-pdf/renderer";
+import type { Listing } from "./listingTypes";
+import { coverStats, overviewFields, coverPhotoType, categoryLabel } from "./categoryFields";
+import { PinIcon, CheckIcon, BadgeIcon, PhoneIcon, MailIcon } from "./icons";
 
 type Props = {
-  listing: any;
-  aiPlan?: any;
+  listing: Listing;
 };
 
 const C = {
@@ -27,355 +18,252 @@ const C = {
   gray: "#6B7280",
   line: "#E5E7EB",
   card: "#EEF2F6",
+  placeholder: "#B4B2A9",
 };
 
-function Pin({ color }: { color: string }) {
-  return (
-    <Svg width={9} height={9} viewBox="0 0 24 24">
-      <Path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke={color} strokeWidth={2} fill="none" />
-      <Circle cx={12} cy={9} r={2.2} fill={color} />
-    </Svg>
-  );
-}
-
-function CarIcon() {
-  return (
-    <Svg width={10} height={10} viewBox="0 0 24 24">
-      <Path d="M5 17h14M5 11l2-5h10l2 5M3 11h18v6H3v-6z" stroke={C.navy} strokeWidth={1.8} fill="none" />
-    </Svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <Svg width={10} height={10} viewBox="0 0 24 24">
-      <Polyline points="20 6 9 17 4 12" stroke={C.gold} strokeWidth={2.4} fill="none" />
-    </Svg>
-  );
-}
+/*
+ * All page-1/page-2 sizing below is scaled ×0.75 from the approved
+ * mockup, which was designed against a 794×1123px canvas. An actual
+ * react-pdf A4 page is 595×842pt — using the mockup's raw pixel
+ * values 1:1 made everything ~33% too tall for the real page.
+ */
 
 const styles = StyleSheet.create({
   page: { backgroundColor: C.white, fontFamily: "Helvetica" },
-  hero: { height: 300, width: "100%", position: "relative" },
+
+  // ---- Page 1: full-bleed cover ----
+  hero: { width: "100%", height: "100%", position: "relative" },
   heroImage: { position: "absolute", width: "100%", height: "100%", objectFit: "cover" },
-  fade1: { position: "absolute", left: 0, right: 0, bottom: 0, height: 88, backgroundColor: "rgba(5,26,46,0.16)" },
-  fade2: { position: "absolute", left: 0, right: 0, bottom: 0, height: 64, backgroundColor: "rgba(5,26,46,0.22)" },
-  fade3: { position: "absolute", left: 0, right: 0, bottom: 0, height: 40, backgroundColor: "rgba(5,26,46,0.32)" },
-  heroContent: { position: "absolute", left: 22, right: 22, top: 16, bottom: 12, justifyContent: "space-between" },
-  logo: { width: 62, height: 48, backgroundColor: "rgba(5,26,46,0.88)", borderWidth: 1.2, borderColor: C.white, alignItems: "center", justifyContent: "center" },
-  logoText: { color: C.white, fontSize: 16, fontFamily: "Helvetica-Bold", letterSpacing: 1 },
-  logoSub: { color: C.white, fontSize: 5.5, letterSpacing: 0.8, marginTop: 1 },
-  heroTitle: { color: C.white, fontSize: 26, fontFamily: "Helvetica-Bold", lineHeight: 1.12 },
-  heroSub: { color: C.goldLight, fontSize: 12, fontFamily: "Helvetica-Bold", marginTop: 4 },
-  locRow: { flexDirection: "row", alignItems: "center", marginTop: 6 },
-  locText: { color: C.white, fontSize: 9, marginLeft: 4 },
-  priceBand: { height: 72, backgroundColor: C.navyDark, flexDirection: "row", alignItems: "center", paddingHorizontal: 22 },
-  priceLabel: { color: C.white, fontSize: 8, fontFamily: "Helvetica-Bold", letterSpacing: 0.8 },
-  price: { color: C.goldLight, fontSize: 20, fontFamily: "Helvetica-Bold", marginTop: 2 },
-  negotiable: { color: C.white, fontSize: 8, marginTop: 2 },
-  facts: { flex: 1, flexDirection: "row", justifyContent: "flex-end" },
-  fact: { width: 78, alignItems: "center" },
-  factLabel: { color: C.white, fontSize: 6.5, fontFamily: "Helvetica-Bold" },
-  factValue: { color: C.white, fontSize: 8, marginTop: 2, textAlign: "center" },
-  body: { paddingHorizontal: 22, paddingTop: 14, paddingBottom: 36 },
-  sectionHead: { flexDirection: "row", alignItems: "center", marginBottom: 7 },
-  goldTick: { width: 18, height: 2, backgroundColor: C.gold, marginRight: 6 },
-  sectionTitle: { fontSize: 9, fontFamily: "Helvetica-Bold", color: C.navy, letterSpacing: 0.6 },
-  goldLine: { flex: 1, height: 1, backgroundColor: C.gold, marginLeft: 8 },
-  grid: { flexDirection: "row", flexWrap: "wrap", borderTopWidth: 1, borderLeftWidth: 1, borderColor: C.line },
-  cell: { width: "25%", height: 52, borderRightWidth: 1, borderBottomWidth: 1, borderColor: C.line, alignItems: "center", justifyContent: "center", paddingHorizontal: 4 },
-  cellLabel: { fontSize: 6, fontFamily: "Helvetica-Bold", color: C.navy },
-  cellValue: { fontSize: 8.5, color: C.black, marginTop: 2, textAlign: "center" },
+  heroFallback: { position: "absolute", width: "100%", height: "100%", backgroundColor: C.placeholder },
+  topBar: { position: "absolute", left: 18, right: 18, top: 16, flexDirection: "row", justifyContent: "space-between" },
+  logo: { width: 43, height: 33, backgroundColor: "rgba(5,26,46,0.9)", borderWidth: 1, borderColor: C.white, alignItems: "center", justifyContent: "center" },
+  logoText: { color: C.white, fontSize: 11, fontFamily: "Helvetica-Bold", letterSpacing: 1 },
+  logoSub: { color: C.white, fontSize: 4, letterSpacing: 1, marginTop: 1 },
+  categoryPill: { backgroundColor: C.gold, color: C.navyDark, fontSize: 7.5, fontFamily: "Helvetica-Bold", letterSpacing: 1, paddingVertical: 4, paddingHorizontal: 8 },
+
+  bottomBand: { position: "absolute", left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.4)", paddingHorizontal: 24, paddingTop: 20, paddingBottom: 16 },
+
+  title: { color: C.white, fontSize: 21, fontFamily: "Helvetica-Bold", lineHeight: 1.2 },
+  locRow: { flexDirection: "row", alignItems: "center", marginTop: 6, gap: 4 },
+  locText: { color: C.goldLight, fontSize: 9, fontFamily: "Helvetica-Bold" },
+  statRow: { flexDirection: "row", marginTop: 12, gap: 16, flexWrap: "wrap" },
+  stat: { flexDirection: "row", alignItems: "center", gap: 4 },
+  statText: { color: C.white, fontSize: 9 },
+  priceLabel: { color: "rgba(255,255,255,0.8)", fontSize: 7, fontFamily: "Helvetica-Bold", letterSpacing: 1, marginTop: 14 },
+  priceRow: { flexDirection: "row", alignItems: "baseline", gap: 6 },
+  price: { color: C.goldLight, fontSize: 20, fontFamily: "Helvetica-Bold" },
+  negotiable: { color: "rgba(255,255,255,0.85)", fontSize: 8 },
+
+  // ---- Page 2: gallery + spec sheet ----
+  body: { paddingHorizontal: 24, paddingTop: 21, flex: 1 },
+  galleryGrid: { flexDirection: "row", flexWrap: "wrap", gap: 4 },
+  galleryPhoto: { width: 133, height: 92, objectFit: "cover" },
+  galleryFallback: { width: 133, height: 92, backgroundColor: C.placeholder },
+  sectionHead: { flexDirection: "row", alignItems: "center", marginTop: 14, marginBottom: 6 },
+  goldTick: { width: 15, height: 1.5, backgroundColor: C.gold, marginRight: 5 },
+  sectionTitle: { fontSize: 8, fontFamily: "Helvetica-Bold", color: C.navy, letterSpacing: 0.5 },
+  goldLine: { flex: 1, height: 1, backgroundColor: C.gold, marginLeft: 7 },
+
+  specGrid: { flexDirection: "row", flexWrap: "wrap" },
+  specItem: { width: "50%", flexDirection: "row", alignItems: "flex-start", gap: 7, paddingVertical: 6, paddingRight: 10, borderBottomWidth: 1, borderBottomColor: C.line },
+  specIcon: { width: 20, height: 20, borderRadius: 10, backgroundColor: C.card, alignItems: "center", justifyContent: "center" },
+  specLabel: { fontSize: 6, fontFamily: "Helvetica-Bold", color: C.gray, letterSpacing: 0.4 },
+  specValue: { fontSize: 8.5, color: C.black, marginTop: 1.5 },
+
   hlGrid: { flexDirection: "row", flexWrap: "wrap" },
-  hlItem: { width: "50%", flexDirection: "row", alignItems: "flex-start", marginBottom: 6, paddingRight: 8 },
-  hlText: { flex: 1, fontSize: 8.5, color: C.black, marginLeft: 4, lineHeight: 1.25 },
-  pageDesc: { fontSize: 9, color: C.slate, lineHeight: 1.45 },
-  footer: { position: "absolute", left: 0, right: 0, bottom: 0, height: 24, backgroundColor: C.navyDark, flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 22 },
-  footerText: { color: C.white, fontSize: 6.5 },
-  pageTwo: { paddingTop: 20, paddingHorizontal: 20, paddingBottom: 36, backgroundColor: C.white, fontFamily: "Helvetica" },
-  galleryGrid: { flexDirection: "row", flexWrap: "wrap", marginTop: 8, marginBottom: 12 },
-  galleryPhoto: { width: "49%", height: 148, objectFit: "cover", marginBottom: 8 },
-  galleryPhotoOdd: { width: "49%", height: 148, objectFit: "cover", marginBottom: 8, marginRight: "2%" },
-  cols: { flexDirection: "row" },
-  colLeft: { width: "58%", paddingRight: 14 },
-  colRight: { width: "42%" },
-  infoTitle: { fontSize: 9, fontFamily: "Helvetica-Bold", color: C.navy, letterSpacing: 0.5 },
-  goldMini: { width: 20, height: 2, backgroundColor: C.gold, marginTop: 3, marginBottom: 7 },
-  desc: { fontSize: 8.5, color: C.slate, lineHeight: 1.4 },
-  locItem: { flexDirection: "row", alignItems: "flex-start", marginBottom: 7 },
-  locItemText: { fontSize: 8.5, color: C.black, marginLeft: 5, flex: 1, lineHeight: 1.3 },
-  agent: { marginTop: 14, backgroundColor: C.card, flexDirection: "row", alignItems: "center", padding: 10 },
-  avatar: { width: 42, height: 42, backgroundColor: C.navy, alignItems: "center", justifyContent: "center", marginRight: 8 },
-  avatarText: { color: C.white, fontSize: 14, fontFamily: "Helvetica-Bold" },
-  agentName: { fontSize: 11, fontFamily: "Helvetica-Bold", color: C.navy },
-  agentMeta: { fontSize: 8, color: C.gray, marginTop: 1 },
-  agentRight: { marginLeft: "auto", borderLeftWidth: 1, borderLeftColor: "#CBD5E1", paddingLeft: 10, width: 130 },
-  interested: { fontSize: 6.5, fontFamily: "Helvetica-Bold", color: C.navy, marginBottom: 2 },
-  contact: { fontSize: 7.5, color: C.black, lineHeight: 1.3 },
-  brandBox: { width: 46, height: 36, backgroundColor: C.navy, alignItems: "center", justifyContent: "center", marginLeft: 8 },
-  brandText: { color: C.white, fontSize: 9, fontFamily: "Helvetica-Bold" },
-  brandSub: { color: C.white, fontSize: 4 },
-  fallbackHero: { position: "absolute", width: "100%", height: "100%", backgroundColor: C.navy },
+  hlItem: { width: "50%", flexDirection: "row", alignItems: "flex-start", marginBottom: 5, paddingRight: 6, gap: 4 },
+  hlText: { flex: 1, fontSize: 7.5, color: C.black, lineHeight: 1.3 },
+
+  desc: { fontSize: 7.5, color: C.slate, lineHeight: 1.45 },
+
+  agent: { marginTop: 12, marginHorizontal: 24, backgroundColor: C.card, flexDirection: "row", alignItems: "center", padding: 9 },
+  avatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: C.navy, alignItems: "center", justifyContent: "center" },
+  avatarText: { color: C.white, fontSize: 11, fontFamily: "Helvetica-Bold" },
+  agentName: { fontSize: 8, fontFamily: "Helvetica-Bold", color: C.navy },
+  agentLine: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
+  agentMeta: { fontSize: 6, color: C.gray },
+
+  footer: { height: 20, backgroundColor: C.navyDark, flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 24, marginTop: 12 },
+  footerText: { color: C.white, fontSize: 6 },
 });
 
-function clean(value: any): string | null {
-  if (value === null || value === undefined || value === "") return null;
-  return String(value);
+function money(value: number | null): string {
+  if (!value) return "Price Upon Request";
+  return `RM ${value.toLocaleString()}`;
 }
 
-function money(value: any): string {
-  const number = Number(value);
-  if (!number) return "Price Upon Request";
-  return `RM ${number.toLocaleString()}`;
+function address(listing: Listing): string {
+  return [listing.address, listing.area, listing.state].filter(Boolean).join(", ");
 }
 
-function wrapTitle(title: string): string[] {
-  const words = title.toUpperCase().trim().split(/\s+/);
-  const lines: string[] = [];
-  let current = "";
-  for (const word of words) {
-    const test = current ? `${current} ${word}` : word;
-    if (test.length <= 18) current = test;
-    else {
-      if (current) lines.push(current);
-      current = word;
-    }
-  }
-  if (current) lines.push(current);
-  return lines.slice(0, 2);
+// Hard safety cap so an unusually long description can never push
+// the spec sheet onto a 3rd page.
+function truncateDescription(text: string | null, max = 520): string {
+  if (!text) return "";
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${cut.slice(0, lastSpace > 0 ? lastSpace : max)}…`;
 }
 
-function linesFrom(value: any): string[] {
-  if (!value) return [];
-  if (Array.isArray(value)) {
-    return value.map((item: any) => String(item).replace(/^[-*]+\s*/, "").trim()).filter(Boolean);
-  }
-  return String(value)
-    .split(/\n/)
-    .map((line) => line.replace(/^[-*]+\s*/, "").trim())
-    .filter((line) => line.length > 2 && line.length < 160);
-}
-
-export default function ListingBrochure({ listing, aiPlan }: Props) {
-  const photos = Array.isArray(listing?.property_photos)
-    ? listing.property_photos.filter((photo: any) => photo?.image_url)
+export default function ListingBrochure({ listing }: Props) {
+  const photos = Array.isArray(listing.property_photos)
+    ? listing.property_photos.filter((p) => p.image_url)
     : [];
 
-  const coverType = aiPlan?.hero?.photo_type || null;
-  const coverPhoto = coverType
-    ? photos.find((photo: any) => photo.photo_type === coverType) ?? photos[0]
-    : photos[0];
+  const preferredType = coverPhotoType[listing.category];
+  const coverPhoto = photos.find((p) => p.photo_type === preferredType) ?? photos[0];
+  const galleryPhotos = photos.filter((p) => p.image_url !== coverPhoto?.image_url).slice(0, 8);
 
-  const galleryPhotos = (
-    aiPlan?.gallery?.enabled === false
-      ? []
-      : photos.filter((photo: any) => photo.image_url !== coverPhoto?.image_url)
-  ).slice(0, 4);
+  const stats = coverStats[listing.category].filter((f) => f.value(listing) !== null);
+  const fields = overviewFields[listing.category].filter((f) => f.value(listing) !== null);
+  const highlights = (listing.highlights ?? []).filter(Boolean);
+  const description = truncateDescription(listing.description);
 
-  const location = [listing?.address, listing?.area, listing?.state].filter(Boolean).join(", ");
-  const rawTitle = String(listing?.title || listing?.headline || "Property Listing");
-  let mainTitle = rawTitle;
-  let subTitle = listing?.area ? String(listing.area) : "";
-  if (rawTitle.includes("@")) {
-    const parts = rawTitle.split("@");
-    mainTitle = parts[0].trim();
-    subTitle = parts[1].trim();
-  }
-  const titleLines = wrapTitle(mainTitle);
-  const purpose = String(listing?.purpose || listing?.listing_purpose || "Sell").toLowerCase();
-  const isRent = purpose.includes("rent");
-
-  const overview = [
-    { label: "Property Type", value: clean(listing?.property_type || listing?.commercial_type || listing?.residential_type || listing?.land_type) },
-    { label: "Built-up", value: clean(listing?.built_up) },
-    { label: "Land Area", value: clean(listing?.land_size || listing?.land_area || listing?.land) },
-    { label: "Bathrooms", value: clean(listing?.bathrooms) },
-    { label: "Tenure", value: clean(listing?.tenure) },
-    { label: "Facing", value: clean(listing?.facing) },
-    { label: "Power Supply", value: clean(listing?.industrial_power_supply || listing?.electricity_phase) },
-    { label: "Status", value: clean(listing?.status) },
-    { label: "Purpose", value: clean(listing?.purpose) },
-    { label: "Category", value: clean(listing?.category) },
-    { label: "Rooms", value: clean(listing?.rooms || listing?.bedrooms) },
-  ].filter((item): item is { label: string; value: string } => Boolean(item.value)).slice(0, 12);
-
-  const keyFacts = [
-    { label: "Built-up", value: clean(listing?.built_up) },
-    { label: "Type", value: clean(listing?.property_type || listing?.commercial_type || listing?.residential_type) },
-    { label: "Tenure", value: clean(listing?.tenure) },
-  ].filter((item): item is { label: string; value: string } => Boolean(item.value));
-
-  let highlights: string[] = linesFrom(listing?.highlights);
-  if (!highlights.length) highlights = linesFrom(listing?.remarks);
-  if (!highlights.length) highlights = linesFrom(listing?.description).slice(0, 8);
-  if (!highlights.length) {
-    highlights = [
-      clean(listing?.tenure) ? `${listing.tenure} tenure` : "",
-      clean(listing?.built_up) ? `Built-up ${listing.built_up}` : "",
-      clean(listing?.land_size || listing?.land_area) ? `Land area ${listing.land_size || listing.land_area}` : "",
-      clean(listing?.bathrooms) ? `${listing.bathrooms} bathrooms` : "",
-      listing?.area ? `Located in ${listing.area}` : "",
-    ].filter(Boolean) as string[];
-  }
-  const aiIndexes = Array.isArray(aiPlan?.highlight_indexes) ? aiPlan.highlight_indexes : [];
-  const selected: string[] = aiIndexes.map((index: any) => highlights[Number(index)]).filter(Boolean);
-  const finalHighlights = (selected.length ? selected : highlights).slice(0, 8);
-  const agentName =
-    listing?.listing_agent === "Cobroke Agent" ? "MAX CHEA" : listing?.listing_agent || "MAX CHEA";
+  const agentName = listing.listing_agent === "Cobroke Agent" ? "MAX CHEA" : listing.listing_agent || "MAX CHEA";
 
   return (
     <Document>
+      {/* PAGE 1 — full-bleed photo cover */}
       <Page size="A4" style={styles.page}>
         <View style={styles.hero}>
           {coverPhoto?.image_url ? (
             <Image src={coverPhoto.image_url} style={styles.heroImage} />
           ) : (
-            <View style={styles.fallbackHero} />
+            <View style={styles.heroFallback} />
           )}
-          <View style={styles.fade1} />
-          <View style={styles.fade2} />
-          <View style={styles.fade3} />
-          <View style={styles.heroContent}>
+
+          <View style={styles.topBar}>
             <View style={styles.logo}>
               <Text style={styles.logoText}>MIB</Text>
               <Text style={styles.logoSub}>PROPERTIES</Text>
             </View>
-            <View>
-              {titleLines.map((line) => (
-                <Text key={line} style={styles.heroTitle}>{line}</Text>
-              ))}
-              {subTitle ? <Text style={styles.heroSub}>{subTitle.toUpperCase()}</Text> : null}
-              {location ? (
-                <View style={styles.locRow}>
-                  <Pin color={C.white} />
-                  <Text style={styles.locText}>{location}</Text>
-                </View>
-              ) : null}
+            <Text style={styles.categoryPill}>{categoryLabel[listing.category]}</Text>
+          </View>
+
+          <View style={styles.bottomBand}>
+            <Text style={styles.title}>
+              {(listing.title || listing.headline || "Property Listing").toUpperCase()}
+            </Text>
+
+            {address(listing) ? (
+              <View style={styles.locRow}>
+                <PinIcon size={9} color={C.goldLight} />
+                <Text style={styles.locText}>{address(listing)}</Text>
+              </View>
+            ) : null}
+
+            {stats.length > 0 ? (
+              <View style={styles.statRow}>
+                {stats.map((f) => (
+                  <View key={f.label} style={styles.stat}>
+                    <f.icon size={11} color={C.goldLight} />
+                    <Text style={styles.statText}>{f.value(listing)}</Text>
+                  </View>
+                ))}
+              </View>
+            ) : null}
+
+            <Text style={styles.priceLabel}>ASKING PRICE</Text>
+            <View style={styles.priceRow}>
+              <Text style={styles.price}>{money(listing.price)}</Text>
+              <Text style={styles.negotiable}>(Negotiable)</Text>
             </View>
           </View>
         </View>
-        <View style={styles.priceBand}>
-          <View>
-            <Text style={styles.priceLabel}>{isRent ? "ASKING RENT" : "ASKING PRICE"}</Text>
-            <Text style={styles.price}>{money(listing?.price)}</Text>
-            <Text style={styles.negotiable}>(Negotiable)</Text>
-          </View>
-          <View style={styles.facts}>
-            {keyFacts.slice(0, 3).map((fact) => (
-              <View key={fact.label} style={styles.fact}>
-                <Text style={styles.factLabel}>{fact.label}</Text>
-                <Text style={styles.factValue}>{fact.value}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
+      </Page>
+
+      {/* PAGE 2 — gallery + icon spec sheet */}
+      <Page size="A4" style={styles.page}>
         <View style={styles.body}>
-          {overview.length > 0 ? (
+          {galleryPhotos.length > 0 ? (
+            <View style={styles.galleryGrid}>
+              {galleryPhotos.map((photo, i) =>
+                photo.image_url ? (
+                  <Image key={`${photo.image_url}-${i}`} src={photo.image_url} style={styles.galleryPhoto} />
+                ) : (
+                  <View key={i} style={styles.galleryFallback} />
+                )
+              )}
+            </View>
+          ) : null}
+
+          {fields.length > 0 ? (
             <View>
               <View style={styles.sectionHead}>
                 <View style={styles.goldTick} />
                 <Text style={styles.sectionTitle}>PROPERTY OVERVIEW</Text>
                 <View style={styles.goldLine} />
               </View>
-              <View style={styles.grid}>
-                {overview.map((item) => (
-                  <View key={item.label} style={styles.cell}>
-                    <Text style={styles.cellLabel}>{item.label}</Text>
-                    <Text style={styles.cellValue}>{item.value}</Text>
+              <View style={styles.specGrid}>
+                {fields.map((f) => (
+                  <View key={f.label} style={styles.specItem}>
+                    <View style={styles.specIcon}>
+                      <f.icon size={10} color={C.navy} />
+                    </View>
+                    <View>
+                      <Text style={styles.specLabel}>{f.label.toUpperCase()}</Text>
+                      <Text style={styles.specValue}>{f.value(listing)}</Text>
+                    </View>
                   </View>
                 ))}
               </View>
             </View>
           ) : null}
-          {finalHighlights.length > 0 ? (
-            <View style={{ marginTop: 14 }}>
+
+          {highlights.length > 0 ? (
+            <View>
               <View style={styles.sectionHead}>
                 <View style={styles.goldTick} />
                 <Text style={styles.sectionTitle}>PROPERTY HIGHLIGHTS</Text>
                 <View style={styles.goldLine} />
               </View>
               <View style={styles.hlGrid}>
-                {finalHighlights.map((item: string) => (
+                {highlights.slice(0, 8).map((item) => (
                   <View key={item} style={styles.hlItem}>
-                    <CheckIcon />
+                    <CheckIcon size={8} />
                     <Text style={styles.hlText}>{item}</Text>
                   </View>
                 ))}
               </View>
             </View>
           ) : null}
-          {listing?.description ? (
-            <View style={{ marginTop: 14 }}>
+
+          {description ? (
+            <View>
               <View style={styles.sectionHead}>
                 <View style={styles.goldTick} />
                 <Text style={styles.sectionTitle}>DESCRIPTION</Text>
                 <View style={styles.goldLine} />
               </View>
-              <Text style={styles.pageDesc}>{String(listing.description)}</Text>
+              <Text style={styles.desc}>{description}</Text>
             </View>
           ) : null}
         </View>
+
+        <View style={styles.agent}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{agentName.charAt(0)}</Text>
+          </View>
+          <View style={{ marginLeft: 8 }}>
+            <Text style={styles.agentName}>{agentName}</Text>
+            <View style={styles.agentLine}>
+              <BadgeIcon size={8} color={C.gray} />
+              <Text style={styles.agentMeta}>{listing.agent_reg_no || "REN 31953"}</Text>
+            </View>
+            <View style={styles.agentLine}>
+              <PhoneIcon size={8} color={C.gray} />
+              <Text style={styles.agentMeta}>{listing.agent_phone || "016-521 0993"}</Text>
+            </View>
+          </View>
+          <View style={{ marginLeft: "auto" }}>
+            <MailIcon size={8} color={C.gray} />
+          </View>
+        </View>
+
         <View style={styles.footer}>
           <Text style={styles.footerText}>maxzchea@gmail.com</Text>
-          <Text style={styles.footerText}>Max Property</Text>
-        </View>
-      </Page>
-      <Page size="A4" style={styles.pageTwo}>
-        <View style={styles.sectionHead}>
-          <View style={styles.goldTick} />
-          <Text style={styles.sectionTitle}>PHOTO GALLERY</Text>
-        </View>
-        <View style={styles.galleryGrid}>
-          {galleryPhotos.map((photo: any, index: number) => (
-            <Image
-              key={`${photo.image_url}-${index}`}
-              src={photo.image_url}
-              style={index % 2 === 0 ? styles.galleryPhotoOdd : styles.galleryPhoto}
-            />
-          ))}
-        </View>
-        <View style={styles.cols}>
-          <View style={styles.colLeft}>
-            <Text style={styles.infoTitle}>DESCRIPTION</Text>
-            <View style={styles.goldMini} />
-            <Text style={styles.desc}>{listing?.description || "Property information available upon request."}</Text>
-          </View>
-          <View style={styles.colRight}>
-            <Text style={styles.infoTitle}>LOCATION</Text>
-            <View style={styles.goldMini} />
-            {location ? (
-              <View style={styles.locItem}>
-                <Pin color={C.navy} />
-                <Text style={styles.locItemText}>{location}</Text>
-              </View>
-            ) : null}
-            {listing?.area ? (
-              <View style={styles.locItem}>
-                <CarIcon />
-                <Text style={styles.locItemText}>Convenient access to local amenities and city centre</Text>
-              </View>
-            ) : null}
-          </View>
-        </View>
-        <View style={styles.agent}>
-          <View style={styles.avatar}><Text style={styles.avatarText}>M</Text></View>
-          <View>
-            <Text style={styles.agentName}>{agentName}</Text>
-            <Text style={styles.agentMeta}>{listing?.agent_reg_no || "REN 31953"}</Text>
-            <Text style={styles.agentMeta}>{listing?.agent_phone || "016-521 0993"}</Text>
-          </View>
-          <View style={styles.agentRight}>
-            <Text style={styles.interested}>INTERESTED IN THIS PROPERTY?</Text>
-            <Text style={styles.contact}>Contact us today for viewing arrangement.</Text>
-          </View>
-          <View style={styles.brandBox}>
-            <Text style={styles.brandText}>MAX</Text>
-            <Text style={styles.brandSub}>PROPERTY</Text>
-          </View>
-        </View>
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>MAX PROPERTY</Text>
-          <Text style={styles.footerText}>Property Information - Page 2</Text>
+          <Text style={styles.footerText}>Page 2 of 2</Text>
         </View>
       </Page>
     </Document>
