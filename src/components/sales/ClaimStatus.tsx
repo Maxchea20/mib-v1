@@ -1,68 +1,27 @@
 "use client";
 
 import { useMemo } from "react";
+import {
+  formatMoney,
+  getClaimed,
+  getGross,
+  getLatestYear,
+} from "@/lib/sales";
 
 type Props = {
   deals: any[];
 };
 
 export default function ClaimStatus({ deals }: Props) {
-  const latestYear = useMemo(() => {
-    const years = deals
-      .map((deal) => Number(deal.year))
-      .filter((year) => !isNaN(year));
+  const latestYear = useMemo(() => getLatestYear(deals), [deals]);
 
-    return years.length
-      ? Math.max(...years)
-      : new Date().getFullYear();
-  }, [deals]);
-
-  const yearDeals = useMemo(() => {
-    return deals.filter(
-      (deal) => Number(deal.year) === latestYear
-    );
-  }, [deals, latestYear]);
-
-  const gross = yearDeals.reduce((sum, deal) => {
-    const storedGross =
-      Number(deal.gross_commission);
-
-    if (
-      !isNaN(storedGross) &&
-      storedGross > 0
-    ) {
-      return sum + storedGross;
-    }
-
-    const sellingPrice =
-      Number(deal.selling_price) || 0;
-
-    const commissionRate =
-      Number(deal.commission_rate) || 0;
-
-    return (
-      sum +
-      (sellingPrice * commissionRate) / 100
-    );
-  }, 0);
-
-  const claimed = yearDeals.reduce(
-    (sum, deal) => {
-      const remarks = String(
-        deal.remarks ?? ""
-      ).toLowerCase().trim();
-
-      const grossCommission =
-        Number(deal.gross_commission) || 0;
-
-      if (remarks === "claimed") {
-        return sum + grossCommission;
-      }
-
-      return sum;
-    },
-    0
+  const yearDeals = useMemo(
+    () => deals.filter((deal) => Number(deal.year) === latestYear),
+    [deals, latestYear]
   );
+
+  const gross = yearDeals.reduce((sum, deal) => sum + getGross(deal), 0);
+  const claimed = yearDeals.reduce((sum, deal) => sum + getClaimed(deal), 0);
 
   const potential = Math.max(
     gross - claimed,
@@ -155,9 +114,3 @@ export default function ClaimStatus({ deals }: Props) {
   );
 }
 
-function formatMoney(value: number) {
-  return `RM ${value.toLocaleString("en-MY", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}

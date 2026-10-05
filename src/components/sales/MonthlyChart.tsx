@@ -10,25 +10,16 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import {
+  MONTHS as months,
+  formatMoney,
+  getGross,
+  parseClaimMonth,
+} from "@/lib/sales";
 
 type Props = {
   deals: any[];
 };
-
-const months = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
 
 const colors = [
   "#2563EB", // Blue
@@ -67,22 +58,24 @@ export default function MonthlyChart({
     return row;
   });
 
-  // Sum Gross Commission into month/year
+  // Sum gross commission into month/year. The year line is the deal's
+  // year (same as the yearly chart and KPIs); the claim month only picks
+  // the point on the line. Deals with no usable claim month are totalled
+  // separately so the chart still reconciles with the other numbers.
+  let unscheduled = 0;
+
   deals.forEach((deal) => {
-
-    if (!deal.claim_month) return;
-
-    const monthIndex = months.indexOf(
-      String(deal.claim_month).substring(0, 3)
-    );
-
-    if (monthIndex === -1) return;
-
     const year = Number(deal.year);
+    if (isNaN(year)) return;
 
-    chartData[monthIndex][year] +=
-      Number(deal.gross_commission) || 0;
+    const claim = parseClaimMonth(deal.claim_month);
 
+    if (!claim) {
+      unscheduled += getGross(deal);
+      return;
+    }
+
+    chartData[claim.month][year] += getGross(deal);
   });
 
   return (
@@ -143,6 +136,12 @@ export default function MonthlyChart({
         </ResponsiveContainer>
 
       </div>
+
+      {unscheduled > 0 && (
+        <p className="mt-4 text-sm text-gray-500">
+          Not shown (no claim month set): {formatMoney(unscheduled)}
+        </p>
+      )}
 
     </div>
 

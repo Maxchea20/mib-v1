@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { formatMoney, getGross, getLatestYear } from "@/lib/sales";
 
 type Props = {
   deals: any[];
@@ -9,46 +10,17 @@ type Props = {
 const TARGET = 200000;
 
 export default function TargetProjection({ deals }: Props) {
-  const latestYear = useMemo(() => {
-    const years = deals
-      .map((deal) => Number(deal.year))
-      .filter((year) => !isNaN(year));
+  const latestYear = useMemo(() => getLatestYear(deals), [deals]);
 
-    return years.length
-      ? Math.max(...years)
-      : new Date().getFullYear();
-  }, [deals]);
+  const yearDeals = useMemo(
+    () => deals.filter((deal) => Number(deal.year) === latestYear),
+    [deals, latestYear]
+  );
 
-  const yearDeals = useMemo(() => {
-    return deals.filter(
-      (deal) => Number(deal.year) === latestYear
-    );
-  }, [deals, latestYear]);
-
-  const gross = useMemo(() => {
-    return yearDeals.reduce((sum, deal) => {
-      const storedGross =
-        Number(deal.gross_commission);
-
-      if (
-        !isNaN(storedGross) &&
-        storedGross > 0
-      ) {
-        return sum + storedGross;
-      }
-
-      const sellingPrice =
-        Number(deal.selling_price) || 0;
-
-      const commissionRate =
-        Number(deal.commission_rate) || 0;
-
-      return (
-        sum +
-        (sellingPrice * commissionRate) / 100
-      );
-    }, 0);
-  }, [yearDeals]);
+  const gross = useMemo(
+    () => yearDeals.reduce((sum, deal) => sum + getGross(deal), 0),
+    [yearDeals]
+  );
 
   const currentMonth = new Date().getMonth() + 1;
 
@@ -197,9 +169,3 @@ function Metric({
   );
 }
 
-function formatMoney(value: number) {
-  return `RM ${value.toLocaleString("en-MY", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}

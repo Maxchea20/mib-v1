@@ -9,6 +9,7 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
+import { getGross } from "@/lib/sales";
 
 type Props = {
   deals: any[];
@@ -24,8 +25,7 @@ export default function YearlyChart({
 
     const year = Number(deal.year);
 
-    const gross =
-      Number(deal.gross_commission) || 0;
+    const gross = getGross(deal);
 
     yearlyMap.set(
       year,

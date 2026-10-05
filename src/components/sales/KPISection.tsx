@@ -1,6 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
+import {
+  formatMoney,
+  getClaimed,
+  getGross,
+  getLatestYear,
+  getNet,
+} from "@/lib/sales";
 
 type Props = {
   deals: any[];
@@ -9,173 +16,28 @@ type Props = {
 export default function KPISection({
   deals,
 }: Props) {
-  /*
-   * Get the latest year available in the database.
-   * This means the KPI section defaults to the latest
-   * sales year automatically.
-   */
-  const latestYear = useMemo(() => {
-    const years = deals
-      .map((deal) => Number(deal.year))
-      .filter((year) => !isNaN(year));
+  // KPIs default to the latest sales year in the database.
+  const latestYear = useMemo(() => getLatestYear(deals), [deals]);
 
-    return years.length
-      ? Math.max(...years)
-      : new Date().getFullYear();
-  }, [deals]);
+  const yearDeals = useMemo(
+    () => deals.filter((deal) => Number(deal.year) === latestYear),
+    [deals, latestYear]
+  );
 
-  /*
-   * Only calculate KPIs for the latest year.
-   */
-  const yearDeals = useMemo(() => {
-    return deals.filter(
-      (deal) => Number(deal.year) === latestYear
-    );
-  }, [deals, latestYear]);
-
-  /*
-   * Gross commission
-   */
-  const gross = yearDeals.reduce((sum, deal) => {
-    const grossCommission =
-      Number(deal.gross_commission);
-
-    if (
-      !isNaN(grossCommission) &&
-      grossCommission > 0
-    ) {
-      return sum + grossCommission;
-    }
-
-    const sellingPrice =
-      Number(deal.selling_price) || 0;
-
-    const commissionRate =
-      Number(deal.commission_rate) || 0;
-
-    return (
-      sum +
-      (sellingPrice * commissionRate) / 100
-    );
-  }, 0);
-
-  /*
-   * Net commission
-   */
-  const net = yearDeals.reduce((sum, deal) => {
-    const netCommission =
-      Number(deal.net_commission);
-
-    if (
-      !isNaN(netCommission) &&
-      netCommission > 0
-    ) {
-      return sum + netCommission;
-    }
-
-    const sellingPrice =
-      Number(deal.selling_price) || 0;
-
-    const commissionRate =
-      Number(deal.commission_rate) || 0;
-
-    return (
-      sum +
-      (sellingPrice * commissionRate) / 100
-    );
-  }, 0);
-
-  /*
-   * Number of deals
-   */
+  const grossList = yearDeals.map(getGross);
+  const gross = grossList.reduce((sum, v) => sum + v, 0);
+  const net = yearDeals.reduce((sum, deal) => sum + getNet(deal), 0);
   const dealCount = yearDeals.length;
 
-  /*
-   * Gross commission for individual deals.
-   *
-   * We use the stored gross_commission first.
-   * If it doesn't exist, calculate it from
-   * selling price × commission rate.
-   */
-  const commissions = yearDeals
-    .map((deal) => {
-      const storedGross =
-        Number(deal.gross_commission);
+  const commissions = grossList.filter((v) => v > 0);
+  const highest = commissions.length ? Math.max(...commissions) : 0;
+  const lowest = commissions.length ? Math.min(...commissions) : 0;
+  const average = commissions.length
+    ? commissions.reduce((sum, v) => sum + v, 0) / commissions.length
+    : 0;
 
-      if (
-        !isNaN(storedGross) &&
-        storedGross > 0
-      ) {
-        return storedGross;
-      }
-
-      const sellingPrice =
-        Number(deal.selling_price) || 0;
-
-      const commissionRate =
-        Number(deal.commission_rate) || 0;
-
-      return (
-        (sellingPrice * commissionRate) / 100
-      );
-    })
-    .filter((value) => value > 0);
-
-  /*
-   * Highest commission
-   */
-  const highest =
-    commissions.length > 0
-      ? Math.max(...commissions)
-      : 0;
-
-  /*
-   * Lowest commission
-   */
-  const lowest =
-    commissions.length > 0
-      ? Math.min(...commissions)
-      : 0;
-
-  /*
-   * Average commission
-   */
-  const average =
-    commissions.length > 0
-      ? commissions.reduce(
-          (sum, value) => sum + value,
-          0
-        ) / commissions.length
-      : 0;
-
-  /*
-   * Claimed amount
-   */
-  const claimed = yearDeals.reduce(
-  (sum, deal) => {
-    const remarks = String(
-      deal.remarks ?? ""
-    ).toLowerCase().trim();
-
-    const grossCommission =
-      Number(deal.gross_commission) || 0;
-
-    if (remarks === "claimed") {
-      return sum + grossCommission;
-    }
-
-    return sum;
-  },
-  0
-);
-
-  /*
-   * Potential / unclaimed commission
-   */
-  const potential = Math.max(
-    gross - claimed,
-    0
-  );
+  const claimed = yearDeals.reduce((sum, deal) => sum + getClaimed(deal), 0);
+  const potential = Math.max(gross - claimed, 0);
 
   return (
     <div className="space-y-4">
@@ -232,13 +94,6 @@ export default function KPISection({
 
     </div>
   );
-}
-
-function formatMoney(value: number) {
-  return `RM ${value.toLocaleString("en-MY", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
 }
 
 function Card({
