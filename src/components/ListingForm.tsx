@@ -225,6 +225,15 @@ export default function ListingForm({
       ""
     );
 
+  // iProperty "Land title type" for Industrial Land (Industrial category).
+  const [landTitleType, setLandTitleType] =
+    useState(
+      listing?.property_sub_type ===
+        "Industrial Land"
+        ? listing?.land_type ?? "Industrial"
+        : "Industrial"
+    );
+
   /*
   |--------------------------------------------------------------------------
   | SUBMIT
@@ -590,7 +599,13 @@ export default function ListingForm({
         "Land"
           ? landType ||
             null
-          : null,
+          : category ===
+              "Industrial" &&
+            propertySubType ===
+              "Industrial Land"
+            ? landTitleType ||
+              "Industrial"
+            : null,
     };
 
     /*
@@ -2976,6 +2991,41 @@ export default function ListingForm({
         {/* ================================================================ */}
         {/* LAND CLASSIFICATION */}
         {/* ================================================================ */}
+
+        {category ===
+          "Industrial" &&
+          propertySubType ===
+            "Industrial Land" && (
+          <select
+            value={
+              landTitleType
+            }
+            onChange={(e) =>
+              setLandTitleType(
+                e.target.value
+              )
+            }
+            className={
+              inputClass
+            }
+          >
+            <option>
+              Residential
+            </option>
+
+            <option>
+              Commercial
+            </option>
+
+            <option>
+              Industrial
+            </option>
+
+            <option>
+              Agricultural
+            </option>
+          </select>
+        )}
 
         {category ===
           "Land" && (

@@ -104,6 +104,7 @@ export default async function ListingProfilePage({ params }: Props) {
                 {listing.category === "Commercial" && <Field label="Commercial Type" value={listing.commercial_type} />}
                 {listing.category === "Industrial" && <Field label="Industrial Zoning" value={listing.industrial_zoning} />}
                 {listing.category === "Land" && <Field label="Land Type" value={listing.land_type} />}
+                {listing.category === "Industrial" && listing.property_sub_type === "Industrial Land" && <Field label="Land Title Type" value={listing.land_type} />}
               </div>
             </div>
 
