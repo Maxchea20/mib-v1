@@ -117,7 +117,7 @@ export async function POST(request: Request) {
         location && `📍 ${location}`,
         priceText && `💰 ${priceText}`,
         listing.description && String(listing.description),
-        "WhatsApp me for details & viewing.",
+        `📲 WhatsApp me for details & viewing: +${whatsapp}`,
       ]
         .filter(Boolean)
         .join("\n"),
@@ -131,7 +131,7 @@ export async function POST(request: Request) {
         location && `📍 ${location}`,
         priceText && `💰 ${priceText}`,
         listing.description && String(listing.description),
-        "WhatsApp me for details & viewing.",
+        `📲 WhatsApp me for details & viewing: +${whatsapp}`,
       ]
         .filter(Boolean)
         .join("\n"),
