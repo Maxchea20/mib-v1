@@ -6,6 +6,7 @@ import {
 } from "react";
 
 import MarketingListingSelector from "@/components/marketing/MarketingListingSelector";
+import GoogleBusinessMarketing from "@/components/marketing/GoogleBusinessMarketing";
 
 type FacebookGroup = {
   id: string;
@@ -183,7 +184,7 @@ export default function MarketingTabs({
 }: Props) {
   const [activeTab, setActiveTab] =
     useState<
-      "facebook" | "iproperty"
+      "facebook" | "iproperty" | "google"
     >("facebook");
 
   return (
@@ -222,6 +223,22 @@ export default function MarketingTabs({
         >
           iProperty
         </button>
+
+        <button
+          type="button"
+          onClick={() =>
+            setActiveTab(
+              "google"
+            )
+          }
+          className={`px-5 py-3 text-sm font-semibold border-b-2 transition ${
+            activeTab === "google"
+              ? "border-blue-600 text-blue-600"
+              : "border-transparent text-gray-500 hover:text-gray-800"
+          }`}
+        >
+          Google Business
+        </button>
       </div>
 
       {/* FACEBOOK */}
@@ -239,6 +256,14 @@ export default function MarketingTabs({
 
       {activeTab === "iproperty" && (
         <IpropertyMarketing
+          listings={listings}
+        />
+      )}
+
+      {/* GOOGLE BUSINESS */}
+
+      {activeTab === "google" && (
+        <GoogleBusinessMarketing
           listings={listings}
         />
       )}
