@@ -93,8 +93,8 @@ export default function GoogleBusinessMarketing({
             Google Business Profile
           </h2>
           <p className="text-sm text-gray-500">
-            Posts the listing photo, title, short description, price and a
-            WhatsApp button.
+            Adds the listing to your profile as a Product: photo, name, price,
+            description and a WhatsApp link.
           </p>
         </div>
 
@@ -141,7 +141,7 @@ export default function GoogleBusinessMarketing({
             checked={dryRun}
             onChange={(e) => setDryRun(e.target.checked)}
           />
-          Test run — fill the post but don&apos;t publish (recommended the
+          Test run — fill the product but don&apos;t publish (recommended the
           first time)
         </label>
 
@@ -156,8 +156,8 @@ export default function GoogleBusinessMarketing({
             <p className="text-sm text-green-700">{success}</p>
             {preview && (
               <pre className="whitespace-pre-wrap text-xs text-gray-700">
-                {preview.summary}
-                {"\n\n"}Button: {preview.button_label} → {preview.button_url}
+                {preview.description ?? preview.summary}
+                {"\n\n"}Link: {preview.button_url}
               </pre>
             )}
           </div>

@@ -18,6 +18,7 @@ import { requireUser } from "@/lib/apiAuth";
 */
 
 const MAX_SUMMARY = 300;
+const MAX_DESCRIPTION = 1000;
 
 function formatPrice(listing: any): string | null {
   const price = Number(listing.price);
@@ -29,7 +30,7 @@ function formatPrice(listing: any): string | null {
 }
 
 function shorten(text: string, max: number): string {
-  const clean = text.replace(/\s+/g, " ").trim();
+  const clean = text.replace(/[ \t]+/g, " ").trim();
   if (clean.length <= max) return clean;
   return `${clean.slice(0, max - 1).trimEnd()}…`;
 }
@@ -123,6 +124,20 @@ export async function POST(request: Request) {
       MAX_SUMMARY
     );
 
+    // Google "Add product" allows a longer description than a post.
+    const description = shorten(
+      [
+        title,
+        location && `📍 ${location}`,
+        priceText && `💰 ${priceText}`,
+        listing.description && String(listing.description),
+        "WhatsApp me for details & viewing.",
+      ]
+        .filter(Boolean)
+        .join("\n"),
+      MAX_DESCRIPTION
+    );
+
     const message = encodeURIComponent(
       `Hi, I'm interested in: ${title}${priceText ? ` (${priceText})` : ""}`
     );
@@ -131,6 +146,8 @@ export async function POST(request: Request) {
       listing_id: listingId,
       title,
       summary,
+      description,
+      price: Number.isFinite(Number(listing.price)) ? Number(listing.price) : null,
       price_text: priceText,
       photo_url: photoUrl,
       button_label: "Learn more",
