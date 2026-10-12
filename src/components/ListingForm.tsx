@@ -3280,6 +3280,26 @@ export default function ListingForm({
           </>
         )}
 
+        {/* LAND */}
+        {category ===
+          "Land" && (
+          <input
+            type="text"
+            placeholder="Land Size (e.g. 7.96 acres or 20,000 sqft)"
+            value={
+              landSize
+            }
+            onChange={(e) =>
+              setLandSize(
+                e.target.value
+              )
+            }
+            className={
+              inputClass
+            }
+          />
+        )}
+
         {/* ================================================================ */}
         {/* CONDITION */}
         {/* ================================================================ */}
