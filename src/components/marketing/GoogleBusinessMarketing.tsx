@@ -20,7 +20,7 @@ export default function GoogleBusinessMarketing({
 }) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [whatsapp, setWhatsapp] = useState("");
-  const [dryRun, setDryRun] = useState(true);
+  const [dryRun, setDryRun] = useState(false);
   const [search, setSearch] = useState("");
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState("");
@@ -141,8 +141,7 @@ export default function GoogleBusinessMarketing({
             checked={dryRun}
             onChange={(e) => setDryRun(e.target.checked)}
           />
-          Test run — fill the product but don&apos;t publish (recommended the
-          first time)
+          Test run — fill the product but don&apos;t publish
         </label>
 
         {error && (
