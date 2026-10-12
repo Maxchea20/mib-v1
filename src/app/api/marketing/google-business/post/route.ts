@@ -35,6 +35,12 @@ function shorten(text: string, max: number): string {
   return `${clean.slice(0, max - 1).trimEnd()}…`;
 }
 
+function compose(parts: (string | null | undefined | false)[], contact: string, max: number): string {
+  const body = parts.filter(Boolean).join("\n");
+  const room = Math.max(max - contact.length - 1, 0);
+  return `${shorten(body, room)}\n${contact}`;
+}
+
 function pickPhoto(photos: any[]): string | null {
   const valid = (photos ?? []).filter(
     (p) => typeof p.image_url === "string" && p.image_url.trim() !== ""
@@ -111,32 +117,18 @@ export async function POST(request: Request) {
       .filter(Boolean)
       .join(", ");
 
-    const summary = shorten(
-      [
-        title,
-        location && `📍 ${location}`,
-        priceText && `💰 ${priceText}`,
-        listing.description && String(listing.description),
-        `📲 WhatsApp me for details & viewing: +${whatsapp}`,
-      ]
-        .filter(Boolean)
-        .join("\n"),
-      MAX_SUMMARY
-    );
+    const contact = `📲 WhatsApp me for details & viewing: +${whatsapp}`;
+    const parts = [
+      title,
+      location && `📍 ${location}`,
+      priceText && `💰 ${priceText}`,
+      listing.description && String(listing.description),
+    ];
+
+    const summary = compose(parts, contact, MAX_SUMMARY);
 
     // Google "Add product" allows a longer description than a post.
-    const description = shorten(
-      [
-        title,
-        location && `📍 ${location}`,
-        priceText && `💰 ${priceText}`,
-        listing.description && String(listing.description),
-        `📲 WhatsApp me for details & viewing: +${whatsapp}`,
-      ]
-        .filter(Boolean)
-        .join("\n"),
-      MAX_DESCRIPTION
-    );
+    const description = compose(parts, contact, MAX_DESCRIPTION);
 
     const message = encodeURIComponent(
       `Hi, I'm interested in: ${title}${priceText ? ` (${priceText})` : ""}`
