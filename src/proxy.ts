@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
+import { BRAND } from "@/site/brand";
+import { resolvePublicRoute } from "@/site/routing";
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +42,41 @@ function isTrustedWorkerRequest(request: NextRequest): boolean {
 
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
+
+  /*
+  | PUBLIC WEBSITE HOSTS (maxproperty.my). Only the public listing pages
+  | are reachable there; the CRM, its API routes and /login are 404.
+  | Everything else (app.maxproperty.my, *.vercel.app) is the private CRM
+  | and keeps the login gate below.
+  */
+  const publicRoute = resolvePublicRoute(
+    request.headers.get("host"),
+    path,
+    BRAND.publicHosts
+  );
+
+  if (publicRoute) {
+    switch (publicRoute.action) {
+      case "pass":
+        return NextResponse.next();
+      case "rewrite":
+        return NextResponse.rewrite(
+          new URL(publicRoute.path + request.nextUrl.search, request.url)
+        );
+      case "redirect": {
+        const target = new URL(request.url);
+        target.host = publicRoute.host;
+        return NextResponse.redirect(target, 308);
+      }
+      default:
+        return new NextResponse("Not found", { status: 404 });
+    }
+  }
+
+  // robots.txt / sitemap.xml must be readable without a login.
+  if (path === "/robots.txt" || path === "/sitemap.xml") {
+    return NextResponse.next();
+  }
   const isPublicPath = PUBLIC_PATHS.some((p) => path.startsWith(p));
 
   if (isPublicPath) {

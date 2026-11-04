@@ -20,6 +20,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MIB",
   description: "Max Intelligence Board",
+  // The private CRM must never be indexed. The public site layout
+  // (src/app/site/layout.tsx) turns indexing back on for its own pages.
+  robots: { index: false, follow: false },
   appleWebApp: {
     capable: true,
     title: "MIB",
