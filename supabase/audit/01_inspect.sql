@@ -33,7 +33,7 @@ union all
 select '3 GRANTS',
        t.table_name,
        t.grantee || ': ' || string_agg(t.privilege_type, ',' order by t.privilege_type)
-from information_schema.role_table_privileges t
+from information_schema.table_privileges t
 where t.table_schema = 'public' and t.grantee in ('anon','authenticated')
 group by t.table_name, t.grantee
 
