@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { supabase } from "@/lib/supabase";
+import { requireUser } from "@/lib/apiAuth";
+import { createClient } from "@/lib/supabase/server";
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,11 @@ import { supabase } from "@/lib/supabase";
 */
 
 export async function POST(request: Request) {
+  const auth = await requireUser();
+  if (!auth.user) return auth.response;
+
+  const supabase = await createClient();
+
   try {
     const body = await request.json();
 
@@ -138,6 +144,11 @@ export async function POST(request: Request) {
 */
 
 export async function GET(request: Request) {
+  const auth = await requireUser();
+  if (!auth.user) return auth.response;
+
+  const supabase = await createClient();
+
   try {
     const { searchParams } = new URL(request.url);
     const jobId = searchParams.get("id");

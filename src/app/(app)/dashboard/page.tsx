@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { Users, Building2, UserCheck, FileEdit } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import MatchedListings from "@/components/dashboard/MatchedListings";
 import Card, { CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -10,6 +10,8 @@ import Badge from "@/components/ui/Badge";
 const CURRENT_YEAR = new Date().getFullYear();
 
 export default async function DashboardPage() {
+  const supabase = await createClient();
+
   const [contactsResult, listingsResult, buyersResult, draftResult, dealsResult] =
     await Promise.all([
       supabase.from("buyers").select("*", { count: "exact", head: true }),

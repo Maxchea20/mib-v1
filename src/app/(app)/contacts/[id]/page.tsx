@@ -2,7 +2,7 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import OwnerPropertiesSection from "@/components/buyers/OwnerPropertiesSection";
 
 import {
@@ -24,6 +24,8 @@ export default async function BuyerProfilePage({
   params,
   searchParams,
 }: Props) {
+  const supabase = await createClient();
+
 
   const { id } = await params;
 

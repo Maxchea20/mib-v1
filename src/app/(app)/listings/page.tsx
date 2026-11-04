@@ -2,9 +2,11 @@ export const dynamic = "force-dynamic";
 
 import ListingList from "@/components/listings/ListingList";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function ListingsPage() {
+  const supabase = await createClient();
+
   const { data: listings } = await supabase
   .from("properties")
   .select(`

@@ -2,10 +2,12 @@
 
 export const dynamic = "force-dynamic";
 
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import MarketingTabs from "@/components/marketing/MarketingTabs";
 
 export default async function MarketingPage() {
+  const supabase = await createClient();
+
   const [
     { data: listings, error: listingsError },
     { data: facebookGroups, error: groupsError },

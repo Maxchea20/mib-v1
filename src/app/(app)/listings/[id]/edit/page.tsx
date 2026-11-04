@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import ListingForm from "@/components/ListingForm";
 
 type Props = {
@@ -14,6 +14,8 @@ type Props = {
 export default async function EditListingPage({
   params,
 }: Props) {
+  const supabase = await createClient();
+
   const { id } = await params;
 
   const { data: listing } = await supabase

@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { requireUser } from "@/lib/apiAuth";
 import { NextResponse } from "next/server";
 
 const openai = new OpenAI({
@@ -637,6 +638,9 @@ The new system uses ONE complete actionScript instead.
 export async function POST(
   request: Request
 ) {
+  const auth = await requireUser();
+  if (!auth.user) return auth.response;
+
   try {
     const body =
       await request.json();

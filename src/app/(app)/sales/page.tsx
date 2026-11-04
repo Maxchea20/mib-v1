@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 import KPISection from "@/components/sales/KPISection";
 import YearlyChart from "@/components/sales/YearlyChart";
@@ -11,6 +11,8 @@ import ClaimStatus from "@/components/sales/ClaimStatus";
 import TargetProjection from "@/components/sales/TargetProjection";
 
 export default async function SalesPage() {
+  const supabase = await createClient();
+
   const { data: deals } = await supabase
     .from("deals")
     .select("*")

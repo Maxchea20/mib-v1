@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 
+import { requireUser } from "@/lib/apiAuth";
 const GRAPH_VERSION = "v26.0";
 
 export async function POST(request: Request) {
+  const auth = await requireUser();
+  if (!auth.user) return auth.response;
+
   try {
     const body = await request.json();
 

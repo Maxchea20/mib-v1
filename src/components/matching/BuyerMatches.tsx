@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 import {
   calculateMatchScore,
@@ -15,6 +15,8 @@ type Props = {
 export default async function BuyerMatches({
   listing,
 }: Props) {
+  const supabase = await createClient();
+
 
   const { data: buyers } =
     await supabase

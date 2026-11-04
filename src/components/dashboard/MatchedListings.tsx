@@ -1,7 +1,7 @@
 // File: src/components/dashboard/MatchedListings.tsx
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import { calculateMatchScore } from "@/lib/matching";
 import Card, { CardHeader } from "@/components/ui/Card";
 import ScoreBar from "@/components/ui/ScoreBar";
@@ -17,6 +17,8 @@ function initials(name: string | null | undefined): string {
 }
 
 export default async function MatchedListings() {
+  const supabase = await createClient();
+
   const { data: buyers } = await supabase
     .from("buyers")
     .select("*")

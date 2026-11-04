@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { requireUser } from "@/lib/apiAuth";
+import { createClient } from "@/lib/supabase/server";
 
 function normalize(value: any): string {
   return String(value ?? "")
@@ -483,6 +484,11 @@ function genericTextMatches(
 export async function POST(
   request: Request
 ) {
+  const auth = await requireUser();
+  if (!auth.user) return auth.response;
+
+  const supabase = await createClient();
+
 
   try {
 

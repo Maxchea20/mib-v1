@@ -2,7 +2,7 @@
 
 import { notFound } from "next/navigation";
 import BuyerForm from "@/components/buyers/BuyerForm";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 type Props = {
   params: Promise<{
@@ -13,6 +13,8 @@ type Props = {
 export default async function EditBuyerPage({
   params,
 }: Props) {
+  const supabase = await createClient();
+
 
   const { id } = await params;
 

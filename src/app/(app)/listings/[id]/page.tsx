@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import ListingActionsMenu from "@/components/listings/ListingActionsMenu";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import ListingTabs from "@/components/ListingTabs";
 import MediaManager from "@/components/media/MediaManager";
 import BuyerMatches from "@/components/matching/BuyerMatches";
@@ -16,6 +16,8 @@ import AIVideoTab from "@/components/ai/AIVideoTab";
 type Props = { params: Promise<{ id: string }> };
 
 export default async function ListingProfilePage({ params }: Props) {
+  const supabase = await createClient();
+
   const { id } = await params;
   const { data: listing } = await supabase
     .from("properties")

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/apiAuth";
 
 /*
@@ -58,6 +58,8 @@ function pickPhoto(photos: any[]): string | null {
 }
 
 export async function POST(request: Request) {
+  const supabase = await createClient();
+
   const auth = await requireUser();
   if (!auth.user) return auth.response;
 

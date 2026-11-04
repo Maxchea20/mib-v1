@@ -1,11 +1,13 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import BuyerList from "@/components/buyers/BuyerList";
 
 
 export default async function ContactsPage() {
+  const supabase = await createClient();
+
 
   // Load all contacts
   const { data: buyers } = await supabase
