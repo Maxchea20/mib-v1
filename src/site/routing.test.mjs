@@ -3,42 +3,56 @@ import assert from "node:assert/strict";
 import { resolvePublicRoute } from "./routing.ts";
 
 const H = ["maxproperty.my", "www.maxproperty.my"];
+const r = (path, host = "maxproperty.my") => resolvePublicRoute(host, path, H);
 
 test("CRM hosts are not handled here", () => {
-  assert.equal(resolvePublicRoute("app.maxproperty.my", "/dashboard", H), null);
-  assert.equal(resolvePublicRoute("mib-v2.vercel.app", "/", H), null);
+  assert.equal(r("/dashboard", "app.maxproperty.my"), null);
+  assert.equal(r("/", "mib-v2.vercel.app"), null);
   assert.equal(resolvePublicRoute(null, "/", H), null);
 });
 
-test("home and listing pages are rewritten to /site", () => {
-  assert.deepEqual(resolvePublicRoute("maxproperty.my", "/", H), { action: "rewrite", path: "/site" });
-  assert.deepEqual(resolvePublicRoute("maxproperty.my:443", "/listing/123", H), { action: "rewrite", path: "/site/listing/123" });
-  assert.deepEqual(resolvePublicRoute("MaxProperty.my", "/listing/9/", H), { action: "rewrite", path: "/site/listing/9" });
+test("English pages (no prefix) rewrite to /site/en", () => {
+  assert.deepEqual(r("/"), { action: "rewrite", path: "/site/en" });
+  assert.deepEqual(r("/residential"), { action: "rewrite", path: "/site/en/residential" });
+  assert.deepEqual(r("/land/"), { action: "rewrite", path: "/site/en/land" });
+  assert.deepEqual(r("/listing/123", "maxproperty.my:443"), { action: "rewrite", path: "/site/en/listing/123" });
+  assert.deepEqual(r("/listing/9/", "MaxProperty.my"), { action: "rewrite", path: "/site/en/listing/9" });
 });
 
-test("category pages are rewritten", () => {
-  for (const c of ["residential", "commercial", "industrial", "land"]) {
-    assert.deepEqual(resolvePublicRoute("maxproperty.my", `/${c}`, H), { action: "rewrite", path: `/site/${c}` });
-    assert.deepEqual(resolvePublicRoute("maxproperty.my", `/${c}/`, H), { action: "rewrite", path: `/site/${c}` });
+test("BM and Chinese pages rewrite with their language", () => {
+  for (const l of ["ms", "zh"]) {
+    assert.deepEqual(r(`/${l}`), { action: "rewrite", path: `/site/${l}` });
+    assert.deepEqual(r(`/${l}/`), { action: "rewrite", path: `/site/${l}` });
+    assert.deepEqual(r(`/${l}/industrial`), { action: "rewrite", path: `/site/${l}/industrial` });
+    assert.deepEqual(r(`/${l}/listing/55`), { action: "rewrite", path: `/site/${l}/listing/55` });
   }
-  assert.deepEqual(resolvePublicRoute("maxproperty.my", "/Residential", H), { action: "notfound" });
-  assert.deepEqual(resolvePublicRoute("maxproperty.my", "/residential/extra", H), { action: "notfound" });
+});
+
+test("/en is a duplicate: redirect to the unprefixed address", () => {
+  assert.deepEqual(r("/en"), { action: "redirect-path", path: "/" });
+  assert.deepEqual(r("/en/"), { action: "redirect-path", path: "/" });
+  assert.deepEqual(r("/en/residential"), { action: "redirect-path", path: "/residential" });
+  assert.deepEqual(r("/en/listing/3"), { action: "redirect-path", path: "/listing/3" });
 });
 
 test("www redirects to the bare domain", () => {
-  assert.deepEqual(resolvePublicRoute("www.maxproperty.my", "/listing/1", H), { action: "redirect", host: "maxproperty.my" });
+  assert.deepEqual(r("/listing/1", "www.maxproperty.my"), { action: "redirect", host: "maxproperty.my" });
+  assert.deepEqual(r("/ms/land", "www.maxproperty.my"), { action: "redirect", host: "maxproperty.my" });
 });
 
-test("robots, sitemap and assets pass", () => {
-  assert.deepEqual(resolvePublicRoute("maxproperty.my", "/robots.txt", H), { action: "pass" });
-  assert.deepEqual(resolvePublicRoute("maxproperty.my", "/sitemap.xml", H), { action: "pass" });
-  assert.deepEqual(resolvePublicRoute("maxproperty.my", "/_next/static/a.js", H), { action: "pass" });
+test("robots, sitemap and assets pass (root only)", () => {
+  assert.deepEqual(r("/robots.txt"), { action: "pass" });
+  assert.deepEqual(r("/sitemap.xml"), { action: "pass" });
+  assert.deepEqual(r("/_next/static/a.js"), { action: "pass" });
+  assert.deepEqual(r("/ms/robots.txt"), { action: "notfound" });
+  assert.deepEqual(r("/zh/sitemap.xml"), { action: "notfound" });
 });
 
-test("everything private is a 404 on the public host", () => {
+test("everything private or malformed is a 404 on the public host", () => {
   for (const p of ["/dashboard", "/listings", "/contacts", "/sales", "/marketing", "/login", "/settings",
-    "/api/ai/description", "/api/marketing/google-business/post", "/site", "/site/listing/1",
-    "/listing/abc", "/listing/1/edit", "/listing/../dashboard", "/listing/1e3", "/listing/"]) {
-    assert.deepEqual(resolvePublicRoute("maxproperty.my", p, H), { action: "notfound" }, p);
+    "/api/ai/description", "/api/marketing/google-business/post", "/site", "/site/en", "/site/ms/listing/1",
+    "/listing/abc", "/listing/1/edit", "/listing/../dashboard", "/listing/1e3", "/listing/", "/Residential",
+    "/residential/extra", "/ms/dashboard", "/ms/login", "/zh/api/x", "/msx", "/ms/ms", "/ms/en/residential", "/fr", "/MS"]) {
+    assert.deepEqual(r(p), { action: "notfound" }, p);
   }
 });

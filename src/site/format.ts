@@ -1,5 +1,5 @@
 import { BRAND } from "./brand";
-import { fill, t, type Lang } from "./i18n";
+import { fill, pathFor, t, type Lang } from "./i18n";
 import type { PublicListing, PublicPhoto } from "./data";
 
 const COVER_TYPE: Record<string, string> = {
@@ -47,15 +47,15 @@ export function sortPhotos(
     });
 }
 
-export function listingUrl(id: number): string {
-  return `${BRAND.siteUrl}/listing/${id}`;
+export function listingUrl(id: number, lang: Lang = "en"): string {
+  return `${BRAND.siteUrl}${pathFor(lang, `/listing/${id}`)}`;
 }
 
 export function whatsappMessage(listing: PublicListing, lang: Lang): string {
   return fill(t(lang).waMessage, {
     title: listing.title ?? "",
     price: formatPrice(listing, lang),
-    url: listingUrl(listing.id),
+    url: listingUrl(listing.id, lang),
   });
 }
 

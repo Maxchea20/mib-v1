@@ -1,20 +1,18 @@
-import { cookies, headers } from "next/headers";
-import { BRAND } from "./brand";
-import { LANG_COOKIE, parseLang, type Lang } from "./i18n";
-import { normalizeHost } from "./routing";
+import { notFound } from "next/navigation";
+import { isLang, pathFor, type Lang } from "./i18n";
 
 /*
-| Per-request context for public pages: the visitor's language, and the
-| link prefix. On the public host ("maxproperty.my") pages live at "/"
-| and "/listing/ID". When previewed on the CRM host (owner only, logged
-| in) they live under "/site", so links must carry that prefix.
+| The language comes from the address (/ms, /zh, or none for English),
+| never from a cookie, so pages can be cached and every language has its
+| own indexable URL.
 */
-export async function getSiteContext(): Promise<{ lang: Lang; base: string }> {
-  const [cookieStore, headerList] = await Promise.all([cookies(), headers()]);
 
-  const lang = parseLang(cookieStore.get(LANG_COOKIE)?.value);
-  const host = normalizeHost(headerList.get("host"));
-  const base = BRAND.publicHosts.includes(host) ? "" : "/site";
+export function requireLang(raw: string): Lang {
+  if (!isLang(raw)) notFound();
+  return raw;
+}
 
-  return { lang, base };
+/** Link helper: a path inside the site, in the visitor's language. */
+export function link(lang: Lang, path: string): string {
+  return pathFor(lang, path);
 }

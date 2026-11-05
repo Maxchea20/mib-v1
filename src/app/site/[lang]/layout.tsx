@@ -5,8 +5,9 @@ import "./site.css";
 import LangSwitch from "@/components/site/LangSwitch";
 import WhatsAppIcon from "@/components/site/WhatsAppIcon";
 import { BRAND, BRAND_CSS_VARS } from "@/site/brand";
-import { getSiteContext } from "@/site/context";
-import { HTML_LANG, t } from "@/site/i18n";
+import { Suspense } from "react";
+import { requireLang } from "@/site/context";
+import { HTML_LANG, LANGS, basePath, t } from "@/site/i18n";
 import { whatsappUrl } from "@/site/format";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -40,12 +41,19 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", images: [BRAND.ogImage] },
 };
 
+export function generateStaticParams() {
+  return LANGS.map((lang) => ({ lang }));
+}
+
 export default async function SiteLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ lang: string }>;
 }) {
-  const { lang, base } = await getSiteContext();
+  const lang = requireLang((await params).lang);
+  const base = basePath(lang);
   const text = t(lang);
   const home = base || "/";
 
@@ -84,7 +92,9 @@ export default async function SiteLayout({
           </nav>
 
           <div className="flex items-center gap-3">
-            <LangSwitch current={lang} label={text.language} />
+            <Suspense fallback={null}>
+              <LangSwitch current={lang} label={text.language} />
+            </Suspense>
             <a
               href={whatsappUrl("")}
               className="hidden min-h-11 items-center gap-2 rounded-full bg-[var(--mp-whatsapp)] px-4 text-sm font-extrabold text-[var(--mp-on-whatsapp)] sm:flex"

@@ -3,8 +3,10 @@ import { redirect } from "next/navigation";
 import ListingCard from "@/components/site/ListingCard";
 import { CATEGORIES, slugFromCategory } from "@/site/categories";
 import { cleanFilters, getPhotosForListings, getPublicListings } from "@/site/data";
-import { getSiteContext } from "@/site/context";
-import { countText, fill, t, type Lang } from "@/site/i18n";
+import type { Metadata } from "next";
+import { requireLang } from "@/site/context";
+import { alternatesFor } from "@/site/seo";
+import { basePath, countText, fill, t, type Lang } from "@/site/i18n";
 
 const PER_SECTION = 3;
 
@@ -19,12 +21,24 @@ function categoryLabel(category: string, lang: Lang): string {
   return map[category] ?? category;
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const lang = requireLang((await params).lang);
+  return { alternates: alternatesFor(lang, "/") };
+}
+
 export default async function SiteHome({
+  params,
   searchParams,
 }: {
+  params: Promise<{ lang: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { lang, base } = await getSiteContext();
+  const lang = requireLang((await params).lang);
+  const base = basePath(lang);
   const text = t(lang);
   const filters = cleanFilters(await searchParams);
   const action = base || "/";

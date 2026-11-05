@@ -5,7 +5,8 @@ import Gallery from "@/components/site/Gallery";
 import ShareButtons from "@/components/site/ShareButtons";
 import WhatsAppIcon from "@/components/site/WhatsAppIcon";
 import { BRAND } from "@/site/brand";
-import { getSiteContext } from "@/site/context";
+import { requireLang } from "@/site/context";
+import { alternatesFor } from "@/site/seo";
 import { slugFromCategory } from "@/site/categories";
 import { getPublicListing } from "@/site/data";
 import {
@@ -18,16 +19,24 @@ import {
   whatsappMessage,
   whatsappUrl,
 } from "@/site/format";
-import { t } from "@/site/i18n";
+import { basePath, t } from "@/site/i18n";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = { params: Promise<{ lang: string; id: string }> };
+
+// Listing pages are cached for 5 minutes (pages are built on first visit),
+// so a busy listing does not hit the database on every view.
+export const revalidate = 300;
+
+export function generateStaticParams() {
+  return [];
+}
 
 function parseId(raw: string): number {
   return /^\d{1,12}$/.test(raw) ? Number(raw) : NaN;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
+  const { lang: rawLang, id } = await params;
   const found = await getPublicListing(parseId(id));
 
   if (!found) {
@@ -35,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const { listing, photos } = found;
-  const { lang } = await getSiteContext();
+  const lang = requireLang(rawLang);
   const price = formatPrice(listing, lang);
   const place = locationLine(listing);
   const title = `${listing.title ?? "Property"}${place ? `, ${place}` : ""}`;
@@ -45,12 +54,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       .trim()
       .slice(0, 200);
   const image = sortPhotos(listing, photos)[0]?.image_url ?? undefined;
-  const url = listingUrl(listing.id);
+  const alt = alternatesFor(lang, `/listing/${listing.id}`);
+  const url = alt.canonical;
 
   return {
     title,
     description,
-    alternates: { canonical: url },
+    alternates: alt,
     openGraph: {
       title: `${title} | ${price}`,
       description,
@@ -69,19 +79,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ListingPage({ params }: Props) {
-  const { id } = await params;
+  const { lang: rawLang, id } = await params;
   const found = await getPublicListing(parseId(id));
 
   if (!found) notFound();
 
   const { listing, photos } = found;
-  const { lang, base } = await getSiteContext();
+  const lang = requireLang(rawLang);
+  const base = basePath(lang);
   const text = t(lang);
   const images = sortPhotos(listing, photos).map((p) => p.image_url as string);
   const price = formatPrice(listing, lang);
   const place = locationLine(listing);
   const message = whatsappMessage(listing, lang);
-  const url = listingUrl(listing.id);
+  const url = listingUrl(listing.id, lang);
 
   const rows: [string, string | number | null][] = [
     [text.propertyType, [listing.property_sub_type || listing.property_type, listing.unit_type].filter(Boolean).join(" · ") || null],

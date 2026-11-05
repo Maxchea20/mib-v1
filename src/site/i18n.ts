@@ -12,7 +12,6 @@
 
 export const LANGS = ["en", "ms", "zh"] as const;
 export type Lang = (typeof LANGS)[number];
-export const LANG_COOKIE = "mp_lang";
 
 export const LANG_LABELS: Record<Lang, string> = {
   en: "EN",
@@ -26,10 +25,27 @@ export const HTML_LANG: Record<Lang, string> = {
   zh: "zh-CN",
 };
 
-export function parseLang(value: string | undefined | null): Lang {
-  return (LANGS as readonly string[]).includes(value ?? "")
-    ? (value as Lang)
-    : "en";
+export function isLang(value: string | undefined | null): value is Lang {
+  return (LANGS as readonly string[]).includes(value ?? "");
+}
+
+/** Where each language lives: English at the root, the others under a prefix. */
+const LANG_PREFIX: Record<Lang, string> = { en: "", ms: "/ms", zh: "/zh" };
+
+/** "/residential" in a language -> "/residential", "/ms/residential", "/zh/residential". */
+export function pathFor(lang: Lang, path: string): string {
+  const clean = path === "/" ? "" : path;
+  return `${LANG_PREFIX[lang]}${clean}` || "/";
+}
+
+/** The language prefix of a browser path, and what is left after it. */
+export function splitLangPath(pathname: string): { lang: Lang; path: string } {
+  for (const l of ["ms", "zh"] as const) {
+    if (pathname === `/${l}` || pathname.startsWith(`/${l}/`)) {
+      return { lang: l, path: pathname.slice(l.length + 1) || "/" };
+    }
+  }
+  return { lang: "en", path: pathname || "/" };
 }
 
 type Dict = {
@@ -397,13 +413,13 @@ export function fill(
   return template.replace(/\{(\w+)\}/g, (_, k) => String(values[k] ?? ""));
 }
 
-/** Browser only: remember the visitor's language for a year. */
-export function rememberLang(lang: Lang): void {
-  document.cookie = `${LANG_COOKIE}=${lang}; path=/; max-age=31536000; samesite=lax`;
-}
-
 /** "1 property" / "3 properties" (BM and Chinese have no plural). */
 export function countText(lang: Lang, n: number): string {
   if (lang === "en" && n === 1) return "1 property";
   return fill(t(lang).countProps, { n });
+}
+
+/** Link prefix for a language: "" (English), "/ms" or "/zh". */
+export function basePath(lang: Lang): string {
+  return pathFor(lang, "/") === "/" ? "" : pathFor(lang, "/");
 }

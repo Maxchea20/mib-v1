@@ -4,12 +4,13 @@ import { notFound } from "next/navigation";
 import ListingCard from "@/components/site/ListingCard";
 import { BRAND } from "@/site/brand";
 import { categoryFromSlug, groupLabel, groupOf, groupsOf } from "@/site/categories";
-import { getSiteContext } from "@/site/context";
+import { requireLang } from "@/site/context";
+import { alternatesFor } from "@/site/seo";
 import { cleanFilters, getPhotosForListings, getPublicListings } from "@/site/data";
-import { countText, fill, t, type Lang } from "@/site/i18n";
+import { basePath, countText, fill, t, type Lang } from "@/site/i18n";
 
 type Props = {
-  params: Promise<{ category: string }>;
+  params: Promise<{ lang: string; category: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
@@ -26,27 +27,28 @@ function label(category: string, lang: Lang): string {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { category: slug } = await params;
+  const { lang: rawLang, category: slug } = await params;
   const cat = categoryFromSlug(slug);
   if (!cat) return { title: "Not found", robots: { index: false, follow: false } };
 
-  const { lang } = await getSiteContext();
+  const lang = requireLang(rawLang);
   const title = fill(t(lang).categoryPage, { category: label(cat.category, lang) });
 
   return {
     title,
     description: `${title}. ${BRAND.tagline}`,
-    alternates: { canonical: `${BRAND.siteUrl}/${cat.slug}` },
-    openGraph: { title: `${title} | ${BRAND.name}`, url: `${BRAND.siteUrl}/${cat.slug}`, siteName: BRAND.name, type: "website", images: [{ url: BRAND.ogImage, width: 1200, height: 630 }] },
+    alternates: alternatesFor(lang, `/${cat.slug}`),
+    openGraph: { title: `${title} | ${BRAND.name}`, url: alternatesFor(lang, `/${cat.slug}`).canonical, siteName: BRAND.name, type: "website", images: [{ url: BRAND.ogImage, width: 1200, height: 630 }] },
   };
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {
-  const { category: slug } = await params;
+  const { lang: rawLang, category: slug } = await params;
   const cat = categoryFromSlug(slug);
   if (!cat) notFound();
 
-  const { lang, base } = await getSiteContext();
+  const lang = requireLang(rawLang);
+  const base = basePath(lang);
   const text = t(lang);
   const query = await searchParams;
   const filters = cleanFilters({ purpose: query.purpose });

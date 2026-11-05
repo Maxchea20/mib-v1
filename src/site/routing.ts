@@ -7,13 +7,18 @@
 | public hosts (maxproperty.my, www.maxproperty.my). The private CRM host
 | never goes through this.
 |
-|   /                    -> rewrite to /site
-|   /listing/123         -> rewrite to /site/listing/123
-|   /residential (also /commercial /industrial /land) -> /site/<category>
-|   /robots.txt, /sitemap.xml -> pass through
-|   /_next/...           -> pass through (assets)
-|   anything else        -> 404 (no CRM page, API route or login is
-|                           reachable from the public host)
+| Languages live in the address: English at the root, Bahasa Malaysia under
+| /ms and Simplified Chinese under /zh.
+|
+|   /                      -> /site/en
+|   /ms  /zh               -> /site/ms   /site/zh
+|   /residential           -> /site/en/residential   (also commercial,
+|   /ms/residential           industrial, land; and each language)
+|   /listing/123           -> /site/en/listing/123   (and /ms /zh)
+|   /en  /en/...           -> 308 to the same path without /en
+|   /robots.txt /sitemap.xml /_next/...  -> pass through
+|   anything else          -> 404 (no CRM page, API route or login is
+|                             reachable from the public host)
 |
 */
 
@@ -21,7 +26,10 @@ export type PublicRoute =
   | { action: "pass" }
   | { action: "rewrite"; path: string }
   | { action: "redirect"; host: string }
+  | { action: "redirect-path"; path: string }
   | { action: "notfound" };
+
+const PREFIXED_LANGS = ["ms", "zh"];
 
 export function normalizeHost(rawHost: string | null | undefined): string {
   return (rawHost ?? "").toLowerCase().split(":")[0].trim();
@@ -43,25 +51,43 @@ export function resolvePublicRoute(
     return { action: "redirect", host: host.slice(4) };
   }
 
-  if (pathname === "/" || pathname === "") {
-    return { action: "rewrite", path: "/site" };
-  }
-
-  const listing = /^\/listing\/(\d{1,12})\/?$/.exec(pathname);
-  if (listing) {
-    return { action: "rewrite", path: `/site/listing/${listing[1]}` };
-  }
-
-  const category = /^\/(residential|commercial|industrial|land)\/?$/.exec(pathname);
-  if (category) {
-    return { action: "rewrite", path: `/site/${category[1]}` };
-  }
-
-  if (pathname === "/robots.txt" || pathname === "/sitemap.xml") {
+  if (pathname.startsWith("/_next/")) {
     return { action: "pass" };
   }
 
-  if (pathname.startsWith("/_next/")) {
+  // English has no prefix: /en/... is a duplicate, so send it to the root form.
+  const enMatch = /^\/en(\/.*)?$/.exec(pathname);
+  if (enMatch) {
+    return { action: "redirect-path", path: enMatch[1] || "/" };
+  }
+
+  // Language prefix (ms / zh) or none (English).
+  let lang = "en";
+  let rest = pathname;
+  for (const l of PREFIXED_LANGS) {
+    if (pathname === `/${l}` || pathname.startsWith(`/${l}/`)) {
+      lang = l;
+      rest = pathname.slice(l.length + 1) || "/";
+      break;
+    }
+  }
+
+  if (rest === "/" || rest === "") {
+    return { action: "rewrite", path: `/site/${lang}` };
+  }
+
+  const category = /^\/(residential|commercial|industrial|land)\/?$/.exec(rest);
+  if (category) {
+    return { action: "rewrite", path: `/site/${lang}/${category[1]}` };
+  }
+
+  const listing = /^\/listing\/(\d{1,12})\/?$/.exec(rest);
+  if (listing) {
+    return { action: "rewrite", path: `/site/${lang}/listing/${listing[1]}` };
+  }
+
+  // robots.txt / sitemap.xml exist only at the root (no language prefix).
+  if (lang === "en" && (rest === "/robots.txt" || rest === "/sitemap.xml")) {
     return { action: "pass" };
   }
 

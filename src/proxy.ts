@@ -68,6 +68,11 @@ export async function proxy(request: NextRequest) {
         target.host = publicRoute.host;
         return NextResponse.redirect(target, 308);
       }
+      case "redirect-path": {
+        const target = new URL(request.url);
+        target.pathname = publicRoute.path;
+        return NextResponse.redirect(target, 308);
+      }
       default:
         return new NextResponse("Not found", { status: 404 });
     }
