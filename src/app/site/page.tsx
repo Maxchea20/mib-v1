@@ -4,7 +4,7 @@ import ListingCard from "@/components/site/ListingCard";
 import { CATEGORIES, slugFromCategory } from "@/site/categories";
 import { cleanFilters, getPhotosForListings, getPublicListings } from "@/site/data";
 import { getSiteContext } from "@/site/context";
-import { fill, t, type Lang } from "@/site/i18n";
+import { countText, fill, t, type Lang } from "@/site/i18n";
 
 const PER_SECTION = 3;
 
@@ -50,17 +50,17 @@ export default async function SiteHome({
 
   const purposeQs = filters.purpose ? `?purpose=${encodeURIComponent(filters.purpose)}` : "";
   const select =
-    "h-12 rounded-[10px] border border-[#CFCABD] bg-white px-3 text-base text-[var(--mp-ink)]";
+    "h-12 rounded-[10px] border border-[var(--mp-line-strong)] bg-[var(--mp-paper)] px-3 text-base text-[var(--mp-ink)]";
 
   return (
     <>
-      <section className="bg-[var(--mp-accent)] text-white">
+      <section className="border-b border-[var(--mp-line)] bg-[linear-gradient(180deg,rgba(10,10,11,0.15),rgba(10,10,11,0.6))]">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 pb-16 pt-14 sm:px-6 sm:pb-20 sm:pt-[72px]">
-          <p className="text-sm font-bold uppercase tracking-[0.08em] text-[#BFE3D6]">{text.heroKicker}</p>
-          <h1 className="max-w-[760px] text-4xl font-extrabold leading-[1.1] sm:text-5xl">{text.heroTitle}</h1>
-          <p className="max-w-[620px] text-lg leading-relaxed text-[#E3F2EC]">{text.heroSub}</p>
+          <p className="text-sm font-bold uppercase tracking-[0.14em] text-[var(--mp-accent)]">{text.heroKicker}</p>
+          <h1 className="mp-display max-w-[780px] text-4xl font-bold leading-[1.08] sm:text-6xl">{text.heroTitle}</h1>
+          <p className="max-w-[620px] text-lg leading-relaxed text-[var(--mp-ink2)]">{text.heroSub}</p>
 
-          <form action={action} method="get" className="flex max-w-[860px] flex-wrap items-end gap-3 rounded-2xl bg-white p-4 text-[var(--mp-ink)]">
+          <form action={action} method="get" className="flex max-w-[860px] flex-wrap items-end gap-3 rounded-2xl border border-[var(--mp-line)] bg-[var(--mp-card)] p-4 text-[var(--mp-ink)]">
             <label className="flex min-w-[170px] flex-1 flex-col gap-1.5 text-[13px] font-bold text-[var(--mp-muted)]">
               {text.filterLooking}
               <select name="purpose" defaultValue={filters.purpose ?? ""} className={select}>
@@ -78,7 +78,7 @@ export default async function SiteHome({
                 ))}
               </select>
             </label>
-            <button type="submit" className="h-12 rounded-[10px] bg-[var(--mp-accent)] px-8 text-base font-bold text-white">
+            <button type="submit" className="h-12 rounded-[10px] bg-[var(--mp-accent)] px-8 text-base font-extrabold text-[var(--mp-on-accent)]">
               {text.filterSearch}
             </button>
           </form>
@@ -87,16 +87,16 @@ export default async function SiteHome({
 
       <main className="mx-auto flex max-w-[1200px] flex-col gap-12 px-4 pb-6 pt-12 sm:px-6">
         <section aria-labelledby="browse" className="flex flex-col gap-4">
-          <h2 id="browse" className="text-2xl font-extrabold">{text.browseByCategory}</h2>
+          <h2 id="browse" className="mp-display text-2xl font-bold">{text.browseByCategory}</h2>
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {sections.map((s) => (
               <Link
                 key={s.slug}
                 href={`${base}/${s.slug}${purposeQs}`}
-                className="flex flex-col gap-1 rounded-2xl border border-[var(--mp-line)] bg-[var(--mp-card)] p-5 transition-shadow hover:shadow-lg"
+                className="flex flex-col gap-1 rounded-2xl border border-[var(--mp-line)] border-t-[3px] border-t-[var(--mp-accent)] bg-[var(--mp-card)] p-5 transition-colors hover:bg-[#1B1B1E]"
               >
-                <span className="text-lg font-extrabold">{categoryLabel(s.category, lang)}</span>
-                <span className="text-sm text-[var(--mp-muted)]">{fill(text.countProps, { n: s.listings.length })}</span>
+                <span className="mp-display text-xl font-bold">{categoryLabel(s.category, lang)}</span>
+                <span className="text-sm text-[var(--mp-muted)]">{countText(lang, s.listings.length)}</span>
               </Link>
             ))}
           </div>
@@ -119,7 +119,7 @@ export default async function SiteHome({
           .map((s) => (
             <section key={s.slug} aria-label={categoryLabel(s.category, lang)} className="flex flex-col gap-5">
               <div className="flex flex-wrap items-end justify-between gap-3">
-                <h2 className="text-3xl font-extrabold">{categoryLabel(s.category, lang)}</h2>
+                <h2 className="mp-display text-3xl font-bold">{categoryLabel(s.category, lang)}</h2>
                 <Link href={`${base}/${s.slug}${purposeQs}`} className="text-[15px] font-bold text-[var(--mp-accent)] underline">
                   {fill(text.viewAllN, { n: s.listings.length })}
                 </Link>
@@ -141,7 +141,7 @@ export default async function SiteHome({
 
       <section className="mx-auto max-w-[1200px] px-4 pb-14 pt-12 sm:px-6">
         <div className="flex flex-col gap-6 rounded-[20px] border border-[var(--mp-line)] bg-[var(--mp-card)] p-6 sm:p-9">
-          <h2 className="text-2xl font-extrabold">{text.howTitle}</h2>
+          <h2 className="mp-display text-2xl font-bold">{text.howTitle}</h2>
           <div className="grid gap-6 sm:grid-cols-3">
             {[
               [text.how1Title, text.how1Text],
@@ -149,7 +149,7 @@ export default async function SiteHome({
               [text.how3Title, text.how3Text],
             ].map(([title, body], i) => (
               <div key={title} className="flex flex-col gap-2">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--mp-accent-soft)] font-extrabold text-[var(--mp-accent)]">{i + 1}</span>
+                <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--mp-accent)] font-extrabold text-[var(--mp-accent)]">{i + 1}</span>
                 <h3 className="text-[17px] font-bold">{title}</h3>
                 <p className="text-[15px] leading-relaxed text-[var(--mp-muted)]">{body}</p>
               </div>

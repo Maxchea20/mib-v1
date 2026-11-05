@@ -27,8 +27,8 @@ export default function LangSwitch({
           aria-pressed={lang === current}
           className={`min-h-9 min-w-11 rounded-full px-3 text-sm font-bold ${
             lang === current
-              ? "bg-[var(--mp-accent)] text-white"
-              : "text-[var(--mp-ink)] hover:bg-[var(--mp-accent-soft)]"
+              ? "bg-[var(--mp-accent)] text-[var(--mp-on-accent)]"
+              : "text-[var(--mp-ink)] hover:text-[var(--mp-accent)]"
           }`}
         >
           {LANG_LABELS[lang]}

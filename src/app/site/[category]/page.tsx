@@ -6,7 +6,7 @@ import { BRAND } from "@/site/brand";
 import { categoryFromSlug, groupLabel, groupOf, groupsOf } from "@/site/categories";
 import { getSiteContext } from "@/site/context";
 import { cleanFilters, getPhotosForListings, getPublicListings } from "@/site/data";
-import { fill, t, type Lang } from "@/site/i18n";
+import { countText, fill, t, type Lang } from "@/site/i18n";
 
 type Props = {
   params: Promise<{ category: string }>;
@@ -70,23 +70,23 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const pill = (active: boolean) =>
     `inline-flex min-h-10 items-center rounded-full border px-4 text-sm font-bold ${
       active
-        ? "border-[var(--mp-accent)] bg-[var(--mp-accent)] text-white"
-        : "border-[var(--mp-line)] bg-[var(--mp-card)] text-[var(--mp-ink)] hover:bg-[var(--mp-accent-soft)]"
+        ? "border-[var(--mp-accent)] bg-[var(--mp-accent)] text-[var(--mp-on-accent)]"
+        : "border-[var(--mp-line)] bg-[var(--mp-card)] text-[var(--mp-ink)] hover:border-[var(--mp-accent)]"
     }`;
 
   return (
     <>
-      <section className="bg-[var(--mp-accent)] text-white">
+      <section className="border-b border-[var(--mp-line)] bg-[linear-gradient(180deg,rgba(10,10,11,0.15),rgba(10,10,11,0.6))]">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-3 px-4 py-10 sm:px-6 sm:py-14">
-          <nav aria-label="Breadcrumb" className="flex gap-2 text-sm text-[#BFE3D6]">
-            <Link href={base || "/"} className="font-semibold underline">{text.breadcrumbAll}</Link>
+          <nav aria-label="Breadcrumb" className="flex gap-2 text-sm text-[var(--mp-muted)]">
+            <Link href={base || "/"} className="font-semibold text-[var(--mp-accent)] underline">{text.breadcrumbAll}</Link>
             <span>/</span>
             <span>{label(cat.category, lang)}</span>
           </nav>
-          <h1 className="text-4xl font-extrabold sm:text-5xl">
+          <h1 className="mp-display text-4xl font-bold sm:text-5xl">
             {fill(text.categoryPage, { category: label(cat.category, lang) })}
           </h1>
-          <p className="text-[#E3F2EC]">{fill(text.resultsCount, { n: listings.length })}</p>
+          <p className="text-[var(--mp-muted)]">{countText(lang, listings.length)}</p>
         </div>
       </section>
 

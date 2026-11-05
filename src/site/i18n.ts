@@ -401,3 +401,9 @@ export function fill(
 export function rememberLang(lang: Lang): void {
   document.cookie = `${LANG_COOKIE}=${lang}; path=/; max-age=31536000; samesite=lax`;
 }
+
+/** "1 property" / "3 properties" (BM and Chinese have no plural). */
+export function countText(lang: Lang, n: number): string {
+  if (lang === "en" && n === 1) return "1 property";
+  return fill(t(lang).countProps, { n });
+}

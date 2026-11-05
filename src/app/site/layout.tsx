@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
+import "./site.css";
 import LangSwitch from "@/components/site/LangSwitch";
 import WhatsAppIcon from "@/components/site/WhatsAppIcon";
 import { BRAND, BRAND_CSS_VARS } from "@/site/brand";
@@ -12,6 +13,13 @@ const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
   display: "swap",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  display: "swap",
+  variable: "--mp-font-display",
 });
 
 export const metadata: Metadata = {
@@ -42,11 +50,11 @@ export default async function SiteLayout({
     <div
       lang={HTML_LANG[lang]}
       style={BRAND_CSS_VARS as React.CSSProperties}
-      className={`${jakarta.className} flex min-h-screen flex-col bg-[var(--mp-paper)] text-[var(--mp-ink)]`}
+      className={`${jakarta.className} ${playfair.variable} mp-cement flex min-h-screen flex-col text-[var(--mp-ink)]`}
     >
-      <header className="border-b border-[var(--mp-line)] bg-[var(--mp-card)]">
+      <header className="border-b border-[var(--mp-line)] bg-[var(--mp-header)] backdrop-blur-sm">
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3 sm:px-6">
-          <Link href={home} className="flex items-center gap-2.5 text-xl font-extrabold">
+          <Link href={home} className="mp-display flex items-center gap-2.5 text-[22px] font-bold">
             {BRAND.logoSrc ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={BRAND.logoSrc} alt={BRAND.name} className="h-8 w-auto" />
@@ -54,8 +62,8 @@ export default async function SiteLayout({
               <>
                 <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
                   <rect width="30" height="30" rx="8" fill="var(--mp-accent)" />
-                  <path d="M7 21V11l8-5 8 5v10" fill="none" stroke="#fff" strokeWidth="2" strokeLinejoin="round" />
-                  <path d="M12 21v-6h6v6" fill="none" stroke="#fff" strokeWidth="2" strokeLinejoin="round" />
+                  <path d="M7 21V11l8-5 8 5v10" fill="none" stroke="#0A0A0B" strokeWidth="2" strokeLinejoin="round" />
+                  <path d="M12 21v-6h6v6" fill="none" stroke="#0A0A0B" strokeWidth="2" strokeLinejoin="round" />
                 </svg>
                 <span>{BRAND.name}</span>
               </>
@@ -73,7 +81,7 @@ export default async function SiteLayout({
             <LangSwitch current={lang} label={text.language} />
             <a
               href={whatsappUrl("")}
-              className="hidden min-h-11 items-center gap-2 rounded-full bg-[var(--mp-whatsapp)] px-4 text-sm font-bold text-white sm:flex"
+              className="hidden min-h-11 items-center gap-2 rounded-full bg-[var(--mp-whatsapp)] px-4 text-sm font-extrabold text-[var(--mp-on-whatsapp)] sm:flex"
             >
               <WhatsAppIcon />
               {text.whatsappUs}
@@ -84,14 +92,14 @@ export default async function SiteLayout({
 
       <div className="flex-1">{children}</div>
 
-      <footer className="bg-[var(--mp-footer)] text-[#E8E5DC]">
+      <footer className="border-t border-[var(--mp-line)] bg-[var(--mp-footer)] text-[var(--mp-ink2)]">
         <div className="mx-auto flex max-w-[1200px] flex-wrap justify-between gap-8 px-4 py-10 sm:px-6">
           <div className="max-w-sm">
-            <p className="text-lg font-extrabold text-white">{BRAND.name}</p>
-            <p className="mt-2 text-sm leading-relaxed text-[#BDB9AE]">{text.footerAbout}</p>
+            <p className="mp-display text-xl font-bold text-[var(--mp-accent)]">{BRAND.name}</p>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--mp-muted)]">{text.footerAbout}</p>
           </div>
-          <div className="text-sm text-[#BDB9AE]">
-            <p className="font-bold text-white">{text.footerContact}</p>
+          <div className="text-sm text-[var(--mp-muted)]">
+            <p className="font-bold text-[var(--mp-ink)]">{text.footerContact}</p>
             <p className="mt-2">
               WhatsApp:{" "}
               <a href={whatsappUrl("")} className="underline">{BRAND.whatsappDisplay}</a>

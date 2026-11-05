@@ -25,25 +25,25 @@ export default function ListingCard({
   return (
     <Link
       href={`${base}/listing/${listing.id}`}
-      className="flex flex-col overflow-hidden rounded-2xl border border-[var(--mp-line)] bg-[var(--mp-card)] transition-shadow hover:shadow-lg"
+      className="flex flex-col overflow-hidden rounded-2xl border border-[var(--mp-line)] bg-[var(--mp-card)] transition-colors hover:border-[var(--mp-accent)]"
     >
       <div className="relative aspect-[16/10] bg-[var(--mp-accent-soft)]">
         {cover ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={cover} alt={listing.title ?? ""} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
         ) : null}
-        <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 text-xs font-extrabold text-[var(--mp-accent)]">
+        <span className="absolute left-3 top-3 rounded-full border border-[var(--mp-accent)] bg-[var(--mp-paper)] px-3 py-1 text-xs font-extrabold text-[var(--mp-accent)]">
           {listing.purpose === "For Rent" ? text.forRent : text.forSale}
         </span>
         {listing.status === "Booked" && (
-          <span className="absolute right-3 top-3 rounded-full bg-[var(--mp-ink)] px-3 py-1 text-xs font-bold text-white">
+          <span className="absolute right-3 top-3 rounded-full bg-[var(--mp-accent)] px-3 py-1 text-xs font-extrabold text-[var(--mp-on-accent)]">
             {text.booked}
           </span>
         )}
       </div>
 
       <div className="flex flex-col gap-2 p-5">
-        <p className="text-2xl font-extrabold text-[var(--mp-accent)]">{formatPrice(listing, lang)}</p>
+        <p className="mp-display text-2xl font-bold text-[var(--mp-accent)]">{formatPrice(listing, lang)}</p>
         <h3 className="text-[17px] font-bold leading-snug">{listing.title}</h3>
         <p className="text-sm text-[var(--mp-muted)]">{locationLine(listing)}</p>
 

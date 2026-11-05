@@ -150,21 +150,21 @@ export default async function ListingPage({ params }: Props) {
         <div className="flex min-w-0 flex-[999_1_540px] flex-col gap-7">
           <div className="flex flex-col gap-2.5">
             <div className="flex gap-2">
-              <span className="rounded-full bg-[var(--mp-accent-soft)] px-3 py-1.5 text-xs font-extrabold text-[var(--mp-accent)]">
+              <span className="rounded-full border border-[var(--mp-accent)] bg-[var(--mp-paper)] px-3 py-1.5 text-xs font-extrabold text-[var(--mp-accent)]">
                 {listing.purpose === "For Rent" ? text.forRent : text.forSale}
               </span>
               {listing.status === "Booked" && (
-                <span className="rounded-full bg-[var(--mp-ink)] px-3 py-1.5 text-xs font-bold text-white">{text.booked}</span>
+                <span className="rounded-full bg-[var(--mp-accent)] px-3 py-1.5 text-xs font-extrabold text-[var(--mp-on-accent)]">{text.booked}</span>
               )}
             </div>
-            <h1 className="text-3xl font-extrabold leading-tight sm:text-4xl">{listing.title}</h1>
+            <h1 className="mp-display text-3xl font-bold leading-tight sm:text-5xl">{listing.title}</h1>
             {place && <p className="text-base text-[var(--mp-muted)]">{place}</p>}
-            <p className="text-3xl font-extrabold text-[var(--mp-accent)] lg:hidden">{price}</p>
+            <p className="mp-display text-3xl font-bold text-[var(--mp-accent)] lg:hidden">{price}</p>
           </div>
 
           {visibleRows.length > 0 && (
             <section className="rounded-2xl border border-[var(--mp-line)] bg-[var(--mp-card)] p-6">
-              <h2 className="text-xl font-extrabold">{text.details}</h2>
+              <h2 className="mp-display text-xl font-bold">{text.details}</h2>
               <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
                 {visibleRows.map(([label, value]) => (
                   <div key={label}>
@@ -178,14 +178,14 @@ export default async function ListingPage({ params }: Props) {
 
           {(listing.description || highlights.length > 0) && (
             <section className="flex flex-col gap-3.5 rounded-2xl border border-[var(--mp-line)] bg-[var(--mp-card)] p-6">
-              <h2 className="text-xl font-extrabold">{text.about}</h2>
+              <h2 className="mp-display text-xl font-bold">{text.about}</h2>
               {listing.description && (
-                <p className="whitespace-pre-line text-base leading-[1.7] text-[#2C3A34]">{listing.description}</p>
+                <p className="whitespace-pre-line text-base leading-[1.7] text-[var(--mp-ink2)]">{listing.description}</p>
               )}
               {highlights.length > 0 && (
                 <>
-                  <h3 className="mt-2 text-base font-extrabold">{text.highlights}</h3>
-                  <ul className="flex list-disc flex-col gap-2 pl-5 text-base leading-normal text-[#2C3A34]">
+                  <h3 className="mt-2 text-base font-extrabold text-[var(--mp-accent)]">{text.highlights}</h3>
+                  <ul className="flex list-disc flex-col gap-2 pl-5 text-base leading-normal text-[var(--mp-ink2)]">
                     {highlights.map((h) => (<li key={h}>{h}</li>))}
                   </ul>
                 </>
@@ -195,7 +195,7 @@ export default async function ListingPage({ params }: Props) {
 
           {place && (
             <section className="flex flex-col gap-2 rounded-2xl border border-[var(--mp-line)] bg-[var(--mp-card)] p-6">
-              <h2 className="text-xl font-extrabold">{text.location}</h2>
+              <h2 className="mp-display text-xl font-bold">{text.location}</h2>
               <p className="text-base font-semibold">{place}</p>
               <p className="text-sm text-[var(--mp-muted)]">{text.locationNote}</p>
             </section>
@@ -203,14 +203,14 @@ export default async function ListingPage({ params }: Props) {
         </div>
 
         <aside className="flex min-w-[280px] max-w-full flex-[1_1_320px] flex-col gap-4 lg:sticky lg:top-4 lg:max-w-[380px]">
-          <div className="flex flex-col gap-4 rounded-2xl border border-[var(--mp-line)] bg-[var(--mp-card)] p-6">
+          <div className="flex flex-col gap-4 rounded-2xl border border-[var(--mp-accent)] bg-[var(--mp-card)] p-6">
             <div className="hidden lg:block">
               <p className="text-[13px] text-[var(--mp-muted)]">{text.askingPrice}</p>
-              <p className="mt-1 text-4xl font-extrabold text-[var(--mp-accent)]">{price}</p>
+              <p className="mp-display mt-1 text-4xl font-bold text-[var(--mp-accent)]">{price}</p>
             </div>
             <a
               href={whatsappUrl(message)}
-              className="flex min-h-[52px] items-center justify-center gap-2.5 rounded-xl bg-[var(--mp-whatsapp)] px-4 text-base font-extrabold text-white"
+              className="flex min-h-[52px] items-center justify-center gap-2.5 rounded-xl bg-[var(--mp-whatsapp)] px-4 text-base font-extrabold text-[var(--mp-on-whatsapp)]"
             >
               <WhatsAppIcon size={22} />
               {text.enquire}
@@ -228,11 +228,11 @@ export default async function ListingPage({ params }: Props) {
       <div className="fixed inset-x-0 bottom-0 z-20 flex items-center gap-3 border-t border-[var(--mp-line)] bg-[var(--mp-card)] px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden">
         <div className="flex-none">
           <p className="text-xs text-[var(--mp-muted)]">{text.askingPrice}</p>
-          <p className="text-lg font-extrabold text-[var(--mp-accent)]">{price}</p>
+          <p className="mp-display text-lg font-bold text-[var(--mp-accent)]">{price}</p>
         </div>
         <a
           href={whatsappUrl(message)}
-          className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--mp-whatsapp)] text-[15px] font-extrabold text-white"
+          className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--mp-whatsapp)] text-[15px] font-extrabold text-[var(--mp-on-whatsapp)]"
         >
           <WhatsAppIcon size={20} />
           WhatsApp

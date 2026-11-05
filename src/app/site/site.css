@@ -1,0 +1,11 @@
+/* Public site look: black cement render + gold. Colours come from src/site/brand.ts */
+.mp-cement {
+  background-color: var(--mp-paper);
+  background-image: url("/textures/cement-black.jpg");
+  background-size: 768px 768px;
+}
+
+.mp-display {
+  font-family: var(--mp-font-display), Georgia, "Times New Roman", serif;
+  letter-spacing: -0.005em;
+}
