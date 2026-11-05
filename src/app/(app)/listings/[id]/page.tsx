@@ -12,6 +12,7 @@ import AIDescriptionButton from "@/components/ai/AIDescriptionButton";
 import AIHighlightsButton from "@/components/ai/AIHighlightsButton";
 import AIDesignTab from "@/components/ai/AIDesignTab";
 import AIVideoTab from "@/components/ai/AIVideoTab";
+import PublicToggle from "@/components/listings/PublicToggle";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -73,6 +74,12 @@ export default async function ListingProfilePage({ params }: Props) {
               <span><strong>Purpose:</strong> {listing.purpose || "-"}</span>
               <span><strong>Listing Agent:</strong> {listing.listing_agent || "-"}</span>
             </div>
+            <PublicToggle
+              id={listing.id}
+              isPublic={listing.is_public === true}
+              status={listing.status}
+              showLink
+            />
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
               <ListingActionsMenu listing={listing} />
               <Link href="/listings" className="shrink-0 bg-stone-800 text-white px-4 py-2 rounded text-sm text-center">Back</Link>

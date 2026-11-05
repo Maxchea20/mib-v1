@@ -64,6 +64,12 @@ export default function ListingForm({
       "Available"
     );
 
+  // Show on the public website (maxproperty.my). New listings start OFF.
+  const [isPublic, setIsPublic] =
+    useState<boolean>(
+      listing?.is_public === true
+    );
+
   const [listingAgent, setListingAgent] =
     useState(
       listing?.listing_agent ??
@@ -275,6 +281,9 @@ export default function ListingForm({
         Number(price),
 
       status,
+
+      is_public:
+        isPublic,
 
       listing_agent:
         listingAgent ||
@@ -937,6 +946,30 @@ export default function ListingForm({
             Inactive
           </option>
         </select>
+
+        {/* PUBLIC WEBSITE */}
+        <label className="flex items-start gap-3 rounded border bg-white p-3 text-black">
+          <input
+            type="checkbox"
+            checked={isPublic}
+            onChange={(e) =>
+              setIsPublic(
+                e.target.checked
+              )
+            }
+            className="mt-1 h-5 w-5"
+          />
+          <span>
+            <span className="block font-medium">
+              Show on public website
+            </span>
+            <span className="block text-sm text-slate-600">
+              Visitors see the photos, price, area, details and description
+              (not the exact address or any owner or agent details). Only
+              shown while the status is Available or Booked.
+            </span>
+          </span>
+        </label>
 
         {/* ================================================================ */}
         {/* LISTING AGENT */}

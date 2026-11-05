@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Bed, Bath, Car, Ruler, Sofa, ImageOff } from "lucide-react";
 import ListingMenu from "./ListingMenu";
+import PublicToggle from "./PublicToggle";
 import { coverPhotoMap } from "@/lib/photoTemplates";
 import Badge from "@/components/ui/Badge";
 
@@ -218,6 +219,17 @@ export default function ListingList({ listings }: Props) {
                   >
                     <ListingMenu id={listing.id} title={listing.headline || listing.title} />
                   </div>
+                </div>
+
+                <div
+                  className="mt-4"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <PublicToggle
+                    id={listing.id}
+                    isPublic={listing.is_public === true}
+                    status={listing.status}
+                  />
                 </div>
               </div>
             </div>
