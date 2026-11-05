@@ -30,11 +30,14 @@ export const metadata: Metadata = {
   },
   description: BRAND.tagline,
   robots: { index: true, follow: true },
+  icons: { icon: BRAND.iconSrc, apple: BRAND.iconSrc },
   openGraph: {
     siteName: BRAND.name,
     type: "website",
     locale: "en_MY",
+    images: [{ url: BRAND.ogImage, width: 1200, height: 630 }],
   },
+  twitter: { card: "summary_large_image", images: [BRAND.ogImage] },
 };
 
 export default async function SiteLayout({
@@ -56,8 +59,11 @@ export default async function SiteLayout({
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3 sm:px-6">
           <Link href={home} className="mp-display flex items-center gap-2.5 text-[22px] font-bold">
             {BRAND.logoSrc ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={BRAND.logoSrc} alt={BRAND.name} className="h-8 w-auto" />
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={BRAND.logoSrc} alt="" width={58} height={40} className="h-10 w-auto" />
+                <span>{BRAND.name}</span>
+              </>
             ) : (
               <>
                 <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">

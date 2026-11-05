@@ -37,7 +37,10 @@ export const BRAND = {
     footer: "#050506",
   },
   // Replace with a real logo file in /public later (e.g. "/logo.svg").
-  logoSrc: null as string | null,
+  logoSrc: "/brand/logo-header.png" as string | null,
+  // Square icon (browser tab / phone home screen) and default share image.
+  iconSrc: "/brand/logo-icon.png",
+  ogImage: "/brand/og-default.jpg",
 };
 
 export const BRAND_CSS_VARS = {

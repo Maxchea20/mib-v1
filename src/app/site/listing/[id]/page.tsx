@@ -57,13 +57,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url,
       siteName: BRAND.name,
       type: "website",
-      images: image ? [{ url: image }] : undefined,
+      images: [{ url: image ?? BRAND.ogImage }],
     },
     twitter: {
-      card: image ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title: `${title} | ${price}`,
       description,
-      images: image ? [image] : undefined,
+      images: [image ?? BRAND.ogImage],
     },
   };
 }
