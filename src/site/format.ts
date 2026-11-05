@@ -66,3 +66,14 @@ export function whatsappUrl(message: string): string {
 export function titleCase(value: string | null | undefined): string {
   return (value ?? "").replace(/_/g, " ").trim();
 }
+
+/** "21700" -> "21,700 sqft". Text that already has a unit is left alone. */
+export function sizeText(value: string | null | undefined): string | null {
+  const v = (value ?? "").trim();
+  if (!v) return null;
+  if (/^[\d,.\s]+$/.test(v)) {
+    const n = Number(v.replace(/[,\s]/g, ""));
+    if (Number.isFinite(n)) return `${n.toLocaleString("en-MY")} sqft`;
+  }
+  return v;
+}

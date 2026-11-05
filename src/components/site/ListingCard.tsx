@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { PublicListing, PublicPhoto } from "@/site/data";
-import { formatPrice, locationLine, sortPhotos } from "@/site/format";
+import { formatPrice, locationLine, sizeText, sortPhotos } from "@/site/format";
 import { t, type Lang } from "@/site/i18n";
 
 export default function ListingCard({
@@ -17,7 +17,10 @@ export default function ListingCard({
   const text = t(lang);
   const cover = sortPhotos(listing, photos)[0]?.image_url ?? null;
   const hasRooms = (listing.bedrooms ?? 0) > 0 || (listing.bathrooms ?? 0) > 0;
-  const size = listing.category === "Land" ? listing.land_size : listing.built_up || listing.land_size;
+  const size =
+    listing.category === "Land"
+      ? listing.land_size
+      : sizeText(listing.built_up) || listing.land_size;
 
   return (
     <Link
@@ -27,7 +30,7 @@ export default function ListingCard({
       <div className="relative aspect-[16/10] bg-[var(--mp-accent-soft)]">
         {cover ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={cover} alt={listing.title ?? ""} loading="lazy" className="h-full w-full object-cover" />
+          <img src={cover} alt={listing.title ?? ""} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
         ) : null}
         <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 text-xs font-extrabold text-[var(--mp-accent)]">
           {listing.purpose === "For Rent" ? text.forRent : text.forSale}
