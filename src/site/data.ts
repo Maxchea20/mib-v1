@@ -78,15 +78,14 @@ export function cleanFilters(input: {
 }
 
 export async function getPublicListings(
-  filters: ListingFilters = {}
-): Promise<{ listings: PublicListing[]; photos: PublicPhoto[] }> {
-  const db = client();
-
-  let query = db
+  filters: ListingFilters = {},
+  limit = 200
+): Promise<PublicListing[]> {
+  let query = client()
     .from("public_listings")
     .select("*")
     .order("id", { ascending: false })
-    .limit(60);
+    .limit(limit);
 
   if (filters.purpose) query = query.eq("purpose", filters.purpose);
   if (filters.category) query = query.eq("category", filters.category);
@@ -95,25 +94,28 @@ export async function getPublicListings(
 
   if (error) {
     console.error("Public listings error:", error.message);
-    return { listings: [], photos: [] };
+    return [];
   }
 
-  const listings = (data ?? []) as PublicListing[];
+  return (data ?? []) as PublicListing[];
+}
 
-  if (listings.length === 0) {
-    return { listings, photos: [] };
-  }
+export async function getPhotosForListings(
+  ids: number[]
+): Promise<PublicPhoto[]> {
+  if (ids.length === 0) return [];
 
-  const { data: photos, error: photoError } = await db
+  const { data, error } = await client()
     .from("public_listing_photos")
     .select("*")
-    .in("property_id", listings.map((l) => l.id));
+    .in("property_id", ids);
 
-  if (photoError) {
-    console.error("Public photos error:", photoError.message);
+  if (error) {
+    console.error("Public photos error:", error.message);
+    return [];
   }
 
-  return { listings, photos: (photos ?? []) as PublicPhoto[] };
+  return (data ?? []) as PublicPhoto[];
 }
 
 export async function getPublicListing(

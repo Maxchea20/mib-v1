@@ -9,6 +9,7 @@
 |
 |   /                    -> rewrite to /site
 |   /listing/123         -> rewrite to /site/listing/123
+|   /residential (also /commercial /industrial /land) -> /site/<category>
 |   /robots.txt, /sitemap.xml -> pass through
 |   /_next/...           -> pass through (assets)
 |   anything else        -> 404 (no CRM page, API route or login is
@@ -49,6 +50,11 @@ export function resolvePublicRoute(
   const listing = /^\/listing\/(\d{1,12})\/?$/.exec(pathname);
   if (listing) {
     return { action: "rewrite", path: `/site/listing/${listing[1]}` };
+  }
+
+  const category = /^\/(residential|commercial|industrial|land)\/?$/.exec(pathname);
+  if (category) {
+    return { action: "rewrite", path: `/site/${category[1]}` };
   }
 
   if (pathname === "/robots.txt" || pathname === "/sitemap.xml") {

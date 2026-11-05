@@ -37,6 +37,9 @@ type Dict = {
   navSale: string;
   navRent: string;
   navLand: string;
+  navResidential: string;
+  navCommercial: string;
+  navIndustrial: string;
   whatsappUs: string;
   heroKicker: string;
   heroTitle: string;
@@ -105,6 +108,13 @@ type Dict = {
   notFoundText: string;
   backToListings: string;
   language: string;
+  browseByCategory: string;
+  viewAllN: string; // {n}
+  categoryPage: string; // {category}
+  allTypes: string;
+  allPurposes: string;
+  groupBy: string;
+  countProps: string; // {n}
 };
 
 const en: Dict = {
@@ -112,6 +122,9 @@ const en: Dict = {
   navSale: "For sale",
   navRent: "For rent",
   navLand: "Land",
+  navResidential: "Residential",
+  navCommercial: "Commercial",
+  navIndustrial: "Industrial",
   whatsappUs: "WhatsApp us",
   heroKicker: "Ipoh, Perak and across Malaysia",
   heroTitle: "Find your next property, then chat with Max directly.",
@@ -185,6 +198,13 @@ const en: Dict = {
     "The property may have been sold or taken down, or the link is not correct.",
   backToListings: "Back to all listings",
   language: "Language",
+  browseByCategory: "Browse by category",
+  viewAllN: "View all {n}",
+  categoryPage: "{category} properties",
+  allTypes: "All types",
+  allPurposes: "Buy or rent",
+  groupBy: "Type",
+  countProps: "{n} properties",
 };
 
 const ms: Dict = {
@@ -192,6 +212,9 @@ const ms: Dict = {
   navSale: "Untuk dijual",
   navRent: "Untuk disewa",
   navLand: "Tanah",
+  navResidential: "Kediaman",
+  navCommercial: "Komersial",
+  navIndustrial: "Perindustrian",
   whatsappUs: "WhatsApp kami",
   heroKicker: "Ipoh, Perak dan seluruh Malaysia",
   heroTitle: "Cari hartanah anda, kemudian berbual terus dengan Max.",
@@ -266,6 +289,13 @@ const ms: Dict = {
     "Hartanah mungkin telah dijual atau ditarik balik, atau pautan tidak betul.",
   backToListings: "Kembali ke semua senarai",
   language: "Bahasa",
+  browseByCategory: "Layari mengikut kategori",
+  viewAllN: "Lihat semua {n}",
+  categoryPage: "Hartanah {category}",
+  allTypes: "Semua jenis",
+  allPurposes: "Beli atau sewa",
+  groupBy: "Jenis",
+  countProps: "{n} hartanah",
 };
 
 const zh: Dict = {
@@ -273,6 +303,9 @@ const zh: Dict = {
   navSale: "出售",
   navRent: "出租",
   navLand: "土地",
+  navResidential: "住宅",
+  navCommercial: "商业",
+  navIndustrial: "工业",
   whatsappUs: "WhatsApp 联系",
   heroKicker: "怡保、霹雳及全马各地",
   heroTitle: "找到您的下一处房产，然后直接和 Max 聊聊。",
@@ -342,6 +375,13 @@ const zh: Dict = {
   notFoundText: "该房产可能已售出或下架，或链接有误。",
   backToListings: "返回全部房源",
   language: "语言",
+  browseByCategory: "按类别浏览",
+  viewAllN: "查看全部 {n} 个",
+  categoryPage: "{category}房产",
+  allTypes: "全部类型",
+  allPurposes: "购买或租赁",
+  groupBy: "类型",
+  countProps: "共 {n} 个房产",
 };
 
 export const DICTS: Record<Lang, Dict> = { en, ms, zh };

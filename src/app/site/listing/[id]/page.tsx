@@ -6,6 +6,7 @@ import ShareButtons from "@/components/site/ShareButtons";
 import WhatsAppIcon from "@/components/site/WhatsAppIcon";
 import { BRAND } from "@/site/brand";
 import { getSiteContext } from "@/site/context";
+import { slugFromCategory } from "@/site/categories";
 import { getPublicListing } from "@/site/data";
 import {
   formatPrice,
@@ -127,7 +128,15 @@ export default async function ListingPage({ params }: Props) {
 
       <nav aria-label="Breadcrumb" className="flex flex-wrap gap-2 text-sm text-[var(--mp-muted)]">
         <Link href={base || "/"} className="font-semibold text-[var(--mp-accent)]">{text.breadcrumbAll}</Link>
-        {place && (<><span>/</span><span>{place}</span></>)}
+        {slugFromCategory(listing.category) && (
+          <>
+            <span>/</span>
+            <Link href={`${base}/${slugFromCategory(listing.category)}`} className="font-semibold text-[var(--mp-accent)]">
+              {{ Residential: text.residential, Commercial: text.commercial, Industrial: text.industrial, Land: text.land }[listing.category as "Residential"]}
+            </Link>
+          </>
+        )}
+                {place && (<><span>/</span><span>{place}</span></>)}
       </nav>
 
       <Gallery

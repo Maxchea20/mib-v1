@@ -16,6 +16,15 @@ test("home and listing pages are rewritten to /site", () => {
   assert.deepEqual(resolvePublicRoute("MaxProperty.my", "/listing/9/", H), { action: "rewrite", path: "/site/listing/9" });
 });
 
+test("category pages are rewritten", () => {
+  for (const c of ["residential", "commercial", "industrial", "land"]) {
+    assert.deepEqual(resolvePublicRoute("maxproperty.my", `/${c}`, H), { action: "rewrite", path: `/site/${c}` });
+    assert.deepEqual(resolvePublicRoute("maxproperty.my", `/${c}/`, H), { action: "rewrite", path: `/site/${c}` });
+  }
+  assert.deepEqual(resolvePublicRoute("maxproperty.my", "/Residential", H), { action: "notfound" });
+  assert.deepEqual(resolvePublicRoute("maxproperty.my", "/residential/extra", H), { action: "notfound" });
+});
+
 test("www redirects to the bare domain", () => {
   assert.deepEqual(resolvePublicRoute("www.maxproperty.my", "/listing/1", H), { action: "redirect", host: "maxproperty.my" });
 });

@@ -63,10 +63,10 @@ export default async function SiteLayout({
           </Link>
 
           <nav aria-label="Main" className="order-3 flex w-full flex-wrap gap-x-6 gap-y-1 text-[15px] font-semibold sm:order-none sm:w-auto">
-            <Link href={home} className="hover:text-[var(--mp-accent)]">{text.navListings}</Link>
-            <Link href={`${base}/?purpose=For%20Sale`} className="hover:text-[var(--mp-accent)]">{text.navSale}</Link>
-            <Link href={`${base}/?purpose=For%20Rent`} className="hover:text-[var(--mp-accent)]">{text.navRent}</Link>
-            <Link href={`${base}/?category=Land`} className="hover:text-[var(--mp-accent)]">{text.navLand}</Link>
+            <Link href={`${base}/residential`} className="hover:text-[var(--mp-accent)]">{text.navResidential}</Link>
+            <Link href={`${base}/commercial`} className="hover:text-[var(--mp-accent)]">{text.navCommercial}</Link>
+            <Link href={`${base}/industrial`} className="hover:text-[var(--mp-accent)]">{text.navIndustrial}</Link>
+            <Link href={`${base}/land`} className="hover:text-[var(--mp-accent)]">{text.navLand}</Link>
           </nav>
 
           <div className="flex items-center gap-3">
