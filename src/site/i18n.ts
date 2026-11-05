@@ -192,7 +192,7 @@ const en: Dict = {
   footerAbout:
     "Property marketing based in Ipoh, Perak. Listings available nationwide.",
   footerContact: "Contact",
-  footerReg: "Registration",
+  footerReg: "REN",
   notFoundTitle: "We could not find that page",
   notFoundText:
     "The property may have been sold or taken down, or the link is not correct.",
@@ -283,7 +283,7 @@ const ms: Dict = {
   footerAbout:
     "Pemasaran hartanah berpusat di Ipoh, Perak. Senarai tersedia di seluruh negara.",
   footerContact: "Hubungi",
-  footerReg: "Pendaftaran",
+  footerReg: "REN",
   notFoundTitle: "Halaman tidak ditemui",
   notFoundText:
     "Hartanah mungkin telah dijual atau ditarik balik, atau pautan tidak betul.",
@@ -370,7 +370,7 @@ const zh: Dict = {
   nextPhoto: "下一张",
   footerAbout: "总部设于霹雳怡保的房产营销，房源遍及全马。",
   footerContact: "联系方式",
-  footerReg: "注册号",
+  footerReg: "REN",
   notFoundTitle: "找不到该页面",
   notFoundText: "该房产可能已售出或下架，或链接有误。",
   backToListings: "返回全部房源",

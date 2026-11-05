@@ -220,6 +220,11 @@ export default async function ListingPage({ params }: Props) {
               <br />
               {message}
             </div>
+            {BRAND.renNumber && (
+              <p className="border-t border-[var(--mp-line)] pt-3 text-sm text-[var(--mp-muted)]">
+                <span className="font-bold text-[var(--mp-ink)]">Max</span> · {BRAND.name} · {text.footerReg} {BRAND.renNumber}
+              </p>
+            )}
           </div>
           <ShareButtons url={url} title={listing.title ?? BRAND.name} labels={{ share: text.share, copy: text.copyLink, copied: text.copied }} />
         </aside>

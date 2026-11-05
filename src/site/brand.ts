@@ -14,8 +14,8 @@ export const BRAND = {
   // WhatsApp number in international format, digits only (no +).
   whatsapp: "60165210993",
   whatsappDisplay: "+60 16-521 0993",
-  // Shown in the footer/profile when set. Leave "" until you have it.
-  renNumber: "",
+  // Registered Estate Negotiator number. Shown in the footer and on listing pages when set.
+  renNumber: "31953",
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://maxproperty.my",
   // Hosts that serve the PUBLIC website (everything else is the private CRM).
   publicHosts: ["maxproperty.my", "www.maxproperty.my"],
