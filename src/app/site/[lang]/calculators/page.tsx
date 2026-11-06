@@ -4,7 +4,7 @@ import { BRAND } from "@/site/brand";
 import { requireLang } from "@/site/context";
 import { basePath, t } from "@/site/i18n";
 import { ct } from "@/site/costText";
-import { alternatesFor } from "@/site/seo";
+import { alternatesFor, OG_LOCALE } from "@/site/seo";
 
 type Props = { params: Promise<{ lang: string }> };
 
@@ -22,6 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: text.calcHubIntro,
       url: alt.canonical,
       siteName: BRAND.name,
+      locale: OG_LOCALE[lang],
       type: "website",
       images: [{ url: BRAND.ogImage, width: 1200, height: 630 }],
     },

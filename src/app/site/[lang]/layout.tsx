@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
+import "../../globals.css";
 import "./site.css";
 import LangSwitch from "@/components/site/LangSwitch";
 import WhatsAppIcon from "@/components/site/WhatsAppIcon";
@@ -8,6 +9,7 @@ import { BRAND, BRAND_CSS_VARS } from "@/site/brand";
 import { Suspense } from "react";
 import { requireLang } from "@/site/context";
 import { HTML_LANG, LANGS, basePath, t } from "@/site/i18n";
+import { HOME_SEO, OG_LOCALE } from "@/site/seo";
 import { whatsappUrl } from "@/site/format";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -23,22 +25,34 @@ const playfair = Playfair_Display({
   variable: "--mp-font-display",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(BRAND.siteUrl),
-  title: {
-    default: `${BRAND.name} | ${BRAND.tagline}`,
-    template: `%s | ${BRAND.name}`,
-  },
-  description: BRAND.tagline,
-  robots: { index: true, follow: true },
-  icons: { icon: BRAND.iconSrc, apple: BRAND.iconSrc },
-  openGraph: {
-    siteName: BRAND.name,
-    type: "website",
-    locale: "en_MY",
-    images: [{ url: BRAND.ogImage, width: 1200, height: 630 }],
-  },
-  twitter: { card: "summary_large_image", images: [BRAND.ogImage] },
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const lang = requireLang((await params).lang);
+  const home = HOME_SEO[lang];
+  return {
+    metadataBase: new URL(BRAND.siteUrl),
+    title: { default: home.title, template: `%s | ${BRAND.name}` },
+    description: home.description,
+    robots: { index: true, follow: true },
+    icons: { icon: BRAND.iconSrc, apple: BRAND.iconSrc },
+    openGraph: {
+      siteName: BRAND.name,
+      type: "website",
+      locale: OG_LOCALE[lang],
+      title: home.title,
+      description: home.description,
+      images: [{ url: BRAND.ogImage, width: 1200, height: 630 }],
+    },
+    twitter: { card: "summary_large_image", images: [BRAND.ogImage] },
+  };
+}
+
+// Pinch-zoom stays enabled on the public site (accessibility), and the
+// browser bar matches the black theme.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: BRAND.colors.paper,
 };
 
 export function generateStaticParams() {
@@ -58,8 +72,9 @@ export default async function SiteLayout({
   const home = base || "/";
 
   return (
+    <html lang={HTML_LANG[lang]} style={{ background: BRAND.colors.paper }}>
+    <body style={{ background: BRAND.colors.paper }}>
     <div
-      lang={HTML_LANG[lang]}
       style={BRAND_CSS_VARS as React.CSSProperties}
       className={`${jakarta.className} ${playfair.variable} mp-cement flex min-h-screen flex-col text-[var(--mp-ink)]`}
     >
@@ -128,5 +143,7 @@ export default async function SiteLayout({
         </div>
       </footer>
     </div>
+    </body>
+    </html>
   );
 }

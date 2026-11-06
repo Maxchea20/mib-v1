@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { BRAND } from "@/site/brand";
 import { basePath, t, type Lang } from "@/site/i18n";
-import { alternatesFor } from "@/site/seo";
+import { alternatesFor, OG_LOCALE } from "@/site/seo";
 
 /* The page frame shared by the purchase-cost calculators (server component). */
 
@@ -18,6 +18,7 @@ export function calcMetadata(lang: Lang, path: string, title: string, intro: str
       description: intro,
       url: alt.canonical,
       siteName: BRAND.name,
+      locale: OG_LOCALE[lang],
       type: "website",
       images: [{ url: BRAND.ogImage, width: 1200, height: 630 }],
     },
