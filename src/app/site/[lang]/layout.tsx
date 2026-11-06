@@ -9,6 +9,8 @@ import { BRAND, BRAND_CSS_VARS } from "@/site/brand";
 import { Suspense } from "react";
 import { requireLang } from "@/site/context";
 import { HTML_LANG, LANGS, basePath, t } from "@/site/i18n";
+import { LANDINGS } from "@/site/landing";
+import { landingCommon, landingText } from "@/site/landingText";
 import { HOME_SEO, OG_LOCALE } from "@/site/seo";
 import { whatsappUrl } from "@/site/format";
 
@@ -130,6 +132,18 @@ export default async function SiteLayout({
             <p className="mp-display text-xl font-bold text-[var(--mp-accent)]">{BRAND.name}</p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--mp-muted)]">{text.footerAbout}</p>
           </div>
+          <nav aria-label={landingCommon(lang).popularTitle} className="text-sm text-[var(--mp-muted)]">
+            <p className="font-bold text-[var(--mp-ink)]">{landingCommon(lang).popularTitle}</p>
+            <ul className="mt-2 flex flex-col gap-1.5">
+              {LANDINGS.map((l) => (
+                <li key={l.slug}>
+                  <Link href={`${base}/${l.slug}`} className="inline-flex min-h-8 items-center underline hover:text-[var(--mp-accent)]">
+                    {landingText(l.slug, lang).nav}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
           <div className="text-sm text-[var(--mp-muted)]">
             <p className="font-bold text-[var(--mp-ink)]">{text.footerContact}</p>
             <p className="mt-2">

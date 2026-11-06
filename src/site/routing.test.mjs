@@ -37,6 +37,11 @@ test("calculator pages rewrite in every language", () => {
   assert.deepEqual(r("/calculators/dsr"), { action: "rewrite", path: "/site/en/calculators/dsr" });
   assert.deepEqual(r("/calculators/rpgt"), { action: "rewrite", path: "/site/en/calculators/rpgt" });
   assert.deepEqual(r("/ms/calculators/rpgt/"), { action: "rewrite", path: "/site/ms/calculators/rpgt" });
+  for (const slug of ["houses-for-sale-ipoh", "factories-for-sale-ipoh", "industrial-land-perak", "commercial-property-ipoh", "land-for-sale-perak"]) {
+    assert.deepEqual(r(`/${slug}`), { action: "rewrite", path: `/site/en/l/${slug}` });
+    assert.deepEqual(r(`/ms/${slug}/`), { action: "rewrite", path: `/site/ms/l/${slug}` });
+  }
+  for (const bad of ["/l/houses-for-sale-ipoh", "/houses-for-sale-ipoh/x", "/houses-for-sale-penang", "/Houses-for-sale-ipoh"]) assert.deepEqual(r(bad), { action: "notfound" }, bad);
   for (const slug of ["legal-fees", "purchase-cost", "rental-yield"]) {
     assert.deepEqual(r(`/calculators/${slug}`), { action: "rewrite", path: `/site/en/calculators/${slug}` });
     assert.deepEqual(r(`/zh/calculators/${slug}/`), { action: "rewrite", path: `/site/zh/calculators/${slug}` });

@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { BRAND } from "@/site/brand";
 import { CATEGORIES } from "@/site/categories";
-import { getPublicListingIds } from "@/site/data";
+import { getPublicListingIds, getPublicListings } from "@/site/data";
+import { LANDINGS, matchesLanding } from "@/site/landing";
 import { HTML_LANG, LANGS, pathFor } from "@/site/i18n";
 
 export const dynamic = "force-dynamic";
@@ -30,6 +31,9 @@ function entry(
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const ids = await getPublicListingIds();
+  // Search landing pages are listed only while they have something on them.
+  const all = await getPublicListings({}, 1000);
+  const landings = LANDINGS.filter((c) => all.some((l) => matchesLanding(l, c)));
 
   return [
     ...entry("/", "daily", 1),
@@ -41,6 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...entry("/calculators/legal-fees", "weekly", 0.8),
     ...entry("/calculators/purchase-cost", "weekly", 0.8),
     ...entry("/calculators/rental-yield", "weekly", 0.8),
+    ...landings.flatMap((c) => entry(`/${c.slug}`, "daily", 0.9)),
     ...ids.flatMap((id) => entry(`/listing/${id}`, "weekly", 0.8)),
   ];
 }
