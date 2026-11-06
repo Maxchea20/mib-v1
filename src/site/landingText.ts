@@ -39,7 +39,7 @@ const common: Record<Lang, LandingCommon> = {
   en: {
     breadcrumbSearches: "Property searches",
     matching: "{n} matching listing(s)",
-    areasTitle: "Areas with listings right now",
+    areasTitle: "Places with listings right now",
     faqTitle: "Good to know",
     toolsTitle: "Plan your purchase",
     moreTitle: "Other searches",
@@ -58,7 +58,7 @@ const common: Record<Lang, LandingCommon> = {
   ms: {
     breadcrumbSearches: "Carian hartanah",
     matching: "{n} senarai sepadan",
-    areasTitle: "Kawasan yang ada senarai sekarang",
+    areasTitle: "Tempat yang ada senarai sekarang",
     faqTitle: "Perlu tahu",
     toolsTitle: "Rancang pembelian anda",
     moreTitle: "Carian lain",
@@ -77,7 +77,7 @@ const common: Record<Lang, LandingCommon> = {
   zh: {
     breadcrumbSearches: "房产搜索",
     matching: "{n} 个符合的房源",
-    areasTitle: "目前有房源的区域",
+    areasTitle: "目前有房源的地点",
     faqTitle: "须知",
     toolsTitle: "规划您的购房",
     moreTitle: "其他搜索",
@@ -100,11 +100,11 @@ export const landingCommon = (lang: Lang) => common[lang];
 const TEXT: Record<string, Record<Lang, LandingText>> = {
   "houses-for-sale-ipoh": {
     en: {
-      nav: "Houses for sale in Ipoh",
-      h1: "Houses for sale in Ipoh",
-      metaTitle: "Houses for sale in Ipoh, Perak",
-      metaDesc: "Browse houses for sale in Ipoh, Perak: terrace, semi-detached, bungalow and more. Chat directly with Max, a registered estate negotiator (REN 31953).",
-      intro: "Browse houses for sale in Ipoh, Perak, from terrace and semi-detached homes to bungalows. Every listing comes with photos, the asking price and the general area, and you can ask Max about any of them directly on WhatsApp.",
+      nav: "Houses for sale in Ipoh and Perak",
+      h1: "Houses for sale in Ipoh and Perak",
+      metaTitle: "Houses for sale in Ipoh and across Perak",
+      metaDesc: "Browse houses for sale in Ipoh and across Perak: terrace, semi-detached, bungalow and more. Chat directly with Max, a registered estate negotiator (REN 31953).",
+      intro: "Browse houses for sale in Ipoh and across Perak, from terrace and semi-detached homes to bungalows. Every listing comes with photos, the asking price and the general area, and you can ask Max about any of them directly on WhatsApp.",
       faq: [
         { q: "How much do I need to pay upfront when buying a house?", a: "Besides the down payment, expect legal fees, stamp duty and a few other costs. The total purchase cost calculator below adds these up for you." },
         { q: "How much can the bank lend me?", a: "It depends on your income, commitments and the bank. Use the DSR and housing loan calculators for an early idea, then confirm with your bank." },
@@ -112,11 +112,11 @@ const TEXT: Record<string, Record<Lang, LandingText>> = {
       ],
     },
     ms: {
-      nav: "Rumah dijual di Ipoh",
-      h1: "Rumah dijual di Ipoh",
-      metaTitle: "Rumah dijual di Ipoh, Perak",
-      metaDesc: "Lihat rumah dijual di Ipoh, Perak: teres, berkembar, banglo dan banyak lagi. Berbual terus dengan Max, ejen harta tanah berdaftar (REN 31953).",
-      intro: "Lihat rumah dijual di Ipoh, Perak, daripada rumah teres dan berkembar hingga banglo. Setiap senarai disertakan gambar, harga dan kawasan umum, dan anda boleh bertanya Max terus di WhatsApp.",
+      nav: "Rumah dijual di Ipoh dan Perak",
+      h1: "Rumah dijual di Ipoh dan Perak",
+      metaTitle: "Rumah dijual di Ipoh dan seluruh Perak",
+      metaDesc: "Lihat rumah dijual di Ipoh dan seluruh Perak: teres, berkembar, banglo dan banyak lagi. Berbual terus dengan Max, ejen harta tanah berdaftar (REN 31953).",
+      intro: "Lihat rumah dijual di Ipoh dan seluruh Perak, daripada rumah teres dan berkembar hingga banglo. Setiap senarai disertakan gambar, harga dan kawasan umum, dan anda boleh bertanya Max terus di WhatsApp.",
       faq: [
         { q: "Berapa yang perlu dibayar di awal semasa membeli rumah?", a: "Selain bayaran pendahuluan, jangkakan yuran guaman, duti setem dan beberapa kos lain. Kalkulator jumlah kos pembelian di bawah mengira semuanya untuk anda." },
         { q: "Berapa yang boleh dipinjamkan bank?", a: "Ia bergantung pada pendapatan, komitmen dan bank anda. Gunakan kalkulator DSR dan pinjaman perumahan untuk gambaran awal, kemudian sahkan dengan bank anda." },
@@ -124,11 +124,11 @@ const TEXT: Record<string, Record<Lang, LandingText>> = {
       ],
     },
     zh: {
-      nav: "怡保住宅出售",
-      h1: "怡保住宅出售",
-      metaTitle: "怡保住宅出售（霹雳）",
-      metaDesc: "浏览霹雳怡保的住宅出售：排屋、半独立式住宅、独立式洋房等。直接联系注册房地产经纪 Max (REN 31953)。",
-      intro: "浏览霹雳怡保的住宅出售，从排屋、半独立式住宅到独立式洋房。每个房源都附有照片、售价和大致区域，您可以直接通过 WhatsApp 向 Max 查询。",
+      nav: "怡保及霹雳住宅出售",
+      h1: "怡保及霹雳住宅出售",
+      metaTitle: "怡保及霹雳住宅出售",
+      metaDesc: "浏览怡保及霹雳各地的住宅出售：排屋、半独立式住宅、独立式洋房等。直接联系注册房地产经纪 Max (REN 31953)。",
+      intro: "浏览怡保及霹雳各地的住宅出售，从排屋、半独立式住宅到独立式洋房。每个房源都附有照片、售价和大致区域，您可以直接通过 WhatsApp 向 Max 查询。",
       faq: [
         { q: "购买住宅时需要先付多少钱？", a: "除了首期，还需预留律师费、印花税和其他费用。下方的购房总成本计算器会帮您加总。" },
         { q: "银行最多能借我多少？", a: "取决于您的收入、负债和银行。可先用 DSR 和房贷计算器了解大概，再向银行确认。" },
@@ -138,11 +138,11 @@ const TEXT: Record<string, Record<Lang, LandingText>> = {
   },
   "factories-for-sale-ipoh": {
     en: {
-      nav: "Factories for sale in Ipoh",
-      h1: "Factories for sale in Ipoh",
-      metaTitle: "Factories for sale in Ipoh, Perak",
-      metaDesc: "Factories and warehouses for sale in Ipoh, Perak. See the details and chat directly with Max, a registered estate negotiator (REN 31953).",
-      intro: "Factories and warehouses for sale in Ipoh, Perak, including detached, semi-detached, terrace and cluster factories. Each listing shows the asking price, the area and the key details, and Max can answer questions about size, tenure and suitability for your business on WhatsApp.",
+      nav: "Factories for sale in Ipoh and Perak",
+      h1: "Factories for sale in Ipoh and Perak",
+      metaTitle: "Factories for sale in Ipoh and across Perak",
+      metaDesc: "Factories and warehouses for sale in Ipoh and across Perak. See the details and chat directly with Max, a registered estate negotiator (REN 31953).",
+      intro: "Factories and warehouses for sale in Ipoh and across Perak, including detached, semi-detached, terrace and cluster factories. Each listing shows the asking price, the area and the key details, and Max can answer questions about size, tenure and suitability for your business on WhatsApp.",
       faq: [
         { q: "What should I check before buying a factory?", a: "Check the land title and tenure, the permitted use of the land, the building's size and condition, and the power supply. Ask Max for the details of the listing you like." },
         { q: "Is financing different for industrial property?", a: "Banks often lend a smaller share of the price for industrial property than for a home, and terms vary. Confirm with your bank, then use the calculators below to plan." },
@@ -150,11 +150,11 @@ const TEXT: Record<string, Record<Lang, LandingText>> = {
       ],
     },
     ms: {
-      nav: "Kilang dijual di Ipoh",
-      h1: "Kilang dijual di Ipoh",
-      metaTitle: "Kilang dijual di Ipoh, Perak",
-      metaDesc: "Kilang dan gudang dijual di Ipoh, Perak. Lihat butiran dan berbual terus dengan Max, ejen harta tanah berdaftar (REN 31953).",
-      intro: "Kilang dan gudang dijual di Ipoh, Perak, termasuk kilang sesebuah, berkembar, teres dan kluster. Setiap senarai menunjukkan harga, kawasan dan butiran penting, dan Max boleh menjawab soalan tentang saiz, pegangan dan kesesuaian untuk perniagaan anda di WhatsApp.",
+      nav: "Kilang dijual di Ipoh dan Perak",
+      h1: "Kilang dijual di Ipoh dan Perak",
+      metaTitle: "Kilang dijual di Ipoh dan seluruh Perak",
+      metaDesc: "Kilang dan gudang dijual di Ipoh dan seluruh Perak. Lihat butiran dan berbual terus dengan Max, ejen harta tanah berdaftar (REN 31953).",
+      intro: "Kilang dan gudang dijual di Ipoh dan seluruh Perak, termasuk kilang sesebuah, berkembar, teres dan kluster. Setiap senarai menunjukkan harga, kawasan dan butiran penting, dan Max boleh menjawab soalan tentang saiz, pegangan dan kesesuaian untuk perniagaan anda di WhatsApp.",
       faq: [
         { q: "Apa yang perlu disemak sebelum membeli kilang?", a: "Semak hak milik dan pegangan tanah, kegunaan tanah yang dibenarkan, saiz dan keadaan bangunan, serta bekalan elektrik. Tanya Max untuk butiran senarai yang anda suka." },
         { q: "Adakah pembiayaan berbeza untuk hartanah perindustrian?", a: "Bank selalunya meminjamkan peratusan harga yang lebih kecil untuk hartanah perindustrian berbanding rumah, dan terma berbeza. Sahkan dengan bank anda, kemudian gunakan kalkulator di bawah untuk merancang." },
@@ -162,11 +162,11 @@ const TEXT: Record<string, Record<Lang, LandingText>> = {
       ],
     },
     zh: {
-      nav: "怡保工厂出售",
-      h1: "怡保工厂出售",
-      metaTitle: "怡保工厂出售（霹雳）",
-      metaDesc: "霹雳怡保的工厂及仓库出售。查看详情并直接联系注册房地产经纪 Max (REN 31953)。",
-      intro: "霹雳怡保的工厂及仓库出售，包括独立式、半独立式、排屋式和组合式工厂。每个房源都列明售价、区域和主要资料，关于面积、地契年限以及是否适合您的业务，都可以通过 WhatsApp 向 Max 查询。",
+      nav: "怡保及霹雳工厂出售",
+      h1: "怡保及霹雳工厂出售",
+      metaTitle: "怡保及霹雳工厂出售",
+      metaDesc: "怡保及霹雳各地的工厂及仓库出售。查看详情并直接联系注册房地产经纪 Max (REN 31953)。",
+      intro: "怡保及霹雳各地的工厂及仓库出售，包括独立式、半独立式、排屋式和组合式工厂。每个房源都列明售价、区域和主要资料，关于面积、地契年限以及是否适合您的业务，都可以通过 WhatsApp 向 Max 查询。",
       faq: [
         { q: "购买工厂前应该检查什么？", a: "请检查地契和年限、土地许可用途、建筑面积和状况，以及电力供应。可向 Max 询问您喜欢的房源详情。" },
         { q: "工业房产的融资不同吗？", a: "银行对工业房产的贷款成数通常比住宅低，条件也各不相同。请先向银行确认，再用下方的计算器规划。" },
@@ -214,11 +214,11 @@ const TEXT: Record<string, Record<Lang, LandingText>> = {
   },
   "commercial-property-ipoh": {
     en: {
-      nav: "Commercial property in Ipoh",
-      h1: "Commercial property in Ipoh",
-      metaTitle: "Commercial property in Ipoh, Perak",
-      metaDesc: "Shop lots, offices and other commercial property for sale and rent in Ipoh, Perak. Chat directly with Max, a registered estate negotiator (REN 31953).",
-      intro: "Commercial property in Ipoh, Perak, for sale and for rent, including shop lots and offices. Each listing shows the price, area and key details, and Max can help you compare options for your business or investment.",
+      nav: "Commercial property in Ipoh and Perak",
+      h1: "Commercial property in Ipoh and Perak",
+      metaTitle: "Commercial property in Ipoh and Perak",
+      metaDesc: "Shop lots, offices and other commercial property for sale and rent in Ipoh and across Perak. Chat directly with Max, a registered estate negotiator (REN 31953).",
+      intro: "Commercial property in Ipoh and across Perak, for sale and for rent, including shop lots and offices. Each listing shows the price, area and key details, and Max can help you compare options for your business or investment.",
       faq: [
         { q: "Is it better to buy or rent a commercial space?", a: "Buying ties up capital but builds an asset; renting is more flexible. If you are buying to let out, the rental yield calculator below shows the return." },
         { q: "What costs come with buying commercial property?", a: "Legal fees, stamp duty and other costs apply, and loan terms differ from home loans. The calculators below give an estimate." },
@@ -226,11 +226,11 @@ const TEXT: Record<string, Record<Lang, LandingText>> = {
       ],
     },
     ms: {
-      nav: "Hartanah komersial di Ipoh",
-      h1: "Hartanah komersial di Ipoh",
-      metaTitle: "Hartanah komersial di Ipoh, Perak",
-      metaDesc: "Kedai, pejabat dan hartanah komersial lain untuk dijual dan disewa di Ipoh, Perak. Berbual terus dengan Max, ejen harta tanah berdaftar (REN 31953).",
-      intro: "Hartanah komersial di Ipoh, Perak, untuk dijual dan disewa, termasuk kedai dan pejabat. Setiap senarai menunjukkan harga, kawasan dan butiran penting, dan Max boleh membantu anda membandingkan pilihan untuk perniagaan atau pelaburan.",
+      nav: "Hartanah komersial di Ipoh dan Perak",
+      h1: "Hartanah komersial di Ipoh dan Perak",
+      metaTitle: "Hartanah komersial di Ipoh dan Perak",
+      metaDesc: "Kedai, pejabat dan hartanah komersial lain untuk dijual dan disewa di Ipoh dan seluruh Perak. Berbual terus dengan Max, ejen harta tanah berdaftar (REN 31953).",
+      intro: "Hartanah komersial di Ipoh dan Perak, untuk dijual dan disewa, termasuk kedai dan pejabat. Setiap senarai menunjukkan harga, kawasan dan butiran penting, dan Max boleh membantu anda membandingkan pilihan untuk perniagaan atau pelaburan.",
       faq: [
         { q: "Lebih baik beli atau sewa ruang komersial?", a: "Membeli mengikat modal tetapi membina aset; menyewa lebih fleksibel. Jika membeli untuk disewakan, kalkulator hasil sewa di bawah menunjukkan pulangan." },
         { q: "Apakah kos membeli hartanah komersial?", a: "Yuran guaman, duti setem dan kos lain dikenakan, dan terma pinjaman berbeza daripada pinjaman rumah. Kalkulator di bawah memberi anggaran." },
@@ -238,11 +238,11 @@ const TEXT: Record<string, Record<Lang, LandingText>> = {
       ],
     },
     zh: {
-      nav: "怡保商业房产",
-      h1: "怡保商业房产",
-      metaTitle: "怡保商业房产（霹雳）",
-      metaDesc: "霹雳怡保的店屋、办公室及其他商业房产买卖与出租。直接联系注册房地产经纪 Max (REN 31953)。",
-      intro: "霹雳怡保的商业房产买卖与出租，包括店屋和办公室。每个房源都列明价格、区域和主要资料，Max 可协助您比较适合业务或投资的选择。",
+      nav: "怡保及霹雳商业房产",
+      h1: "怡保及霹雳商业房产",
+      metaTitle: "怡保及霹雳商业房产",
+      metaDesc: "怡保及霹雳各地的店屋、办公室及其他商业房产买卖与出租。直接联系注册房地产经纪 Max (REN 31953)。",
+      intro: "怡保及霹雳各地的商业房产买卖与出租，包括店屋和办公室。每个房源都列明价格、区域和主要资料，Max 可协助您比较适合业务或投资的选择。",
       faq: [
         { q: "购买还是租用商业空间比较好？", a: "购买会占用资金但能累积资产；租用则更灵活。如果买来出租，下方的租金回报率计算器可显示回报。" },
         { q: "购买商业房产有哪些费用？", a: "需要律师费、印花税和其他费用，贷款条件也与房贷不同。下方的计算器可提供估算。" },
