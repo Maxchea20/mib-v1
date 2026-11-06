@@ -6,6 +6,7 @@ import { BRAND } from "@/site/brand";
 import { categoryFromSlug, groupLabel, groupOf, groupsOf } from "@/site/categories";
 import { requireLang } from "@/site/context";
 import { alternatesFor, OG_LOCALE } from "@/site/seo";
+import { breadcrumbSchema, safeJson } from "@/site/schema";
 import { cleanFilters, getPhotosForListings, getPublicListings } from "@/site/data";
 import { basePath, countText, fill, t, type Lang } from "@/site/i18n";
 
@@ -77,8 +78,14 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         : "border-[var(--mp-line)] bg-[var(--mp-card)] text-[var(--mp-ink)] hover:border-[var(--mp-accent)]"
     }`;
 
+  const crumbs = breadcrumbSchema([
+    { name: text.breadcrumbAll, url: `${BRAND.siteUrl}${base || "/"}` },
+    { name: label(cat.category, lang), url: alternatesFor(lang, `/${cat.slug}`).canonical },
+  ]);
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJson(crumbs) }} />
       <section className="border-b border-[var(--mp-line)] bg-[linear-gradient(180deg,rgba(10,10,11,0.15),rgba(10,10,11,0.6))]">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-3 px-4 py-10 sm:px-6 sm:py-14">
           <nav aria-label="Breadcrumb" className="flex gap-2 text-sm text-[var(--mp-muted)]">

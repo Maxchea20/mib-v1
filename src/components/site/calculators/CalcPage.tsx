@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { BRAND } from "@/site/brand";
 import { basePath, t, type Lang } from "@/site/i18n";
 import { alternatesFor, OG_LOCALE } from "@/site/seo";
+import { breadcrumbSchema, safeJson } from "@/site/schema";
 
 /* The page frame shared by the purchase-cost calculators (server component). */
 
@@ -51,9 +52,15 @@ export default function CalcPage({
     publisher: { "@type": "Organization", name: BRAND.name, url: BRAND.siteUrl },
   };
 
+  const crumbs = breadcrumbSchema([
+    { name: text.breadcrumbAll, url: `${BRAND.siteUrl}${base || "/"}` },
+    { name: text.calcNav, url: alternatesFor(lang, "/calculators").canonical },
+    { name: title, url: alternatesFor(lang, path).canonical },
+  ]);
+
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJson([jsonLd, crumbs]) }} />
 
       <section className="border-b border-[var(--mp-line)] bg-[linear-gradient(180deg,rgba(10,10,11,0.15),rgba(10,10,11,0.6))]">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-3 px-4 py-10 sm:px-6 sm:py-14">

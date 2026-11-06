@@ -6,6 +6,7 @@ import { cleanFilters, getPhotosForListings, getPublicListings } from "@/site/da
 import type { Metadata } from "next";
 import { requireLang } from "@/site/context";
 import { alternatesFor } from "@/site/seo";
+import { agentSchema, safeJson, websiteSchema } from "@/site/schema";
 import { basePath, countText, fill, t, type Lang } from "@/site/i18n";
 
 const PER_SECTION = 3;
@@ -68,6 +69,7 @@ export default async function SiteHome({
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJson([agentSchema(lang), websiteSchema(lang)]) }} />
       <section className="border-b border-[var(--mp-line)] bg-[linear-gradient(180deg,rgba(10,10,11,0.15),rgba(10,10,11,0.6))]">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 pb-16 pt-14 sm:px-6 sm:pb-20 sm:pt-[72px]">
           <p className="text-sm font-bold uppercase tracking-[0.14em] text-[var(--mp-accent)]">{text.heroKicker}</p>

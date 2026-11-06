@@ -7,6 +7,7 @@ import WhatsAppIcon from "@/components/site/WhatsAppIcon";
 import { BRAND } from "@/site/brand";
 import { requireLang } from "@/site/context";
 import { alternatesFor, OG_LOCALE } from "@/site/seo";
+import { breadcrumbSchema, listingSchema, safeJson } from "@/site/schema";
 import { slugFromCategory } from "@/site/categories";
 import { getPublicListing } from "@/site/data";
 import {
@@ -111,31 +112,29 @@ export default async function ListingPage({ params }: Props) {
   const visibleRows = rows.filter(([, v]) => v !== null && v !== "");
   const highlights = (listing.highlights ?? []).filter((h) => h && h.trim());
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "RealEstateListing",
-    name: listing.title,
-    url,
-    description: listing.headline || listing.description || undefined,
-    image: images.slice(0, 5),
-    offers: {
-      "@type": "Offer",
-      price: listing.price,
-      priceCurrency: "MYR",
-      availability:
-        listing.status === "Booked"
-          ? "https://schema.org/LimitedAvailability"
-          : "https://schema.org/InStock",
-    },
-    contentLocation: place || undefined,
-  };
+  const categorySlug = slugFromCategory(listing.category);
+  const categoryName = ({ Residential: text.residential, Commercial: text.commercial, Industrial: text.industrial, Land: text.land } as Record<string, string>)[listing.category ?? ""];
+  const jsonLd = [
+    listingSchema(listing, {
+      lang,
+      url,
+      images,
+      place,
+      description: (listing.headline || listing.description || "").replace(/\s+/g, " ").trim().slice(0, 500),
+    }),
+    breadcrumbSchema([
+      { name: text.breadcrumbAll, url: `${BRAND.siteUrl}${base || "/"}` },
+      ...(categorySlug && categoryName ? [{ name: categoryName, url: alternatesFor(lang, `/${categorySlug}`).canonical }] : []),
+      { name: listing.title ?? "Property", url },
+    ]),
+  ];
 
   return (
     <main className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 pb-24 pt-6 sm:px-6 lg:pb-14">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+          __html: safeJson(jsonLd),
         }}
       />
 

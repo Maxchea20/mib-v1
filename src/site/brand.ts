@@ -16,6 +16,11 @@ export const BRAND = {
   whatsappDisplay: "+60 16-521 0993",
   // Registered Estate Negotiator number. Shown in the footer and on listing pages when set.
   renNumber: "31953",
+  // Profile pages that belong to the business (Google Business Profile, Facebook, ...).
+  // Add the full URLs here and they are published as "sameAs" in the structured data.
+  sameAs: [] as string[],
+  // Where the business works. Used as the service area in the structured data.
+  serviceAreas: ["Ipoh", "Perak"] as string[],
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://maxproperty.my",
   // Hosts that serve the PUBLIC website (everything else is the private CRM).
   publicHosts: ["maxproperty.my", "www.maxproperty.my"],
