@@ -30,7 +30,7 @@ export default function ListingCard({
       <div className="relative aspect-[16/10] bg-[var(--mp-accent-soft)]">
         {cover ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={cover} alt={listing.title ?? ""} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+          <img src={cover} alt={[listing.title, locationLine(listing)].filter(Boolean).join(", ")} width={800} height={500} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
         ) : null}
         <span className="absolute left-3 top-3 rounded-full border border-[var(--mp-accent)] bg-[var(--mp-paper)] px-3 py-1 text-xs font-extrabold text-[var(--mp-accent)]">
           {listing.purpose === "For Rent" ? text.forRent : text.forSale}

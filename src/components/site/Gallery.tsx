@@ -33,6 +33,10 @@ export default function Gallery({
           alt={`${alt} (${index + 1}/${images.length})`}
           className="aspect-[16/10] w-full object-cover"
           loading={index === 0 ? "eager" : "lazy"}
+          fetchPriority={index === 0 ? "high" : undefined}
+          decoding="async"
+          width={1200}
+          height={750}
         />
 
         {images.length > 1 && (

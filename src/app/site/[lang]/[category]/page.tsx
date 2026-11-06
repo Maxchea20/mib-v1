@@ -5,7 +5,7 @@ import ListingCard from "@/components/site/ListingCard";
 import { BRAND } from "@/site/brand";
 import { categoryFromSlug, groupLabel, groupOf, groupsOf } from "@/site/categories";
 import { requireLang } from "@/site/context";
-import { alternatesFor } from "@/site/seo";
+import { alternatesFor, OG_LOCALE } from "@/site/seo";
 import { cleanFilters, getPhotosForListings, getPublicListings } from "@/site/data";
 import { basePath, countText, fill, t, type Lang } from "@/site/i18n";
 
@@ -38,7 +38,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description: `${title}. ${BRAND.tagline}`,
     alternates: alternatesFor(lang, `/${cat.slug}`),
-    openGraph: { title: `${title} | ${BRAND.name}`, url: alternatesFor(lang, `/${cat.slug}`).canonical, siteName: BRAND.name, type: "website", images: [{ url: BRAND.ogImage, width: 1200, height: 630 }] },
+    openGraph: { title: `${title} | ${BRAND.name}`, url: alternatesFor(lang, `/${cat.slug}`).canonical, siteName: BRAND.name,
+      locale: OG_LOCALE[lang], type: "website", images: [{ url: BRAND.ogImage, width: 1200, height: 630 }] },
   };
 }
 

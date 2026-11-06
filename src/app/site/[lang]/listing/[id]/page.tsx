@@ -6,7 +6,7 @@ import ShareButtons from "@/components/site/ShareButtons";
 import WhatsAppIcon from "@/components/site/WhatsAppIcon";
 import { BRAND } from "@/site/brand";
 import { requireLang } from "@/site/context";
-import { alternatesFor } from "@/site/seo";
+import { alternatesFor, OG_LOCALE } from "@/site/seo";
 import { slugFromCategory } from "@/site/categories";
 import { getPublicListing } from "@/site/data";
 import {
@@ -66,6 +66,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url,
       siteName: BRAND.name,
+      locale: OG_LOCALE[lang],
       type: "website",
       images: [{ url: image ?? BRAND.ogImage }],
     },
@@ -153,7 +154,7 @@ export default async function ListingPage({ params }: Props) {
 
       <Gallery
         images={images}
-        alt={listing.title ?? ""}
+        alt={[listing.title, place].filter(Boolean).join(", ")}
         labels={{ prev: text.prevPhoto, next: text.nextPhoto, counter: text.photoOf }}
       />
 
