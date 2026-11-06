@@ -37,8 +37,12 @@ test("calculator pages rewrite in every language", () => {
   assert.deepEqual(r("/calculators/dsr"), { action: "rewrite", path: "/site/en/calculators/dsr" });
   assert.deepEqual(r("/calculators/rpgt"), { action: "rewrite", path: "/site/en/calculators/rpgt" });
   assert.deepEqual(r("/ms/calculators/rpgt/"), { action: "rewrite", path: "/site/ms/calculators/rpgt" });
+  for (const slug of ["legal-fees", "purchase-cost", "rental-yield"]) {
+    assert.deepEqual(r(`/calculators/${slug}`), { action: "rewrite", path: `/site/en/calculators/${slug}` });
+    assert.deepEqual(r(`/zh/calculators/${slug}/`), { action: "rewrite", path: `/site/zh/calculators/${slug}` });
+  }
   assert.deepEqual(r("/zh/calculators/dsr/"), { action: "rewrite", path: "/site/zh/calculators/dsr" });
-  for (const bad of ["/calculators/other", "/calculators/housing-loan/x", "/calculators/stamp-duty", "/Calculators", "/calculators/dsr/x", "/calculators/DSR", "/calculators/RPGT", "/calculators/rpgt/x"])
+  for (const bad of ["/calculators/other", "/calculators/housing-loan/x", "/calculators/stamp-duty", "/Calculators", "/calculators/dsr/x", "/calculators/DSR", "/calculators/RPGT", "/calculators/rpgt/x", "/calculators/legal-fees/x", "/calculators/Rental-Yield"])
     assert.deepEqual(r(bad), { action: "notfound" }, bad);
 });
 
