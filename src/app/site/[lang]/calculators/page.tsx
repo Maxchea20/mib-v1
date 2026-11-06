@@ -39,6 +39,11 @@ export default async function CalculatorsHub({ params }: Props) {
       title: text.hlTitle,
       body: text.hlCardText,
     },
+    {
+      href: `${base}/calculators/dsr`,
+      title: text.dsrTitle,
+      body: text.dsrCardText,
+    },
   ];
 
   return (

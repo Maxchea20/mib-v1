@@ -172,6 +172,51 @@ type Dict = {
   hlDisclaimer: string;
   hlWhatsapp: string;
   hlWhatsappMsg: string;
+  dsrTitle: string;
+  dsrIntro: string;
+  dsrCardText: string;
+  dsrSecProperty: string;
+  dsrSecIncome: string;
+  dsrSecCommit: string;
+  dsrPriceHint: string;
+  dsrIncome: string;
+  dsrIncomeHint: string;
+  dsrCommitNote: string;
+  dsrCar: string;
+  dsrPersonal: string;
+  dsrHousing: string;
+  dsrPtptn: string;
+  dsrCard: string;
+  dsrExpenses: string;
+  dsrZeroChip: string;
+  dsrPlaceholderAmount: string;
+  dsrErrRequired: string;
+  dsrErrInvalid: string;
+  dsrErrNegative: string;
+  dsrErrZero: string;
+  dsrErrTooHigh: string;
+  dsrProgress: string;
+  dsrPending: string;
+  dsrResult: string;
+  dsrNetIncome: string;
+  dsrExisting: string;
+  dsrNewInstalment: string;
+  dsrTotalCommit: string;
+  dsrDsr: string;
+  dsrGreen: string;
+  dsrRed: string;
+  dsrGreenTag: string;
+  dsrRedTag: string;
+  dsrLimitLine: string;
+  dsrLoanLine: string;
+  dsrWhatsapp: string;
+  dsrWhatsappMsg: string;
+  dsrDisclaimer: string;
+  dsrAssume1: string;
+  dsrAssume2: string;
+  dsrAssume3: string;
+  dsrAssume4: string;
+  dsrMobileWait: string;
 };
 
 const en: Dict = {
@@ -303,6 +348,51 @@ const en: Dict = {
   hlDisclaimer: "This calculator gives an estimate only. Actual amounts depend on your bank's terms and are subject to bank approval.",
   hlWhatsapp: "Ask Max about this loan",
   hlWhatsappMsg: "Hi Max, I tried the housing loan calculator: property price {price}, margin {margin}%, {years} years at {rate}% a year, about {monthly} a month. Can you advise me?",
+  dsrTitle: "DSR calculator",
+  dsrIntro: "Check your Debt Service Ratio (DSR) for a new property loan. Fill in every field and the result updates as you type.",
+  dsrCardText: "Check whether your income can support a new property loan.",
+  dsrSecProperty: "1. Property purchase",
+  dsrSecIncome: "2. Monthly net income",
+  dsrSecCommit: "3. Existing monthly commitments",
+  dsrPriceHint: "Required. The purchase price of the property.",
+  dsrIncome: "Net monthly income (RM)",
+  dsrIncomeHint: "Required. Your income after EPF, SOCSO and income tax deductions.",
+  dsrCommitNote: "Every field is required. If you have none, enter 0 or tap RM 0.",
+  dsrCar: "Car loan (RM per month)",
+  dsrPersonal: "Personal loan (RM per month)",
+  dsrHousing: "Current housing loan (RM per month)",
+  dsrPtptn: "PTPTN (RM per month)",
+  dsrCard: "Credit card commitment (RM per month)",
+  dsrExpenses: "Monthly expenses (RM per month)",
+  dsrZeroChip: "RM 0",
+  dsrPlaceholderAmount: "Enter amount",
+  dsrErrRequired: "This field is required.",
+  dsrErrInvalid: "Enter a valid number.",
+  dsrErrNegative: "This cannot be negative.",
+  dsrErrZero: "This cannot be zero.",
+  dsrErrTooHigh: "This amount is too high.",
+  dsrProgress: "{n} fields still need an answer",
+  dsrPending: "Complete every required field to see your DSR.",
+  dsrResult: "Your DSR result",
+  dsrNetIncome: "Net monthly income",
+  dsrExisting: "Existing monthly commitments",
+  dsrNewInstalment: "Estimated new property instalment",
+  dsrTotalCommit: "Total monthly commitments",
+  dsrDsr: "Your DSR",
+  dsrGreen: "Below 75%: within the indicative limit",
+  dsrRed: "75% or above: over the indicative limit",
+  dsrGreenTag: "GREEN",
+  dsrRedTag: "RED",
+  dsrLimitLine: "75% of your net income is {amount} a month.",
+  dsrLoanLine: "New loan {loan} over {years} years at {rate}% a year.",
+  dsrWhatsapp: "Discuss my DSR with Max",
+  dsrWhatsappMsg: "Hi Max, I checked my DSR: net income {income}, existing commitments {existing}, new instalment {instalment}, total {total}, DSR {dsr}%. Can you advise me?",
+  dsrDisclaimer: "This is an indicative affordability calculation. Actual bank DSR assessment varies according to the bank's policies, treatment of income, expenses and credit commitments.",
+  dsrAssume1: "DSR = (existing monthly commitments + new property instalment) ÷ net monthly income × 100.",
+  dsrAssume2: "The new instalment uses the reducing-balance formula on the loan amount (price × margin), at the rate and tenure you enter.",
+  dsrAssume3: "This calculator uses 75% as its guide. Banks set their own limits and may treat income, expenses and commitments differently.",
+  dsrAssume4: "The DSR is shown to two decimals, and the colour follows the figure you see: 75.00% and above is red.",
+  dsrMobileWait: "Complete all fields",
 };
 
 const ms: Dict = {
@@ -435,6 +525,51 @@ const ms: Dict = {
   hlDisclaimer: "Kalkulator ini hanya memberi anggaran. Jumlah sebenar bergantung pada terma bank anda dan tertakluk kepada kelulusan bank.",
   hlWhatsapp: "Tanya Max tentang pinjaman ini",
   hlWhatsappMsg: "Hai Max, saya cuba kalkulator pinjaman perumahan: harga hartanah {price}, margin {margin}%, {years} tahun pada {rate}% setahun, kira-kira {monthly} sebulan. Boleh anda nasihatkan saya?",
+  dsrTitle: "Kalkulator DSR",
+  dsrIntro: "Semak Nisbah Khidmat Hutang (DSR) anda untuk pinjaman hartanah baharu. Isi setiap ruangan dan keputusan dikemas kini semasa anda menaip.",
+  dsrCardText: "Semak sama ada pendapatan anda mampu menampung pinjaman hartanah baharu.",
+  dsrSecProperty: "1. Pembelian hartanah",
+  dsrSecIncome: "2. Pendapatan bersih bulanan",
+  dsrSecCommit: "3. Komitmen bulanan sedia ada",
+  dsrPriceHint: "Wajib. Harga pembelian hartanah.",
+  dsrIncome: "Pendapatan bersih bulanan (RM)",
+  dsrIncomeHint: "Wajib. Pendapatan anda selepas potongan KWSP, PERKESO dan cukai pendapatan.",
+  dsrCommitNote: "Setiap ruangan wajib diisi. Jika tiada, masukkan 0 atau tekan RM 0.",
+  dsrCar: "Pinjaman kereta (RM sebulan)",
+  dsrPersonal: "Pinjaman peribadi (RM sebulan)",
+  dsrHousing: "Pinjaman perumahan semasa (RM sebulan)",
+  dsrPtptn: "PTPTN (RM sebulan)",
+  dsrCard: "Komitmen kad kredit (RM sebulan)",
+  dsrExpenses: "Perbelanjaan bulanan (RM sebulan)",
+  dsrZeroChip: "RM 0",
+  dsrPlaceholderAmount: "Masukkan jumlah",
+  dsrErrRequired: "Ruangan ini wajib diisi.",
+  dsrErrInvalid: "Masukkan nombor yang sah.",
+  dsrErrNegative: "Nilai ini tidak boleh negatif.",
+  dsrErrZero: "Nilai ini tidak boleh sifar.",
+  dsrErrTooHigh: "Jumlah ini terlalu tinggi.",
+  dsrProgress: "{n} ruangan masih perlu diisi",
+  dsrPending: "Lengkapkan semua ruangan wajib untuk melihat DSR anda.",
+  dsrResult: "Keputusan DSR anda",
+  dsrNetIncome: "Pendapatan bersih bulanan",
+  dsrExisting: "Komitmen bulanan sedia ada",
+  dsrNewInstalment: "Anggaran ansuran hartanah baharu",
+  dsrTotalCommit: "Jumlah komitmen bulanan",
+  dsrDsr: "DSR anda",
+  dsrGreen: "Di bawah 75%: dalam had petunjuk",
+  dsrRed: "75% atau lebih: melebihi had petunjuk",
+  dsrGreenTag: "HIJAU",
+  dsrRedTag: "MERAH",
+  dsrLimitLine: "75% daripada pendapatan bersih anda ialah {amount} sebulan.",
+  dsrLoanLine: "Pinjaman baharu {loan} selama {years} tahun pada {rate}% setahun.",
+  dsrWhatsapp: "Bincang DSR saya dengan Max",
+  dsrWhatsappMsg: "Hai Max, saya telah menyemak DSR saya: pendapatan bersih {income}, komitmen sedia ada {existing}, ansuran baharu {instalment}, jumlah {total}, DSR {dsr}%. Boleh anda nasihatkan saya?",
+  dsrDisclaimer: "Ini ialah pengiraan kemampuan yang bersifat petunjuk. Penilaian DSR sebenar oleh bank berbeza mengikut dasar bank, layanan terhadap pendapatan, perbelanjaan dan komitmen kredit.",
+  dsrAssume1: "DSR = (komitmen bulanan sedia ada + ansuran hartanah baharu) ÷ pendapatan bersih bulanan × 100.",
+  dsrAssume2: "Ansuran baharu menggunakan formula baki berkurangan ke atas jumlah pinjaman (harga × margin), pada kadar dan tempoh yang anda masukkan.",
+  dsrAssume3: "Kalkulator ini menggunakan 75% sebagai panduan. Bank menetapkan had sendiri dan mungkin melayan pendapatan, perbelanjaan dan komitmen secara berbeza.",
+  dsrAssume4: "DSR ditunjukkan dua tempat perpuluhan, dan warna mengikut angka yang anda lihat: 75.00% dan ke atas ialah merah.",
+  dsrMobileWait: "Lengkapkan semua ruangan",
 };
 
 const zh: Dict = {
@@ -562,6 +697,51 @@ const zh: Dict = {
   hlDisclaimer: "本计算器仅提供估算。实际金额取决于银行的条款，并须经银行批准。",
   hlWhatsapp: "向 Max 咨询此贷款",
   hlWhatsappMsg: "你好 Max，我试用了房屋贷款计算器：房产价格 {price}，贷款成数 {margin}%，{years} 年，年利率 {rate}%，每月约 {monthly}。可以给我一些建议吗？",
+  dsrTitle: "DSR 计算器",
+  dsrIntro: "查看您申请新房贷时的债务偿还比率（DSR）。请填写每一栏，结果会在输入时即时更新。",
+  dsrCardText: "查看您的收入能否支持新的房贷。",
+  dsrSecProperty: "1. 购房资料",
+  dsrSecIncome: "2. 每月净收入",
+  dsrSecCommit: "3. 现有每月负担",
+  dsrPriceHint: "必填。房产的购买价格。",
+  dsrIncome: "每月净收入（RM）",
+  dsrIncomeHint: "必填。扣除 EPF、SOCSO 和所得税后的收入。",
+  dsrCommitNote: "每一栏都必须填写。如果没有，请输入 0 或点击 RM 0。",
+  dsrCar: "汽车贷款（每月 RM）",
+  dsrPersonal: "个人贷款（每月 RM）",
+  dsrHousing: "现有房屋贷款（每月 RM）",
+  dsrPtptn: "PTPTN（每月 RM）",
+  dsrCard: "信用卡月供（每月 RM）",
+  dsrExpenses: "每月开销（每月 RM）",
+  dsrZeroChip: "RM 0",
+  dsrPlaceholderAmount: "输入金额",
+  dsrErrRequired: "此栏必填。",
+  dsrErrInvalid: "请输入有效数字。",
+  dsrErrNegative: "不能为负数。",
+  dsrErrZero: "不能为零。",
+  dsrErrTooHigh: "金额过高。",
+  dsrProgress: "还有 {n} 栏需要填写",
+  dsrPending: "请填写所有必填栏，以查看您的 DSR。",
+  dsrResult: "您的 DSR 结果",
+  dsrNetIncome: "每月净收入",
+  dsrExisting: "现有每月负担",
+  dsrNewInstalment: "预计新房产月供",
+  dsrTotalCommit: "每月总负担",
+  dsrDsr: "您的 DSR",
+  dsrGreen: "低于 75%：在参考限额内",
+  dsrRed: "75% 或以上：超出参考限额",
+  dsrGreenTag: "绿色",
+  dsrRedTag: "红色",
+  dsrLimitLine: "您净收入的 75% 为每月 {amount}。",
+  dsrLoanLine: "新贷款 {loan}，{years} 年，年利率 {rate}%。",
+  dsrWhatsapp: "与 Max 讨论我的 DSR",
+  dsrWhatsappMsg: "你好 Max，我查看了我的 DSR：每月净收入 {income}，现有负担 {existing}，新月供 {instalment}，总额 {total}，DSR {dsr}%。可以给我一些建议吗？",
+  dsrDisclaimer: "这只是参考性的负担能力计算。银行实际的 DSR 评估会因银行政策，以及对收入、开销和信贷负担的处理方式而有所不同。",
+  dsrAssume1: "DSR =（现有每月负担 + 新房产月供）÷ 每月净收入 × 100。",
+  dsrAssume2: "新月供按递减余额法，以贷款金额（价格 × 贷款成数）及您输入的利率和年限计算。",
+  dsrAssume3: "本计算器以 75% 作为参考。各银行有自己的限额，对收入、开销和负担的处理也可能不同。",
+  dsrAssume4: "DSR 显示至两位小数，颜色依据您看到的数字：75.00% 及以上为红色。",
+  dsrMobileWait: "请填写所有栏位",
 };
 
 export const DICTS: Record<Lang, Dict> = { en, ms, zh };
@@ -586,4 +766,10 @@ export function countText(lang: Lang, n: number): string {
 /** Link prefix for a language: "" (English), "/ms" or "/zh". */
 export function basePath(lang: Lang): string {
   return pathFor(lang, "/") === "/" ? "" : pathFor(lang, "/");
+}
+
+/** "1 field still needs an answer" / "3 fields still need an answer" (BM and Chinese have no plural). */
+export function fieldsLeftText(lang: Lang, n: number): string {
+  if (lang === "en" && n === 1) return "1 field still needs an answer";
+  return fill(t(lang).dsrProgress, { n });
 }

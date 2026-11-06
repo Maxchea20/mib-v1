@@ -34,7 +34,9 @@ test("calculator pages rewrite in every language", () => {
   assert.deepEqual(r("/calculators/housing-loan"), { action: "rewrite", path: "/site/en/calculators/housing-loan" });
   assert.deepEqual(r("/ms/calculators/housing-loan"), { action: "rewrite", path: "/site/ms/calculators/housing-loan" });
   assert.deepEqual(r("/zh/calculators"), { action: "rewrite", path: "/site/zh/calculators" });
-  for (const bad of ["/calculators/other", "/calculators/housing-loan/x", "/calculators/stamp-duty", "/Calculators"])
+  assert.deepEqual(r("/calculators/dsr"), { action: "rewrite", path: "/site/en/calculators/dsr" });
+  assert.deepEqual(r("/zh/calculators/dsr/"), { action: "rewrite", path: "/site/zh/calculators/dsr" });
+  for (const bad of ["/calculators/other", "/calculators/housing-loan/x", "/calculators/stamp-duty", "/Calculators", "/calculators/dsr/x", "/calculators/DSR"])
     assert.deepEqual(r(bad), { action: "notfound" }, bad);
 });
 
