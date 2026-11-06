@@ -38,6 +38,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...entry("/calculators/housing-loan", "weekly", 0.8),
     ...entry("/calculators/dsr", "weekly", 0.8),
     ...entry("/calculators/rpgt", "weekly", 0.8),
+    ...entry("/calculators/legal-fees", "weekly", 0.8),
+    ...entry("/calculators/purchase-cost", "weekly", 0.8),
+    ...entry("/calculators/rental-yield", "weekly", 0.8),
     ...ids.flatMap((id) => entry(`/listing/${id}`, "weekly", 0.8)),
   ];
 }

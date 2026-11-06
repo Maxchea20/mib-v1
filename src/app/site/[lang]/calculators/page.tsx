@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BRAND } from "@/site/brand";
 import { requireLang } from "@/site/context";
 import { basePath, t } from "@/site/i18n";
+import { ct } from "@/site/costText";
 import { alternatesFor } from "@/site/seo";
 
 type Props = { params: Promise<{ lang: string }> };
@@ -30,6 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CalculatorsHub({ params }: Props) {
   const lang = requireLang((await params).lang);
   const text = t(lang);
+  const c = ct(lang);
   const base = basePath(lang);
 
   // More calculators are added to this list as they are built.
@@ -49,6 +51,9 @@ export default async function CalculatorsHub({ params }: Props) {
       title: text.rpTitle,
       body: text.rpCardText,
     },
+    { href: `${base}/calculators/legal-fees`, title: c.llTitle, body: c.llCard },
+    { href: `${base}/calculators/purchase-cost`, title: c.pcTitle, body: c.pcCard },
+    { href: `${base}/calculators/rental-yield`, title: c.ryTitle, body: c.ryCard },
   ];
 
   return (
