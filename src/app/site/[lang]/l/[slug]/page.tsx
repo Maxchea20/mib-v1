@@ -8,7 +8,7 @@ import { requireLang } from "@/site/context";
 import { getPhotosForListings, getPublicListings } from "@/site/data";
 import { whatsappUrl } from "@/site/format";
 import { basePath, fill, t } from "@/site/i18n";
-import { LANDINGS, areasOf, landingFromSlug, matchesLanding } from "@/site/landing";
+import { LANDINGS, landingFromSlug, matchesLanding, placesOf, sortForLanding } from "@/site/landing";
 import { landingCommon, landingText } from "@/site/landingText";
 import { ct } from "@/site/costText";
 import { alternatesFor, OG_LOCALE } from "@/site/seo";
@@ -29,7 +29,7 @@ async function listingsFor(slug: string) {
     category: cfg.categories.length === 1 ? cfg.categories[0] : undefined,
     purpose: cfg.purpose,
   });
-  return { cfg, listings: fetched.filter((l) => matchesLanding(l, cfg)) };
+  return { cfg, listings: sortForLanding(fetched.filter((l) => matchesLanding(l, cfg))) };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -72,7 +72,7 @@ export default async function LandingPage({ params }: Props) {
   const costs = ct(lang);
   const { listings } = found;
   const photos = await getPhotosForListings(listings.map((l) => l.id));
-  const areas = areasOf(listings);
+  const areas = placesOf(listings);
   const canonical = alternatesFor(lang, `/${slug}`).canonical;
 
   const others = LANDINGS.filter((l) => l.slug !== slug);
@@ -100,7 +100,7 @@ export default async function LandingPage({ params }: Props) {
       description: text.metaDesc,
       url: canonical,
       inLanguage: lang === "zh" ? "zh-CN" : lang,
-      about: { "@type": "Place", name: slug.includes("perak") ? "Perak, Malaysia" : "Ipoh, Perak, Malaysia" },
+      about: { "@type": "Place", name: "Perak, Malaysia" },
       mainEntity: {
         "@type": "ItemList",
         numberOfItems: listings.length,
