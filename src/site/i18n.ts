@@ -217,6 +217,83 @@ type Dict = {
   dsrAssume3: string;
   dsrAssume4: string;
   dsrMobileWait: string;
+  rpTitle: string;
+  rpIntro: string;
+  rpCardText: string;
+  rpSecCategory: string;
+  rpCategoryHint: string;
+  rpPart1: string;
+  rpPart1Desc: string;
+  rpPart2: string;
+  rpPart2Desc: string;
+  rpPart3: string;
+  rpPart3Desc: string;
+  rpSellerKind: string;
+  rpIndividual: string;
+  rpOtherBody: string;
+  rpSellerKindHint: string;
+  rpSecProperty: string;
+  rpAcqPrice: string;
+  rpDispPrice: string;
+  rpAcqDate: string;
+  rpDispDate: string;
+  rpDateHint: string;
+  rpSecCosts: string;
+  rpCostsNote: string;
+  rpCostAcqLegal: string;
+  rpCostDispLegal: string;
+  rpCostStamp: string;
+  rpCostReno: string;
+  rpCostOther: string;
+  rpOptional: string;
+  rpSecExemption: string;
+  rpPrivate: string;
+  rpPrivateWarn: string;
+  rpPrivateNA: string;
+  rpErrCategory: string;
+  rpErrSellerKind: string;
+  rpErrRequired: string;
+  rpErrInvalid: string;
+  rpErrNegative: string;
+  rpErrZero: string;
+  rpErrTooHigh: string;
+  rpErrDateInvalid: string;
+  rpErrDateEarly: string;
+  rpErrDateOrder: string;
+  rpPending: string;
+  rpResult: string;
+  rpResCategory: string;
+  rpResHolding: string;
+  rpResRate: string;
+  rpResAcq: string;
+  rpResDisp: string;
+  rpResCosts: string;
+  rpResAdjusted: string;
+  rpResExemption: string;
+  rpResChargeable: string;
+  rpResTax: string;
+  rpBandWithin3: string;
+  rpBandYear4: string;
+  rpBandYear5: string;
+  rpBandYear6: string;
+  rpPeriod: string;
+  rpRatesTitle: string;
+  rpExIndividual: string;
+  rpExPrivate: string;
+  rpExNone: string;
+  rpNoGain: string;
+  rpLossNote: string;
+  rpAssumeTitle: string;
+  rpAssume1: string;
+  rpAssume2: string;
+  rpAssume3: string;
+  rpAssume4: string;
+  rpAssume5: string;
+  rpAssume6: string;
+  rpDisclaimer: string;
+  rpRetention: string;
+  rpWhatsapp: string;
+  rpWhatsappMsg: string;
 };
 
 const en: Dict = {
@@ -393,6 +470,83 @@ const en: Dict = {
   dsrAssume3: "This calculator uses 75% as its guide. Banks set their own limits and may treat income, expenses and commitments differently.",
   dsrAssume4: "The DSR is shown to two decimals, and the colour follows the figure you see: 75.00% and above is red.",
   dsrMobileWait: "Complete all fields",
+  rpTitle: "RPGT calculator",
+  rpIntro: "Estimate the Real Property Gains Tax (RPGT) on selling a property in Malaysia. Fill in the details and the result updates as you type.",
+  rpCardText: "Estimate the Real Property Gains Tax when you sell a property.",
+  rpSecCategory: "1. Who is selling?",
+  rpCategoryHint: "Choose the category that matches the seller. This decides the RPGT rates.",
+  rpPart1: "Part I",
+  rpPart1Desc: "Malaysian citizens, permanent residents and other Part I disposers.",
+  rpPart2: "Part II",
+  rpPart2Desc: "Malaysian-incorporated companies, trustees and registered bodies.",
+  rpPart3: "Part III",
+  rpPart3Desc: "Non-citizens, non-permanent residents and foreign-incorporated companies.",
+  rpSellerKind: "The seller is",
+  rpIndividual: "An individual",
+  rpOtherBody: "A company, trustee or other body",
+  rpSellerKindHint: "Only individuals qualify for the RM10,000 / 10% exemption.",
+  rpSecProperty: "2. Property details",
+  rpAcqPrice: "Acquisition price (RM)",
+  rpDispPrice: "Disposal price (RM)",
+  rpAcqDate: "Acquisition date (SPA date)",
+  rpDispDate: "Disposal date (SPA date)",
+  rpDateHint: "Use the date of the sale and purchase agreement.",
+  rpSecCosts: "3. Allowable costs",
+  rpCostsNote: "Only enter costs that qualify under the RPGT Act and that you can prove. Not every property expense can be deducted. Leave a field blank if there is none.",
+  rpCostAcqLegal: "Acquisition legal fees (RM)",
+  rpCostDispLegal: "Disposal legal fees (RM)",
+  rpCostStamp: "Acquisition stamp duty (RM)",
+  rpCostReno: "Qualifying renovation or enhancement expenditure (RM)",
+  rpCostOther: "Other allowable incidental expenses (RM)",
+  rpOptional: "Optional",
+  rpSecExemption: "4. Exemption",
+  rpPrivate: "I want to claim the once-in-a-lifetime private residence exemption",
+  rpPrivateWarn: "This election depends on eligibility and is generally irrevocable. Check with a tax adviser or LHDN before relying on it.",
+  rpPrivateNA: "Only for Malaysian citizens and permanent residents who are individuals (Part I).",
+  rpErrCategory: "Please choose a seller category.",
+  rpErrSellerKind: "Please say whether the seller is an individual or a company or other body.",
+  rpErrRequired: "This field is required.",
+  rpErrInvalid: "Enter a valid number.",
+  rpErrNegative: "This cannot be negative.",
+  rpErrZero: "This must be more than zero.",
+  rpErrTooHigh: "This amount is too high.",
+  rpErrDateInvalid: "Enter a valid date.",
+  rpErrDateEarly: "Dates before 1 January 1970 are not supported.",
+  rpErrDateOrder: "The disposal date cannot be before the acquisition date.",
+  rpPending: "Complete the required fields to see your estimate.",
+  rpResult: "Your RPGT estimate",
+  rpResCategory: "Seller category",
+  rpResHolding: "Holding period",
+  rpResRate: "Applicable RPGT rate",
+  rpResAcq: "Acquisition price",
+  rpResDisp: "Disposal price",
+  rpResCosts: "Total allowable expenses",
+  rpResAdjusted: "Adjusted gain",
+  rpResExemption: "Applicable exemption",
+  rpResChargeable: "Chargeable gain",
+  rpResTax: "Estimated RPGT payable",
+  rpBandWithin3: "Within 3 years",
+  rpBandYear4: "4th year",
+  rpBandYear5: "5th year",
+  rpBandYear6: "6th year onwards",
+  rpPeriod: "Disposal period",
+  rpRatesTitle: "RPGT rates (Schedule 5)",
+  rpExIndividual: "Individual exemption: the higher of RM10,000 or 10% of the gain",
+  rpExPrivate: "Private residence exemption (once in a lifetime)",
+  rpExNone: "None (not available to companies and other bodies)",
+  rpNoGain: "No chargeable gain, so no RPGT is payable.",
+  rpLossNote: "This disposal shows no gain, so no RPGT is payable.",
+  rpAssumeTitle: "How this is calculated",
+  rpAssume1: "Adjusted gain = disposal price − acquisition price − allowable expenses.",
+  rpAssume2: "The holding period is counted from the acquisition SPA date to the disposal SPA date using anniversaries, not by subtracting calendar years. A disposal on an anniversary stays in the earlier period.",
+  rpAssume3: "Individuals get an exemption of the higher of RM10,000 or 10% of the gain, never more than the gain. Companies, trustees and other bodies do not.",
+  rpAssume4: "Chargeable gain = adjusted gain − exemption. RPGT = chargeable gain × the rate for your category and holding period.",
+  rpAssume5: "If there is no positive chargeable gain, RPGT is RM 0.",
+  rpAssume6: "The private residence exemption is optional, only for Part I individuals, and only applies if you tick it.",
+  rpDisclaimer: "This is an indicative estimate based on the Real Property Gains Tax Act 1976 and Schedule 5. Actual RPGT depends on LHDN's assessment, your eligibility for exemptions and the documents you submit. It is not tax advice.",
+  rpRetention: "The retention sum a purchaser may have to withhold under section 21B is a separate matter. It is not calculated here and is not the same as the RPGT payable.",
+  rpWhatsapp: "Discuss my RPGT with Max",
+  rpWhatsappMsg: "Hi Max, I tried the RPGT calculator: {category}, acquired {acq} for {acqPrice}, disposing {disp} for {dispPrice}. Estimated RPGT {tax}. Can you advise me?",
 };
 
 const ms: Dict = {
@@ -570,6 +724,83 @@ const ms: Dict = {
   dsrAssume3: "Kalkulator ini menggunakan 75% sebagai panduan. Bank menetapkan had sendiri dan mungkin melayan pendapatan, perbelanjaan dan komitmen secara berbeza.",
   dsrAssume4: "DSR ditunjukkan dua tempat perpuluhan, dan warna mengikut angka yang anda lihat: 75.00% dan ke atas ialah merah.",
   dsrMobileWait: "Lengkapkan semua ruangan",
+  rpTitle: "Kalkulator CKHT",
+  rpIntro: "Anggarkan Cukai Keuntungan Harta Tanah (CKHT) apabila menjual hartanah di Malaysia. Isi butiran dan keputusan dikemas kini semasa anda menaip.",
+  rpCardText: "Anggarkan Cukai Keuntungan Harta Tanah apabila anda menjual hartanah.",
+  rpSecCategory: "1. Siapa penjual?",
+  rpCategoryHint: "Pilih kategori yang sepadan dengan penjual. Ini menentukan kadar CKHT.",
+  rpPart1: "Bahagian I",
+  rpPart1Desc: "Warganegara Malaysia, penduduk tetap dan pelupus Bahagian I yang lain.",
+  rpPart2: "Bahagian II",
+  rpPart2Desc: "Syarikat diperbadankan di Malaysia, pemegang amanah dan badan berdaftar.",
+  rpPart3: "Bahagian III",
+  rpPart3Desc: "Bukan warganegara, bukan penduduk tetap dan syarikat diperbadankan di luar negara.",
+  rpSellerKind: "Penjual ialah",
+  rpIndividual: "Individu",
+  rpOtherBody: "Syarikat, pemegang amanah atau badan lain",
+  rpSellerKindHint: "Hanya individu layak mendapat pengecualian RM10,000 / 10%.",
+  rpSecProperty: "2. Butiran hartanah",
+  rpAcqPrice: "Harga perolehan (RM)",
+  rpDispPrice: "Harga pelupusan (RM)",
+  rpAcqDate: "Tarikh perolehan (tarikh PJB)",
+  rpDispDate: "Tarikh pelupusan (tarikh PJB)",
+  rpDateHint: "Gunakan tarikh perjanjian jual beli.",
+  rpSecCosts: "3. Kos yang dibenarkan",
+  rpCostsNote: "Masukkan hanya kos yang layak di bawah Akta CKHT dan yang boleh anda buktikan. Tidak semua perbelanjaan hartanah boleh ditolak. Biarkan kosong jika tiada.",
+  rpCostAcqLegal: "Yuran guaman perolehan (RM)",
+  rpCostDispLegal: "Yuran guaman pelupusan (RM)",
+  rpCostStamp: "Duti setem perolehan (RM)",
+  rpCostReno: "Perbelanjaan pengubahsuaian atau peningkatan yang layak (RM)",
+  rpCostOther: "Perbelanjaan sampingan lain yang dibenarkan (RM)",
+  rpOptional: "Pilihan",
+  rpSecExemption: "4. Pengecualian",
+  rpPrivate: "Saya mahu menuntut pengecualian kediaman persendirian sekali seumur hidup",
+  rpPrivateWarn: "Pilihan ini bergantung pada kelayakan dan biasanya tidak boleh ditarik balik. Semak dengan penasihat cukai atau LHDN sebelum bergantung padanya.",
+  rpPrivateNA: "Hanya untuk warganegara Malaysia dan penduduk tetap yang merupakan individu (Bahagian I).",
+  rpErrCategory: "Sila pilih kategori penjual.",
+  rpErrSellerKind: "Sila nyatakan sama ada penjual ialah individu atau syarikat atau badan lain.",
+  rpErrRequired: "Ruangan ini wajib diisi.",
+  rpErrInvalid: "Masukkan nombor yang sah.",
+  rpErrNegative: "Nilai ini tidak boleh negatif.",
+  rpErrZero: "Nilai ini mesti lebih daripada sifar.",
+  rpErrTooHigh: "Jumlah ini terlalu tinggi.",
+  rpErrDateInvalid: "Masukkan tarikh yang sah.",
+  rpErrDateEarly: "Tarikh sebelum 1 Januari 1970 tidak disokong.",
+  rpErrDateOrder: "Tarikh pelupusan tidak boleh sebelum tarikh perolehan.",
+  rpPending: "Lengkapkan ruangan wajib untuk melihat anggaran anda.",
+  rpResult: "Anggaran CKHT anda",
+  rpResCategory: "Kategori penjual",
+  rpResHolding: "Tempoh pegangan",
+  rpResRate: "Kadar CKHT yang terpakai",
+  rpResAcq: "Harga perolehan",
+  rpResDisp: "Harga pelupusan",
+  rpResCosts: "Jumlah perbelanjaan dibenarkan",
+  rpResAdjusted: "Keuntungan terlaras",
+  rpResExemption: "Pengecualian yang terpakai",
+  rpResChargeable: "Keuntungan boleh dikenakan cukai",
+  rpResTax: "Anggaran CKHT yang perlu dibayar",
+  rpBandWithin3: "Dalam tempoh 3 tahun",
+  rpBandYear4: "Tahun ke-4",
+  rpBandYear5: "Tahun ke-5",
+  rpBandYear6: "Tahun ke-6 dan seterusnya",
+  rpPeriod: "Tempoh pelupusan",
+  rpRatesTitle: "Kadar CKHT (Jadual 5)",
+  rpExIndividual: "Pengecualian individu: yang lebih tinggi antara RM10,000 atau 10% daripada keuntungan",
+  rpExPrivate: "Pengecualian kediaman persendirian (sekali seumur hidup)",
+  rpExNone: "Tiada (tidak tersedia untuk syarikat dan badan lain)",
+  rpNoGain: "Tiada keuntungan boleh dikenakan cukai, jadi tiada CKHT perlu dibayar.",
+  rpLossNote: "Pelupusan ini tidak menunjukkan keuntungan, jadi tiada CKHT perlu dibayar.",
+  rpAssumeTitle: "Cara pengiraan",
+  rpAssume1: "Keuntungan terlaras = harga pelupusan − harga perolehan − perbelanjaan dibenarkan.",
+  rpAssume2: "Tempoh pegangan dikira dari tarikh PJB perolehan hingga tarikh PJB pelupusan menggunakan ulang tahun, bukan dengan menolak tahun kalendar. Pelupusan pada tarikh ulang tahun kekal dalam tempoh yang lebih awal.",
+  rpAssume3: "Individu mendapat pengecualian yang lebih tinggi antara RM10,000 atau 10% daripada keuntungan, tidak melebihi keuntungan. Syarikat, pemegang amanah dan badan lain tidak mendapatnya.",
+  rpAssume4: "Keuntungan boleh dikenakan cukai = keuntungan terlaras − pengecualian. CKHT = keuntungan boleh dikenakan cukai × kadar bagi kategori dan tempoh pegangan anda.",
+  rpAssume5: "Jika tiada keuntungan boleh dikenakan cukai yang positif, CKHT ialah RM 0.",
+  rpAssume6: "Pengecualian kediaman persendirian adalah pilihan, hanya untuk individu Bahagian I, dan hanya terpakai jika anda menandanya.",
+  rpDisclaimer: "Ini ialah anggaran petunjuk berdasarkan Akta Cukai Keuntungan Harta Tanah 1976 dan Jadual 5. CKHT sebenar bergantung pada penilaian LHDN, kelayakan anda untuk pengecualian dan dokumen yang anda kemukakan. Ini bukan nasihat cukai.",
+  rpRetention: "Jumlah penahanan yang mungkin perlu ditahan oleh pembeli di bawah seksyen 21B adalah perkara berasingan. Ia tidak dikira di sini dan tidak sama dengan CKHT yang perlu dibayar.",
+  rpWhatsapp: "Bincang CKHT saya dengan Max",
+  rpWhatsappMsg: "Hai Max, saya cuba kalkulator CKHT: {category}, diperoleh {acq} pada harga {acqPrice}, dilupuskan {disp} pada harga {dispPrice}. Anggaran CKHT {tax}. Boleh anda nasihatkan saya?",
 };
 
 const zh: Dict = {
@@ -742,6 +973,83 @@ const zh: Dict = {
   dsrAssume3: "本计算器以 75% 作为参考。各银行有自己的限额，对收入、开销和负担的处理也可能不同。",
   dsrAssume4: "DSR 显示至两位小数，颜色依据您看到的数字：75.00% 及以上为红色。",
   dsrMobileWait: "请填写所有栏位",
+  rpTitle: "RPGT 计算器",
+  rpIntro: "估算在马来西亚出售房产时需缴交的不动产盈利税（RPGT）。填写资料后，结果会在输入时即时更新。",
+  rpCardText: "估算出售房产时需缴交的不动产盈利税。",
+  rpSecCategory: "1. 卖家是谁？",
+  rpCategoryHint: "请选择与卖家相符的类别，这将决定适用的 RPGT 税率。",
+  rpPart1: "第一部分",
+  rpPart1Desc: "马来西亚公民、永久居民及其他第一部分处置人。",
+  rpPart2: "第二部分",
+  rpPart2Desc: "在马来西亚注册成立的公司、受托人及注册团体。",
+  rpPart3: "第三部分",
+  rpPart3Desc: "非公民、非永久居民及外国注册公司。",
+  rpSellerKind: "卖家是",
+  rpIndividual: "个人",
+  rpOtherBody: "公司、受托人或其他团体",
+  rpSellerKindHint: "只有个人才能享有 RM10,000 / 10% 的豁免。",
+  rpSecProperty: "2. 房产资料",
+  rpAcqPrice: "购入价格（RM）",
+  rpDispPrice: "出售价格（RM）",
+  rpAcqDate: "购入日期（买卖合约日期）",
+  rpDispDate: "出售日期（买卖合约日期）",
+  rpDateHint: "请使用买卖合约（SPA）上的日期。",
+  rpSecCosts: "3. 可扣除费用",
+  rpCostsNote: "请只填写符合 RPGT 法令规定且有凭证的费用。并非所有房产开销都可扣除。没有的栏位请留空。",
+  rpCostAcqLegal: "购入律师费（RM）",
+  rpCostDispLegal: "出售律师费（RM）",
+  rpCostStamp: "购入印花税（RM）",
+  rpCostReno: "符合资格的装修或提升开销（RM）",
+  rpCostOther: "其他可扣除的附带开销（RM）",
+  rpOptional: "选填",
+  rpSecExemption: "4. 豁免",
+  rpPrivate: "我想申请一生一次的自住房产豁免",
+  rpPrivateWarn: "此选择取决于是否符合资格，且一般不可撤销。在依赖之前，请向税务顾问或 LHDN 查证。",
+  rpPrivateNA: "仅适用于属于个人的马来西亚公民和永久居民（第一部分）。",
+  rpErrCategory: "请选择卖家类别。",
+  rpErrSellerKind: "请说明卖家是个人，还是公司或其他团体。",
+  rpErrRequired: "此栏必填。",
+  rpErrInvalid: "请输入有效数字。",
+  rpErrNegative: "不能为负数。",
+  rpErrZero: "必须大于零。",
+  rpErrTooHigh: "金额过高。",
+  rpErrDateInvalid: "请输入有效日期。",
+  rpErrDateEarly: "不支持 1970 年 1 月 1 日之前的日期。",
+  rpErrDateOrder: "出售日期不能早于购入日期。",
+  rpPending: "请填写必填栏位以查看估算结果。",
+  rpResult: "您的 RPGT 估算",
+  rpResCategory: "卖家类别",
+  rpResHolding: "持有期",
+  rpResRate: "适用的 RPGT 税率",
+  rpResAcq: "购入价格",
+  rpResDisp: "出售价格",
+  rpResCosts: "可扣除费用总额",
+  rpResAdjusted: "调整后盈利",
+  rpResExemption: "适用豁免",
+  rpResChargeable: "应课税盈利",
+  rpResTax: "预计应缴 RPGT",
+  rpBandWithin3: "3 年内",
+  rpBandYear4: "第 4 年",
+  rpBandYear5: "第 5 年",
+  rpBandYear6: "第 6 年起",
+  rpPeriod: "出售时期",
+  rpRatesTitle: "RPGT 税率（附表 5）",
+  rpExIndividual: "个人豁免：RM10,000 或盈利的 10%，取较高者",
+  rpExPrivate: "自住房产豁免（一生一次）",
+  rpExNone: "无（公司及其他团体不适用）",
+  rpNoGain: "没有应课税盈利，因此无须缴交 RPGT。",
+  rpLossNote: "此次出售没有盈利，因此无须缴交 RPGT。",
+  rpAssumeTitle: "计算方法",
+  rpAssume1: "调整后盈利 = 出售价格 − 购入价格 − 可扣除费用。",
+  rpAssume2: "持有期是按购入买卖合约日期至出售买卖合约日期的周年来计算，而不是把日历年份相减。恰好在周年日出售，仍属较早的时期。",
+  rpAssume3: "个人可获豁免，金额为 RM10,000 或盈利的 10%（取较高者），但不超过盈利。公司、受托人及其他团体不适用。",
+  rpAssume4: "应课税盈利 = 调整后盈利 − 豁免。RPGT = 应课税盈利 × 您的类别与持有期所对应的税率。",
+  rpAssume5: "如果没有正数的应课税盈利，RPGT 为 RM 0。",
+  rpAssume6: "自住房产豁免为选填，仅适用于第一部分的个人，并且只有在您勾选后才会应用。",
+  rpDisclaimer: "这是根据 1976 年不动产盈利税法令及附表 5 所作的参考估算。实际 RPGT 取决于 LHDN 的评估、您是否符合豁免资格以及您提交的文件。此内容不构成税务意见。",
+  rpRetention: "买方依据第 21B 条可能需要扣留的保留金是另一回事。此处不作计算，也不等于应缴的 RPGT。",
+  rpWhatsapp: "与 Max 讨论我的 RPGT",
+  rpWhatsappMsg: "你好 Max，我试用了 RPGT 计算器：{category}，{acq} 以 {acqPrice} 购入，{disp} 以 {dispPrice} 出售，预计 RPGT {tax}。可以给我一些建议吗？",
 };
 
 export const DICTS: Record<Lang, Dict> = { en, ms, zh };
@@ -772,4 +1080,12 @@ export function basePath(lang: Lang): string {
 export function fieldsLeftText(lang: Lang, n: number): string {
   if (lang === "en" && n === 1) return "1 field still needs an answer";
   return fill(t(lang).dsrProgress, { n });
+}
+
+/** "4 years, 2 months, 5 days" (English pluralises; BM and Chinese have no plural). */
+export function holdingText(lang: Lang, years: number, months: number, days: number): string {
+  if (lang === "ms") return `${years} tahun, ${months} bulan, ${days} hari`;
+  if (lang === "zh") return `${years} 年 ${months} 个月 ${days} 天`;
+  const unit = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+  return `${unit(years, "year", "years")}, ${unit(months, "month", "months")}, ${unit(days, "day", "days")}`;
 }

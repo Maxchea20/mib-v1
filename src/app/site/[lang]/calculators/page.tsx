@@ -44,6 +44,11 @@ export default async function CalculatorsHub({ params }: Props) {
       title: text.dsrTitle,
       body: text.dsrCardText,
     },
+    {
+      href: `${base}/calculators/rpgt`,
+      title: text.rpTitle,
+      body: text.rpCardText,
+    },
   ];
 
   return (

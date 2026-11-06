@@ -15,7 +15,7 @@
 |   /residential           -> /site/en/residential   (also commercial,
 |   /ms/residential           industrial, land; and each language)
 |   /listing/123           -> /site/en/listing/123   (and /ms /zh)
-|   /calculators, /calculators/housing-loan, /calculators/dsr -> /site/en/calculators...
+|   /calculators, /calculators/housing-loan, /calculators/dsr, /calculators/rpgt -> /site/en/calculators...
 |   /en  /en/...           -> 308 to the same path without /en
 |   /robots.txt /sitemap.xml /_next/...  -> pass through
 |   anything else          -> 404 (no CRM page, API route or login is
@@ -82,7 +82,7 @@ export function resolvePublicRoute(
     return { action: "rewrite", path: `/site/${lang}/${category[1]}` };
   }
 
-  const calculators = /^\/calculators(\/(?:housing-loan|dsr))?\/?$/.exec(rest);
+  const calculators = /^\/calculators(\/(?:housing-loan|dsr|rpgt))?\/?$/.exec(rest);
   if (calculators) {
     return { action: "rewrite", path: `/site/${lang}/calculators${calculators[1] ?? ""}` };
   }
