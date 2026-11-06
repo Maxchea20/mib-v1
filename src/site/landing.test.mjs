@@ -19,7 +19,12 @@ test("factories: Industrial + factory type + Ipoh", () => {
   const f = { category: "Industrial", property_type: "Factory" };
   assert.equal(m("factories-for-sale-ipoh", f), true);
   assert.equal(m("factories-for-sale-ipoh", { ...f, property_type: "Warehouse", property_sub_type: "Detached Factory" }), true);
-  assert.equal(m("factories-for-sale-ipoh", { ...f, property_type: "Warehouse" }), false);
+  assert.equal(m("factories-for-sale-ipoh", { ...f, property_type: "Industrial", property_sub_type: "Warehouse" }), true);
+  // every Industrial sub type MIB offers, other than land
+  for (const sub of ["Factory", "Warehouse", "Cluster factory", "Semi-D factory", "Detached factory", "Terrace factory"])
+    assert.equal(m("factories-for-sale-ipoh", { ...f, property_type: "Industrial", property_sub_type: sub }), true, sub);
+  assert.equal(m("factories-for-sale-ipoh", { ...f, property_type: "Industrial", property_sub_type: "Industrial Land" }), false);
+  assert.equal(m("factories-for-sale-ipoh", { ...f, property_type: "Industrial", property_sub_type: "Warehouse", state: "Perak", city: "Ipoh", area: "Menglembu" }), true);
   assert.equal(m("factories-for-sale-ipoh", { ...f, purpose: "For Rent" }), false);
   assert.equal(m("factories-for-sale-ipoh", { ...f, city: "Taiping" }), false);
 });
@@ -30,6 +35,10 @@ test("industrial land in Perak: land type industrial, any purpose, whole state",
   assert.equal(m("industrial-land-perak", { ...f, purpose: "For Rent" }), true);
   assert.equal(m("industrial-land-perak", { ...f, land_type: "Agriculture Land" }), false);
   assert.equal(m("industrial-land-perak", { ...f, state: "Selangor" }), false);
+  // an Industrial-category listing whose sub type is "Industrial Land" belongs here too
+  const ind = { category: "Industrial", property_type: "Industrial", property_sub_type: "Industrial Land", land_type: null, city: "Ipoh" };
+  assert.equal(m("industrial-land-perak", ind), true);
+  assert.equal(m("industrial-land-perak", { ...ind, property_sub_type: "Factory" }), false);
 });
 
 test("commercial in Ipoh (sale and rent) and land for sale in Perak", () => {

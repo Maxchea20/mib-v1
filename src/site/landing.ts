@@ -14,22 +14,28 @@ import type { PublicListing } from "./data";
 
 export type LandingConfig = {
   slug: string;
-  category: "Residential" | "Commercial" | "Industrial" | "Land";
+  /** One or more MIB categories. */
+  categories: ("Residential" | "Commercial" | "Industrial" | "Land")[];
   purpose?: "For Sale" | "For Rent";
   city?: string;
   state?: string;
   /** Matched against the property type, sub type and title. */
   typeMatch?: RegExp;
-  /** Matched against the land type only. */
+  /** Land category only: matched against the land type. */
   landTypeMatch?: RegExp;
+  /** Industrial category only: matched against the property sub type. */
+  subTypeMatch?: RegExp;
 };
 
 export const LANDINGS: LandingConfig[] = [
-  { slug: "houses-for-sale-ipoh", category: "Residential", purpose: "For Sale", city: "ipoh" },
-  { slug: "factories-for-sale-ipoh", category: "Industrial", purpose: "For Sale", city: "ipoh", typeMatch: /factory|kilang|工厂/i },
-  { slug: "industrial-land-perak", category: "Land", state: "perak", landTypeMatch: /industr/i },
-  { slug: "commercial-property-ipoh", category: "Commercial", city: "ipoh" },
-  { slug: "land-for-sale-perak", category: "Land", purpose: "For Sale", state: "perak" },
+  { slug: "houses-for-sale-ipoh", categories: ["Residential"], purpose: "For Sale", city: "ipoh" },
+  // MIB Industrial sub types: Factory, Warehouse, Cluster / Semi-D / Detached / Terrace factory, Industrial Land.
+  { slug: "factories-for-sale-ipoh", categories: ["Industrial"], purpose: "For Sale", city: "ipoh", typeMatch: /factory|kilang|warehouse|gudang|工厂|仓库/i },
+  // Industrial land is either a Land listing with the industrial land type,
+  // or an Industrial listing whose sub type is "Industrial Land".
+  { slug: "industrial-land-perak", categories: ["Land", "Industrial"], state: "perak", landTypeMatch: /industr/i, subTypeMatch: /industrial land|tanah perindustrian|工业用地/i },
+  { slug: "commercial-property-ipoh", categories: ["Commercial"], city: "ipoh" },
+  { slug: "land-for-sale-perak", categories: ["Land"], purpose: "For Sale", state: "perak" },
 ];
 
 export const LANDING_SLUGS = LANDINGS.map((l) => l.slug);
@@ -41,7 +47,7 @@ export function landingFromSlug(slug: string): LandingConfig | null {
 const norm = (v: string | null | undefined) => (v ?? "").trim().toLowerCase();
 
 export function matchesLanding(l: PublicListing, c: LandingConfig): boolean {
-  if (l.category !== c.category) return false;
+  if (!l.category || !(c.categories as string[]).includes(l.category)) return false;
   if (c.purpose && l.purpose !== c.purpose) return false;
   if (c.city && norm(l.city) !== c.city) return false;
   if (c.state && norm(l.state) !== c.state) return false;
@@ -49,7 +55,13 @@ export function matchesLanding(l: PublicListing, c: LandingConfig): boolean {
     const hay = [l.property_type, l.property_sub_type, l.title].filter(Boolean).join(" ");
     if (!c.typeMatch.test(hay)) return false;
   }
-  if (c.landTypeMatch && !c.landTypeMatch.test(l.land_type ?? "")) return false;
+  if (c.landTypeMatch || c.subTypeMatch) {
+    const asLand = l.category === "Land" && c.landTypeMatch?.test(l.land_type ?? "");
+    const asIndustrial = l.category === "Industrial" && c.subTypeMatch?.test(
+      [l.property_sub_type, l.property_type].filter(Boolean).join(" ")
+    );
+    if (!asLand && !asIndustrial) return false;
+  }
   return true;
 }
 

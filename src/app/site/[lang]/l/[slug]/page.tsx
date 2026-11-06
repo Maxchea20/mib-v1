@@ -25,8 +25,11 @@ export function generateStaticParams() {
 async function listingsFor(slug: string) {
   const cfg = landingFromSlug(slug);
   if (!cfg) return null;
-  const inCategory = await getPublicListings({ category: cfg.category, purpose: cfg.purpose });
-  return { cfg, listings: inCategory.filter((l) => matchesLanding(l, cfg)) };
+  const fetched = await getPublicListings({
+    category: cfg.categories.length === 1 ? cfg.categories[0] : undefined,
+    purpose: cfg.purpose,
+  });
+  return { cfg, listings: fetched.filter((l) => matchesLanding(l, cfg)) };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
