@@ -15,6 +15,7 @@
 |   /residential           -> /site/en/residential   (also commercial,
 |   /ms/residential           industrial, land; and each language)
 |   /listing/123           -> /site/en/listing/123   (and /ms /zh)
+|   /houses-for-sale-ipoh and the other four search pages -> /site/en/l/<slug>
 |   /calculators, /calculators/housing-loan, /calculators/dsr, /calculators/rpgt, /calculators/legal-fees, /calculators/purchase-cost, /calculators/rental-yield -> /site/en/calculators...
 |   /en  /en/...           -> 308 to the same path without /en
 |   /robots.txt /sitemap.xml /_next/...  -> pass through
@@ -80,6 +81,11 @@ export function resolvePublicRoute(
   const category = /^\/(residential|commercial|industrial|land)\/?$/.exec(rest);
   if (category) {
     return { action: "rewrite", path: `/site/${lang}/${category[1]}` };
+  }
+
+  const landing = /^\/(houses-for-sale-ipoh|factories-for-sale-ipoh|industrial-land-perak|commercial-property-ipoh|land-for-sale-perak)\/?$/.exec(rest);
+  if (landing) {
+    return { action: "rewrite", path: `/site/${lang}/l/${landing[1]}` };
   }
 
   const calculators = /^\/calculators(\/(?:housing-loan|dsr|rpgt|legal-fees|purchase-cost|rental-yield))?\/?$/.exec(rest);
