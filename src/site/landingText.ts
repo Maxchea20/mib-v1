@@ -141,8 +141,8 @@ const TEXT: Record<string, Record<Lang, LandingText>> = {
       nav: "Factories for sale in Ipoh",
       h1: "Factories for sale in Ipoh",
       metaTitle: "Factories for sale in Ipoh, Perak",
-      metaDesc: "Factories and industrial buildings for sale in Ipoh, Perak. See the details and chat directly with Max, a registered estate negotiator (REN 31953).",
-      intro: "Factories and industrial buildings for sale in Ipoh, Perak. Each listing shows the asking price, the area and the key details, and Max can answer questions about size, tenure and suitability for your business on WhatsApp.",
+      metaDesc: "Factories and warehouses for sale in Ipoh, Perak. See the details and chat directly with Max, a registered estate negotiator (REN 31953).",
+      intro: "Factories and warehouses for sale in Ipoh, Perak, including detached, semi-detached, terrace and cluster factories. Each listing shows the asking price, the area and the key details, and Max can answer questions about size, tenure and suitability for your business on WhatsApp.",
       faq: [
         { q: "What should I check before buying a factory?", a: "Check the land title and tenure, the permitted use of the land, the building's size and condition, and the power supply. Ask Max for the details of the listing you like." },
         { q: "Is financing different for industrial property?", a: "Banks often lend a smaller share of the price for industrial property than for a home, and terms vary. Confirm with your bank, then use the calculators below to plan." },
@@ -153,8 +153,8 @@ const TEXT: Record<string, Record<Lang, LandingText>> = {
       nav: "Kilang dijual di Ipoh",
       h1: "Kilang dijual di Ipoh",
       metaTitle: "Kilang dijual di Ipoh, Perak",
-      metaDesc: "Kilang dan bangunan perindustrian dijual di Ipoh, Perak. Lihat butiran dan berbual terus dengan Max, ejen harta tanah berdaftar (REN 31953).",
-      intro: "Kilang dan bangunan perindustrian dijual di Ipoh, Perak. Setiap senarai menunjukkan harga, kawasan dan butiran penting, dan Max boleh menjawab soalan tentang saiz, pegangan dan kesesuaian untuk perniagaan anda di WhatsApp.",
+      metaDesc: "Kilang dan gudang dijual di Ipoh, Perak. Lihat butiran dan berbual terus dengan Max, ejen harta tanah berdaftar (REN 31953).",
+      intro: "Kilang dan gudang dijual di Ipoh, Perak, termasuk kilang sesebuah, berkembar, teres dan kluster. Setiap senarai menunjukkan harga, kawasan dan butiran penting, dan Max boleh menjawab soalan tentang saiz, pegangan dan kesesuaian untuk perniagaan anda di WhatsApp.",
       faq: [
         { q: "Apa yang perlu disemak sebelum membeli kilang?", a: "Semak hak milik dan pegangan tanah, kegunaan tanah yang dibenarkan, saiz dan keadaan bangunan, serta bekalan elektrik. Tanya Max untuk butiran senarai yang anda suka." },
         { q: "Adakah pembiayaan berbeza untuk hartanah perindustrian?", a: "Bank selalunya meminjamkan peratusan harga yang lebih kecil untuk hartanah perindustrian berbanding rumah, dan terma berbeza. Sahkan dengan bank anda, kemudian gunakan kalkulator di bawah untuk merancang." },
@@ -165,8 +165,8 @@ const TEXT: Record<string, Record<Lang, LandingText>> = {
       nav: "怡保工厂出售",
       h1: "怡保工厂出售",
       metaTitle: "怡保工厂出售（霹雳）",
-      metaDesc: "霹雳怡保的工厂及工业建筑出售。查看详情并直接联系注册房地产经纪 Max (REN 31953)。",
-      intro: "霹雳怡保的工厂及工业建筑出售。每个房源都列明售价、区域和主要资料，关于面积、地契年限以及是否适合您的业务，都可以通过 WhatsApp 向 Max 查询。",
+      metaDesc: "霹雳怡保的工厂及仓库出售。查看详情并直接联系注册房地产经纪 Max (REN 31953)。",
+      intro: "霹雳怡保的工厂及仓库出售，包括独立式、半独立式、排屋式和组合式工厂。每个房源都列明售价、区域和主要资料，关于面积、地契年限以及是否适合您的业务，都可以通过 WhatsApp 向 Max 查询。",
       faq: [
         { q: "购买工厂前应该检查什么？", a: "请检查地契和年限、土地许可用途、建筑面积和状况，以及电力供应。可向 Max 询问您喜欢的房源详情。" },
         { q: "工业房产的融资不同吗？", a: "银行对工业房产的贷款成数通常比住宅低，条件也各不相同。请先向银行确认，再用下方的计算器规划。" },
