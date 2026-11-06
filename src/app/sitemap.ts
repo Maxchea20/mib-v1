@@ -34,6 +34,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...entry("/", "daily", 1),
     ...CATEGORIES.flatMap((c) => entry(`/${c.slug}`, "daily", 0.9)),
+    ...entry("/calculators", "weekly", 0.7),
+    ...entry("/calculators/housing-loan", "weekly", 0.8),
     ...ids.flatMap((id) => entry(`/listing/${id}`, "weekly", 0.8)),
   ];
 }

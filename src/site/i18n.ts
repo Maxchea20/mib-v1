@@ -131,6 +131,47 @@ type Dict = {
   allPurposes: string;
   groupBy: string;
   countProps: string; // {n}
+  calcNav: string;
+  calcHubTitle: string;
+  calcHubIntro: string;
+  calcOpen: string;
+  hlTitle: string;
+  hlIntro: string;
+  hlCardText: string;
+  hlPrice: string;
+  hlMargin: string;
+  hlMarginHint: string;
+  hlTenure: string;
+  hlTenureHint: string;
+  hlRate: string;
+  hlRateHint: string;
+  hlYears: string;
+  hlReset: string;
+  hlResults: string;
+  hlMonthly: string;
+  hlLoanAmount: string;
+  hlDownPayment: string;
+  hlTotalInterest: string;
+  hlTotalRepayment: string;
+  hlBreakdown: string;
+  hlPrincipal: string;
+  hlInterest: string;
+  hlMonthsLabel: string;
+  hlInvalid: string;
+  hlErrPrice: string;
+  hlErrPriceHigh: string;
+  hlErrMargin: string;
+  hlErrTenure: string;
+  hlErrRate: string;
+  hlAssumeTitle: string;
+  hlAssume1: string;
+  hlAssume2: string;
+  hlAssume3: string;
+  hlAssume4: string;
+  hlAssume5: string;
+  hlDisclaimer: string;
+  hlWhatsapp: string;
+  hlWhatsappMsg: string;
 };
 
 const en: Dict = {
@@ -221,6 +262,47 @@ const en: Dict = {
   allPurposes: "Buy or rent",
   groupBy: "Type",
   countProps: "{n} properties",
+  calcNav: "Calculators",
+  calcHubTitle: "Property calculators",
+  calcHubIntro: "Free tools to help you plan your purchase. No sign-up needed.",
+  calcOpen: "Open calculator",
+  hlTitle: "Housing loan calculator",
+  hlIntro: "Estimate your monthly instalment, down payment and total interest. The results update as you type.",
+  hlCardText: "Estimate your monthly instalment, down payment and total interest.",
+  hlPrice: "Property price (RM)",
+  hlMargin: "Loan margin (%)",
+  hlMarginHint: "The share of the price that the bank finances.",
+  hlTenure: "Loan tenure (years)",
+  hlTenureHint: "A longer tenure lowers the instalment but increases the total interest.",
+  hlRate: "Interest rate (% per year)",
+  hlRateHint: "Enter your bank's rate. 4.5% is only an example.",
+  hlYears: "years",
+  hlReset: "Reset to example values",
+  hlResults: "Your estimate",
+  hlMonthly: "Estimated monthly instalment",
+  hlLoanAmount: "Loan amount",
+  hlDownPayment: "Down payment",
+  hlTotalInterest: "Total interest",
+  hlTotalRepayment: "Total repayment",
+  hlBreakdown: "Where your money goes",
+  hlPrincipal: "Loan amount",
+  hlInterest: "Interest",
+  hlMonthsLabel: "{n} monthly payments",
+  hlInvalid: "Please correct the highlighted fields to see your estimate.",
+  hlErrPrice: "Enter a property price above RM 0.",
+  hlErrPriceHigh: "This price is too high for the calculator.",
+  hlErrMargin: "Enter a loan margin between 1% and 100%.",
+  hlErrTenure: "Enter a tenure between 1 and 40 years.",
+  hlErrRate: "Enter an interest rate between 0% and 25%.",
+  hlAssumeTitle: "How this is calculated",
+  hlAssume1: "Reducing-balance method: interest is charged every month on the loan still outstanding, not on the original amount.",
+  hlAssume2: "Monthly instalment = L × r ÷ (1 − (1 + r)^−n), where L is the loan amount, r is the yearly rate ÷ 12, and n is the number of months.",
+  hlAssume3: "The interest rate is assumed to stay the same for the whole tenure. Real bank rates can change over time.",
+  hlAssume4: "Legal fees, stamp duty, insurance and other charges are not included.",
+  hlAssume5: "The instalment is rounded to the nearest sen. Total repayment is the instalment multiplied by the number of months.",
+  hlDisclaimer: "This calculator gives an estimate only. Actual amounts depend on your bank's terms and are subject to bank approval.",
+  hlWhatsapp: "Ask Max about this loan",
+  hlWhatsappMsg: "Hi Max, I tried the housing loan calculator: property price {price}, margin {margin}%, {years} years at {rate}% a year, about {monthly} a month. Can you advise me?",
 };
 
 const ms: Dict = {
@@ -312,6 +394,47 @@ const ms: Dict = {
   allPurposes: "Beli atau sewa",
   groupBy: "Jenis",
   countProps: "{n} hartanah",
+  calcNav: "Kalkulator",
+  calcHubTitle: "Kalkulator hartanah",
+  calcHubIntro: "Alat percuma untuk membantu anda merancang pembelian. Tiada pendaftaran diperlukan.",
+  calcOpen: "Buka kalkulator",
+  hlTitle: "Kalkulator pinjaman perumahan",
+  hlIntro: "Anggarkan ansuran bulanan, bayaran pendahuluan dan jumlah faedah anda. Keputusan dikemas kini semasa anda menaip.",
+  hlCardText: "Anggarkan ansuran bulanan, bayaran pendahuluan dan jumlah faedah.",
+  hlPrice: "Harga hartanah (RM)",
+  hlMargin: "Margin pembiayaan (%)",
+  hlMarginHint: "Peratusan harga yang dibiayai oleh bank.",
+  hlTenure: "Tempoh pinjaman (tahun)",
+  hlTenureHint: "Tempoh lebih panjang menurunkan ansuran tetapi menambah jumlah faedah.",
+  hlRate: "Kadar faedah (% setahun)",
+  hlRateHint: "Masukkan kadar bank anda. 4.5% hanyalah contoh.",
+  hlYears: "tahun",
+  hlReset: "Set semula kepada nilai contoh",
+  hlResults: "Anggaran anda",
+  hlMonthly: "Anggaran ansuran bulanan",
+  hlLoanAmount: "Jumlah pinjaman",
+  hlDownPayment: "Bayaran pendahuluan",
+  hlTotalInterest: "Jumlah faedah",
+  hlTotalRepayment: "Jumlah bayaran balik",
+  hlBreakdown: "Ke mana wang anda pergi",
+  hlPrincipal: "Jumlah pinjaman",
+  hlInterest: "Faedah",
+  hlMonthsLabel: "{n} bayaran bulanan",
+  hlInvalid: "Sila betulkan ruangan yang ditandakan untuk melihat anggaran anda.",
+  hlErrPrice: "Masukkan harga hartanah melebihi RM 0.",
+  hlErrPriceHigh: "Harga ini terlalu tinggi untuk kalkulator.",
+  hlErrMargin: "Masukkan margin pembiayaan antara 1% dan 100%.",
+  hlErrTenure: "Masukkan tempoh antara 1 dan 40 tahun.",
+  hlErrRate: "Masukkan kadar faedah antara 0% dan 25%.",
+  hlAssumeTitle: "Cara pengiraan",
+  hlAssume1: "Kaedah baki berkurangan: faedah dikenakan setiap bulan ke atas baki pinjaman, bukan ke atas jumlah asal.",
+  hlAssume2: "Ansuran bulanan = L × r ÷ (1 − (1 + r)^−n), dengan L ialah jumlah pinjaman, r ialah kadar setahun ÷ 12, dan n ialah bilangan bulan.",
+  hlAssume3: "Kadar faedah dianggap sama sepanjang tempoh. Kadar bank sebenar boleh berubah dari semasa ke semasa.",
+  hlAssume4: "Yuran guaman, duti setem, insurans dan caj lain tidak termasuk.",
+  hlAssume5: "Ansuran dibundarkan kepada sen terdekat. Jumlah bayaran balik ialah ansuran darab bilangan bulan.",
+  hlDisclaimer: "Kalkulator ini hanya memberi anggaran. Jumlah sebenar bergantung pada terma bank anda dan tertakluk kepada kelulusan bank.",
+  hlWhatsapp: "Tanya Max tentang pinjaman ini",
+  hlWhatsappMsg: "Hai Max, saya cuba kalkulator pinjaman perumahan: harga hartanah {price}, margin {margin}%, {years} tahun pada {rate}% setahun, kira-kira {monthly} sebulan. Boleh anda nasihatkan saya?",
 };
 
 const zh: Dict = {
@@ -398,6 +521,47 @@ const zh: Dict = {
   allPurposes: "购买或租赁",
   groupBy: "类型",
   countProps: "共 {n} 个房产",
+  calcNav: "计算器",
+  calcHubTitle: "房产计算器",
+  calcHubIntro: "免费工具，帮助您规划购房。无需注册。",
+  calcOpen: "打开计算器",
+  hlTitle: "房屋贷款计算器",
+  hlIntro: "估算您的每月还款额、首期付款和总利息。输入时结果即时更新。",
+  hlCardText: "估算每月还款额、首期付款和总利息。",
+  hlPrice: "房产价格（RM）",
+  hlMargin: "贷款成数（%）",
+  hlMarginHint: "银行提供贷款占房价的比例。",
+  hlTenure: "贷款年限（年）",
+  hlTenureHint: "年限越长，每月还款越低，但总利息越高。",
+  hlRate: "年利率（%）",
+  hlRateHint: "请输入您银行的利率。4.5% 仅为示例。",
+  hlYears: "年",
+  hlReset: "恢复示例数值",
+  hlResults: "您的估算结果",
+  hlMonthly: "预计每月还款额",
+  hlLoanAmount: "贷款金额",
+  hlDownPayment: "首期付款",
+  hlTotalInterest: "总利息",
+  hlTotalRepayment: "总还款额",
+  hlBreakdown: "您的钱用在哪里",
+  hlPrincipal: "贷款本金",
+  hlInterest: "利息",
+  hlMonthsLabel: "共 {n} 期月供",
+  hlInvalid: "请更正标出的栏位，以查看您的估算结果。",
+  hlErrPrice: "请输入大于 RM 0 的房产价格。",
+  hlErrPriceHigh: "此价格超出计算器范围。",
+  hlErrMargin: "请输入 1% 至 100% 之间的贷款成数。",
+  hlErrTenure: "请输入 1 至 40 年之间的贷款年限。",
+  hlErrRate: "请输入 0% 至 25% 之间的年利率。",
+  hlAssumeTitle: "计算方法",
+  hlAssume1: "递减余额法：利息按尚未还清的贷款余额逐月计算，而不是按原始贷款额计算。",
+  hlAssume2: "每月还款额 = L × r ÷ (1 − (1 + r)^−n)，其中 L 为贷款金额，r 为年利率 ÷ 12，n 为总月数。",
+  hlAssume3: "假设整个贷款期间利率不变。银行实际利率可能随时间变动。",
+  hlAssume4: "不包括律师费、印花税、保险及其他费用。",
+  hlAssume5: "每月还款额四舍五入至最接近的仙。总还款额 = 每月还款额 × 月数。",
+  hlDisclaimer: "本计算器仅提供估算。实际金额取决于银行的条款，并须经银行批准。",
+  hlWhatsapp: "向 Max 咨询此贷款",
+  hlWhatsappMsg: "你好 Max，我试用了房屋贷款计算器：房产价格 {price}，贷款成数 {margin}%，{years} 年，年利率 {rate}%，每月约 {monthly}。可以给我一些建议吗？",
 };
 
 export const DICTS: Record<Lang, Dict> = { en, ms, zh };

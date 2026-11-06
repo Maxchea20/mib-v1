@@ -89,6 +89,7 @@ export default async function SiteLayout({
             <Link href={`${base}/commercial`} className="hover:text-[var(--mp-accent)]">{text.navCommercial}</Link>
             <Link href={`${base}/industrial`} className="hover:text-[var(--mp-accent)]">{text.navIndustrial}</Link>
             <Link href={`${base}/land`} className="hover:text-[var(--mp-accent)]">{text.navLand}</Link>
+            <Link href={`${base}/calculators`} className="hover:text-[var(--mp-accent)]">{text.calcNav}</Link>
           </nav>
 
           <div className="flex items-center gap-3">

@@ -28,6 +28,16 @@ test("BM and Chinese pages rewrite with their language", () => {
   }
 });
 
+test("calculator pages rewrite in every language", () => {
+  assert.deepEqual(r("/calculators"), { action: "rewrite", path: "/site/en/calculators" });
+  assert.deepEqual(r("/calculators/"), { action: "rewrite", path: "/site/en/calculators" });
+  assert.deepEqual(r("/calculators/housing-loan"), { action: "rewrite", path: "/site/en/calculators/housing-loan" });
+  assert.deepEqual(r("/ms/calculators/housing-loan"), { action: "rewrite", path: "/site/ms/calculators/housing-loan" });
+  assert.deepEqual(r("/zh/calculators"), { action: "rewrite", path: "/site/zh/calculators" });
+  for (const bad of ["/calculators/other", "/calculators/housing-loan/x", "/calculators/stamp-duty", "/Calculators"])
+    assert.deepEqual(r(bad), { action: "notfound" }, bad);
+});
+
 test("/en is a duplicate: redirect to the unprefixed address", () => {
   assert.deepEqual(r("/en"), { action: "redirect-path", path: "/" });
   assert.deepEqual(r("/en/"), { action: "redirect-path", path: "/" });
