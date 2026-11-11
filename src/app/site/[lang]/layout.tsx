@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
-import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "../../globals.css";
 import "./site.css";
 import LangSwitch from "@/components/site/LangSwitch";
@@ -15,15 +15,18 @@ import { landingCommon, landingText } from "@/site/landingText";
 import { HOME_SEO, OG_LOCALE } from "@/site/seo";
 import { whatsappUrl } from "@/site/format";
 
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+// Self-hosted (see ./fonts/README.md): no download from Google at build time.
+const jakarta = localFont({
+  src: "./fonts/plus-jakarta-sans-latin-wght-normal.woff2",
+  weight: "200 800",
+  style: "normal",
   display: "swap",
 });
 
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["600", "700"],
+const playfair = localFont({
+  src: "./fonts/playfair-display-latin-wght-normal.woff2",
+  weight: "400 900",
+  style: "normal",
   display: "swap",
   variable: "--mp-font-display",
 });
