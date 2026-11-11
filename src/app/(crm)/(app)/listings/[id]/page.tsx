@@ -11,7 +11,7 @@ import AIFacebookContentButton from "@/components/ai/AIFacebookContentButton";
 import AIDescriptionButton from "@/components/ai/AIDescriptionButton";
 import AIHighlightsButton from "@/components/ai/AIHighlightsButton";
 import AIDesignTab from "@/components/ai/AIDesignTab";
-import AIVideoTab from "@/components/ai/AIVideoTab";
+import QuickVideoTab from "@/components/ai/QuickVideoTab";
 import PublicToggle from "@/components/listings/PublicToggle";
 import ShareKit from "@/components/listings/ShareKit";
 
@@ -23,7 +23,7 @@ export default async function ListingProfilePage({ params }: Props) {
   const { id } = await params;
   const { data: listing } = await supabase
     .from("properties")
-    .select(`*, property_photos ( photo_type, image_url )`)
+    .select(`*, property_photos ( id, photo_type, image_url )`)
     .eq("id", id)
     .single();
 
@@ -196,7 +196,7 @@ export default async function ListingProfilePage({ params }: Props) {
         }
         gallery={<MediaManager propertyId={listing.id} category={listing.category} />}
         aiDesign={<AIDesignTab key={`ai-design-${listing.id}`} listing={listing} />}
-        aiVideo={<AIVideoTab key={`ai-video-${listing.id}`} listing={listing} />}
+        aiVideo={<QuickVideoTab key={`quick-video-${listing.id}`} listing={listing} />}
         share={<ShareKit key={`share-${listing.id}`} listing={listing} />}
       />
 
