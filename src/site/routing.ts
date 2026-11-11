@@ -18,7 +18,7 @@
 |   /houses-for-sale-ipoh and the other four search pages -> /site/en/l/<slug>
 |   /calculators, /calculators/housing-loan, /calculators/dsr, /calculators/rpgt, /calculators/legal-fees, /calculators/purchase-cost, /calculators/rental-yield -> /site/en/calculators...
 |   /en  /en/...           -> 308 to the same path without /en
-|   /robots.txt /sitemap.xml /_next/...  -> pass through
+|   /robots.txt /sitemap.xml /_next/... /_vercel/...  -> pass through
 |   anything else          -> 404 (no CRM page, API route or login is
 |                             reachable from the public host)
 |
@@ -53,7 +53,8 @@ export function resolvePublicRoute(
     return { action: "redirect", host: host.slice(4) };
   }
 
-  if (pathname.startsWith("/_next/")) {
+  // /_next/ (assets) and /_vercel/ (visitor analytics script and events) are never pages.
+  if (pathname.startsWith("/_next/") || pathname.startsWith("/_vercel/")) {
     return { action: "pass" };
   }
 

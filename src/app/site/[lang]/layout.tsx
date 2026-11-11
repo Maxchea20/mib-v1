@@ -6,6 +6,7 @@ import "./site.css";
 import LangSwitch from "@/components/site/LangSwitch";
 import WhatsAppIcon from "@/components/site/WhatsAppIcon";
 import { BRAND, BRAND_CSS_VARS } from "@/site/brand";
+import { Analytics } from "@vercel/analytics/next";
 import { Suspense } from "react";
 import { requireLang } from "@/site/context";
 import { HTML_LANG, LANGS, basePath, t } from "@/site/i18n";
@@ -157,6 +158,8 @@ export default async function SiteLayout({
         </div>
       </footer>
     </div>
+    {/* Anonymous visitor counting for the public site only (never the CRM). */}
+    <Analytics />
     </body>
     </html>
   );
