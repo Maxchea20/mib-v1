@@ -224,3 +224,90 @@ export function buildCaption(l: ShareListing, lang: Lang): string {
 export function withLink(caption: string, id: number | string, lang: Lang, channel: ShareChannel): string {
   return caption.split(LINK_TOKEN).join(trackedUrl(id, lang, channel));
 }
+
+/* =====================================================================
+   VIDEO CAPTIONS: one style per app (TikTok, Instagram, Xiaohongshu)
+   ===================================================================== */
+
+export type Platform = "tiktok" | "instagram" | "xiaohongshu";
+
+export type PlatformCaption = {
+  /** Xiaohongshu has a separate title box (20 characters at most). */
+  title: string;
+  body: string;
+  /** What to paste: the title and the text together where the app has one box. */
+  full: string;
+};
+
+/** Perak towns in Chinese. Anything not listed keeps its normal spelling. */
+const ZH_PLACES: Record<string, string> = {
+  ipoh: "怡保", perak: "霹雳", taiping: "太平", kampar: "金宝", "batu gajah": "华都牙也",
+  "teluk intan": "安顺", sitiawan: "实兆远", lumut: "红土坎", menglembu: "万里望", "kuala kangsar": "江沙",
+};
+const zhPlace = (v: string) => ZH_PLACES[v.trim().toLowerCase()] ?? v.trim();
+
+/** RM 1,500,000 -> "RM1.5m" / "150万"; short forms for titles. */
+function shortPrice(price: number, lang: Lang): string {
+  if (lang === "zh") {
+    if (price >= 10000) return `${Math.round((price / 10000) * 10) / 10}万`.replace(".0万", "万");
+    return `${price}`;
+  }
+  if (price >= 1_000_000) return `RM${Math.round((price / 1_000_000) * 100) / 100}m`;
+  if (price >= 1000) return `RM${Math.round(price / 1000)}k`;
+  return `RM${price}`;
+}
+
+export function buildPlatformCaption(l: ShareListing, lang: Lang, platform: Platform, opts: { includeContact?: boolean } = {}): PlatformCaption {
+  const rent = l.purpose === "For Rent";
+  const emoji = EMOJI[l.category ?? ""] ?? "🏠";
+  const place = placeOf(l);
+  const type = typeLabel(l, lang);
+  const facts = buildCaption(l, lang).split("\n\n")[1] ?? "";   // price · rooms · size · tenure
+  const n = Number(l.price);
+  const hasPrice = Number.isFinite(n) && n > 0;
+  const site = `${BRAND.siteUrl.replace(/^https?:\/\//, "")}/listing/${l.id}`;
+  const wa = `WhatsApp ${BRAND.whatsappDisplay}`;
+  const ren = BRAND.renNumber ? `REN ${BRAND.renNumber}` : "";
+  const cta = lang === "ms" ? "Mesej Max untuk butiran dan lawatan 👇" : lang === "zh" ? "联系 Max 了解详情与安排看房 👇" : "Message Max for details and viewing 👇";
+  const head =
+    lang === "ms" ? `${type} untuk ${rent ? "disewa" : "dijual"}${place ? ` di ${place}` : ""}` :
+    lang === "zh" ? `${place ? `${place.split(", ").map(zhPlace).join(" ")} ` : ""}${type}${rent ? "出租" : "出售"}` :
+    `${type} for ${rent ? "rent" : "sale"}${place ? ` in ${place}` : ""}`;
+
+  if (platform === "tiktok") {
+    // short: TikTok viewers read the first line only
+    const tags = hashtagsFor(l, lang).slice(0, 5).join(" ");
+    const body = [`${emoji} ${head}`, facts, [wa, site].join("\n"), tags].filter(Boolean).join("\n\n");
+    return { title: "", body, full: body };
+  }
+
+  if (platform === "instagram") {
+    const link = lang === "ms" ? "Pautan di bio 🔗" : lang === "zh" ? "链接在个人简介 🔗" : "Link in bio 🔗";
+    const body = [`${emoji} ${head}`, facts, [cta, wa, ren].filter(Boolean).join("\n"), link, hashtagsFor(l, lang).join(" ")].filter(Boolean).join("\n\n");
+    return { title: "", body, full: body };
+  }
+
+  // Xiaohongshu: a short title, then emoji lines. Phone numbers and links are left out by default.
+  const city = zhPlace((l.city || l.area || "").trim());
+  const t = lang === "zh"
+    ? `${city ? `${city}｜` : ""}${type}${rent ? "出租" : "出售"}${hasPrice ? ` ${shortPrice(n, "zh")}` : ""}`
+    : `${city ? `${city}｜` : ""}${type} ${rent ? "for rent" : "for sale"}${hasPrice ? ` ${shortPrice(n, lang)}` : ""}`;
+  const title = Array.from(t).slice(0, 20).join("");
+
+  const state = zhPlace((l.state || "").trim());
+  const lines =
+    lang === "zh"
+      ? [`${emoji} ${place.split(", ")[0] ? zhPlace(place.split(", ")[0]) : ""} ${type}`.trim(),
+         facts ? `💰 ${facts.replaceAll(" · ", " ｜ ")}` : "",
+         state ? `📍 ${state}${city && city !== state ? ` · ${city}` : ""}` : "",
+         `有意了解/看房，欢迎私信咨询 · 编号 ${l.id}`]
+      : [`${emoji} ${head}`, facts ? `💰 ${facts}` : "", state ? `📍 ${[l.city, l.state].filter(Boolean).join(", ")}` : "",
+         lang === "ms" ? `Berminat? Mesej saya · No. ${l.id}` : `Interested? Message me · Ref ${l.id}`];
+  if (opts.includeContact) lines.push([wa, ren].filter(Boolean).join(" · "));
+  const tags = (lang === "zh"
+    ? ["#怡保房产", "#霹雳房产", "#马来西亚房产", rent ? "#出租" : "#出售", ({ Industrial: "#工厂", Land: "#土地", Commercial: "#商业房产", Residential: "#住宅" } as Record<string, string>)[l.category ?? ""] ?? ""]
+    : hashtagsFor(l, lang).slice(0, 5)
+  ).filter(Boolean).join(" ");
+  const body = [...lines.filter(Boolean), "", tags].join("\n");
+  return { title, body, full: `${title}\n\n${body}` };
+}

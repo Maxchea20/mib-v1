@@ -100,3 +100,49 @@ test("live on website needs the switch ON and Available/Booked status", () => {
   assert.equal(isLiveOnWebsite({ is_public: false, status: "Available" }), false);
   assert.equal(isLiveOnWebsite({ is_public: null, status: "Available" }), false);
 });
+
+import { buildPlatformCaption } from "./shareKit.ts";
+
+const FAC = { id: 21, title: "Semi-D factory Kamunting", category: "Industrial", purpose: "For Sale", price: 1500000, status: "Available", is_public: true,
+  area: "Kamunting", city: "Taiping", state: "Perak", property_type: "Industrial", property_sub_type: "Semi-D factory", built_up: "10,000", tenure: "freehold",
+  address: "12 Jalan Rahsia", postal_code: "34600" };
+
+test("TikTok: short, with 5 hashtags, WhatsApp and the listing address as text", () => {
+  const c = buildPlatformCaption(FAC, "en", "tiktok");
+  assert.ok(c.body.startsWith("🏭 Semi-D factory for sale in Kamunting, Taiping, Perak"));
+  assert.ok(c.body.includes("maxproperty.my/listing/21") && c.body.includes("WhatsApp +60 16-521 0993"));
+  assert.ok(c.body.split("#").length - 1 <= 5);
+  assert.ok(c.body.length < 400);
+  assert.equal(c.title, "");
+});
+
+test("Instagram: link in bio, REN, up to 8 hashtags", () => {
+  const c = buildPlatformCaption(FAC, "en", "instagram");
+  assert.ok(c.body.includes("Link in bio") && c.body.includes("REN 31953"));
+  assert.ok(buildPlatformCaption(FAC, "zh", "instagram").body.includes("链接在个人简介"));
+});
+
+test("Xiaohongshu in Chinese: title of 20 characters at most, no phone number or link by default", () => {
+  const c = buildPlatformCaption(FAC, "zh", "xiaohongshu");
+  assert.equal(c.title, "太平｜半独立式工厂出售 150万");
+  assert.ok(Array.from(c.title).length <= 20);
+  assert.ok(c.body.includes("私信咨询") && c.body.includes("编号 21"));
+  assert.ok(!c.body.includes("+60") && !c.body.includes("maxproperty") && !c.body.includes("WhatsApp"));
+  assert.ok(c.body.includes("#怡保房产") && c.body.includes("#工厂"));
+  assert.ok(c.full.startsWith(c.title));
+  assert.ok(!c.full.includes("Jalan Rahsia") && !c.full.includes("34600"));
+});
+
+test("Xiaohongshu: contact line only when asked for; long titles are cut to 20", () => {
+  const withContact = buildPlatformCaption(FAC, "zh", "xiaohongshu", { includeContact: true });
+  assert.ok(withContact.body.includes("WhatsApp +60 16-521 0993") && withContact.body.includes("REN 31953"));
+  const long = buildPlatformCaption({ ...FAC, property_sub_type: "Something very very long indeed here", city: "Taiping" }, "en", "xiaohongshu");
+  assert.ok(Array.from(long.title).length <= 20);
+});
+
+test("rent and BM captions", () => {
+  const r = { ...FAC, category: "Residential", purpose: "For Rent", price: 1800, property_type: "Condominium", property_sub_type: null, bedrooms: 3, bathrooms: 2, built_up: "1,100 sqft" };
+  assert.ok(buildPlatformCaption(r, "zh", "xiaohongshu").title.includes("出租"));
+  assert.ok(buildPlatformCaption(r, "ms", "tiktok").body.includes("RM 1,800 / bulan"));
+  assert.ok(!/ForSale|Dijual/.test(buildPlatformCaption(r, "ms", "instagram").body));
+});

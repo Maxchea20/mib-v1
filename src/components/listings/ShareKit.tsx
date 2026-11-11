@@ -2,27 +2,22 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import {
-  buildCaption,
-  isLiveOnWebsite,
-  orderedPhotoUrls,
-  trackedUrl,
-  withLink,
-  type ShareChannel,
-  type ShareListing,
-  type SharePhoto,
-} from "@/lib/shareKit";
+import { buildPlatformCaption, isLiveOnWebsite, type Platform, type ShareListing } from "@/lib/shareKit";
 import type { Lang } from "@/site/i18n";
 
 /*
-| SHARE KIT. One place to post a listing on Facebook, Instagram, Xiaohongshu
-| and WhatsApp: a ready caption (English / BM / Chinese), the best photos, the
-| listing video, and a tagged link. Nothing is posted automatically: the phone's
-| own share menu opens and you tap send yourself.
+| SHARE. Post the listing's video on TikTok, Instagram or Xiaohongshu with a
+| caption written for that app. Nothing is posted automatically: the phone's own
+| share menu opens with the video attached and you tap send yourself.
 */
 
-type Listing = ShareListing & { property_photos?: SharePhoto[] };
+type Project = { id: string; final_video_url: string | null; completed_at: string | null };
 
+const PLATFORMS: { id: Platform; label: string; defaultLang: Lang }[] = [
+  { id: "tiktok", label: "TikTok", defaultLang: "en" },
+  { id: "instagram", label: "Instagram", defaultLang: "en" },
+  { id: "xiaohongshu", label: "小红书", defaultLang: "zh" },
+];
 const LANGS: { id: Lang; label: string }[] = [
   { id: "en", label: "English" },
   { id: "ms", label: "BM" },
@@ -50,250 +45,211 @@ async function copyText(text: string): Promise<boolean> {
   }
 }
 
-async function toFile(url: string, name: string): Promise<File> {
-  const res = await fetch(url, { mode: "cors" });
-  if (!res.ok) throw new Error(`Could not load ${name}`);
-  const blob = await res.blob();
-  return new File([blob], name, { type: blob.type || "image/jpeg" });
-}
-
-export default function ShareKit({ listing }: { listing: Listing }) {
-  const photos = useMemo(() => orderedPhotoUrls(listing.category, listing.property_photos), [listing]);
-  const live = isLiveOnWebsite(listing);
-
+export default function ShareKit({ listing }: { listing: ShareListing }) {
+  const [videos, setVideos] = useState<Project[] | null>(null);
+  const [videoIndex, setVideoIndex] = useState(0);
+  const [platform, setPlatform] = useState<Platform>("tiktok");
   const [lang, setLang] = useState<Lang>("en");
-  const [captionByLang, setCaptionByLang] = useState<Partial<Record<Lang, string>>>({});
-  // The caption shows the real (tagged) link; the tag is swapped per channel when sharing.
-  const shareLink = trackedUrl(listing.id, lang, "share");
-  const caption = captionByLang[lang] ?? withLink(buildCaption(listing, lang), listing.id, lang, "share");
-
-  const [selected, setSelected] = useState<string[]>(() => photos.slice(0, 3));
-  const [video, setVideo] = useState<string | null>(null);
-  const [useVideo, setUseVideo] = useState(false);
+  const [contact, setContact] = useState(false);
+  const [edited, setEdited] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
 
-  // The newest finished video for this listing, if one has been made.
   useEffect(() => {
     let cancelled = false;
     supabase
       .from("ai_video_projects")
-      .select("final_video_url, status, completed_at")
+      .select("id, final_video_url, completed_at")
       .eq("property_id", listing.id)
       .eq("status", "completed")
       .not("final_video_url", "is", null)
       .order("completed_at", { ascending: false })
-      .limit(1)
+      .limit(12)
       .then(({ data }) => {
-        if (!cancelled && data?.[0]?.final_video_url) setVideo(data[0].final_video_url as string);
+        if (!cancelled) setVideos((data as Project[]) ?? []);
       });
     return () => {
       cancelled = true;
     };
   }, [listing.id]);
 
+  const video = videos?.[videoIndex] ?? null;
+  const key = `${platform}-${lang}-${contact}`;
+  const built = useMemo(() => buildPlatformCaption(listing, lang, platform, { includeContact: contact }), [listing, lang, platform, contact]);
+  const text = edited[key] ?? built.full;
+  const live = isLiveOnWebsite(listing);
+
   const say = (m: string) => {
     setNotice(m);
-    window.setTimeout(() => setNotice(""), 4000);
+    window.setTimeout(() => setNotice(""), 4500);
   };
 
-  const captionFor = (channel: ShareChannel) =>
-    caption.split(shareLink).join(trackedUrl(listing.id, lang, channel));
+  function pickPlatform(p: Platform) {
+    setPlatform(p);
+    setLang(PLATFORMS.find((x) => x.id === p)!.defaultLang);
+  }
 
-  const toggle = (url: string) =>
-    setSelected((cur) => (cur.includes(url) ? cur.filter((u) => u !== url) : [...cur, url]));
+  async function loadFile(): Promise<File> {
+    const res = await fetch(video!.final_video_url!, { mode: "cors" });
+    if (!res.ok) throw new Error("Could not load the video.");
+    return new File([await res.blob()], `${listing.id}-video.mp4`, { type: "video/mp4" });
+  }
 
-  async function copyCaption(channel: ShareChannel = "copy") {
-    const ok = await copyText(captionFor(channel));
+  async function copyCaption() {
+    const ok = await copyText(text);
     say(ok ? "Caption copied. Paste it in the app." : "Could not copy. Select the caption and copy it by hand.");
-    return ok;
   }
 
-  async function copyLink() {
-    const ok = await copyText(trackedUrl(listing.id, lang, "copy"));
-    say(ok ? "Link copied." : "Could not copy the link.");
-  }
-
-  async function shareToApps() {
+  async function share() {
+    if (!video) return;
     setBusy(true);
-    const text = captionFor("share");
-    await copyText(text); // many apps drop the shared text, so it is on the clipboard too
+    await copyText(text); // the apps often ignore shared text, so it is on the clipboard too
     try {
-      const files: File[] = [];
-      try {
-        for (const [i, url] of selected.entries()) files.push(await toFile(url, `photo-${i + 1}.jpg`));
-        if (useVideo && video) {
-          const res = await fetch(video, { mode: "cors" });
-          if (res.ok) files.push(new File([await res.blob()], "video.mp4", { type: "video/mp4" }));
-        }
-      } catch {
-        say("Could not load the photos for sharing. Sharing the link only.");
-        files.length = 0;
-      }
-
-      const withFiles = files.length > 0 && typeof navigator.canShare === "function" && navigator.canShare({ files });
-      if (typeof navigator.share !== "function") {
-        say("This browser has no share menu. Caption copied, use the buttons below.");
+      const file = await loadFile();
+      if (typeof navigator.share !== "function" || typeof navigator.canShare !== "function" || !navigator.canShare({ files: [file] })) {
+        say("This browser cannot share videos. Use Save video, then post it from your gallery. The caption is copied.");
         return;
       }
-      await navigator.share(withFiles ? { files, text } : { text });
-      say(withFiles ? "Caption copied. Paste it in the app." : "Shared.");
+      await navigator.share({ files: [file], text });
+      say("Caption copied. Paste it in the app before you post.");
     } catch (e) {
-      if ((e as Error).name !== "AbortError") say("Sharing failed. The caption is copied, try WhatsApp or Facebook below.");
+      if ((e as Error).name !== "AbortError") say("Sharing failed. Use Save video, then post it from your gallery. The caption is copied.");
     } finally {
       setBusy(false);
     }
   }
 
-  async function openWhatsApp() {
-    window.open(`https://wa.me/?text=${encodeURIComponent(captionFor("whatsapp"))}`, "_blank", "noopener");
+  async function save() {
+    if (!video) return;
+    setBusy(true);
+    try {
+      const file = await loadFile();
+      const url = URL.createObjectURL(file);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      await copyText(text);
+      say("Video saved to your phone. Caption copied.");
+    } catch {
+      say("Could not save the video.");
+    } finally {
+      setBusy(false);
+    }
   }
 
-  async function openFacebook() {
-    await copyCaption("facebook");
-    const u = encodeURIComponent(trackedUrl(listing.id, lang, "facebook"));
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${u}`, "_blank", "noopener");
-  }
+  const box = "bg-white border rounded-xl shadow-sm p-4 sm:p-5";
+  const cap = "mb-2 text-xs font-bold uppercase tracking-wide text-[var(--copper)]";
+  const seg = (on: boolean) => `min-h-12 rounded-lg border text-sm font-bold ${on ? "border-stone-900 bg-stone-900 text-white" : "border-stone-300 bg-white text-stone-800"}`;
 
-  const place = [listing.area, listing.city, listing.state].filter(Boolean).join(", ");
+  if (videos === null) return <p className="text-sm text-stone-600">Loading…</p>;
+
+  if (!video) {
+    return (
+      <div className={`${box} text-center`} data-testid="no-video">
+        <div className="text-4xl">🎬</div>
+        <h2 className="mt-2 text-lg font-bold text-stone-900">No video for this listing yet</h2>
+        <p className="mt-1 text-sm text-stone-600">
+          Open the <b>Video</b> tab and tap <b>Make video</b>. It is made from the listing&apos;s photos and takes under a minute.
+          It will appear here when it is ready.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4" data-testid="share-kit">
-      <div className="bg-white border rounded-xl shadow-sm p-4 sm:p-5">
-        <h2 className="text-xl font-bold text-stone-900">Share kit</h2>
-        <p className="text-sm text-stone-600 mt-1">
-          {listing.title || "Listing"}{place ? ` · ${place}` : ""}
-        </p>
-        {live ? (
-          <span className="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-300">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" /> Public on website
-          </span>
-        ) : (
-          <p className="mt-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-800 ring-1 ring-inset ring-amber-300" data-testid="not-live">
-            This listing is not on the website yet (switch &quot;Public website&quot; ON and set the status to Available or
-            Booked). The link in the caption will not open until then.
-          </p>
-        )}
+      <div className={box}>
+        <p className={cap}>Your video</p>
+        <div className="flex gap-3">
+          <video src={video.final_video_url!} controls playsInline preload="metadata" className="h-48 w-[108px] shrink-0 rounded-lg bg-black object-cover" />
+          <div className="min-w-0 text-sm text-stone-700">
+            <p className="font-bold text-stone-900">{listing.title || "Listing"}</p>
+            <p>Vertical 9:16, ready to post</p>
+            {videos.length > 1 && (
+              <label className="mt-2 block text-xs text-stone-600">
+                Video
+                <select value={videoIndex} onChange={(e) => setVideoIndex(Number(e.target.value))} className="mt-1 h-11 w-full rounded-lg border border-stone-300 bg-white px-2 text-sm" aria-label="Choose video">
+                  {videos.map((v, i) => (
+                    <option key={v.id} value={i}>
+                      {i === 0 ? "Latest" : `Earlier`} · {v.completed_at ? new Date(v.completed_at).toLocaleDateString("en-MY") : ""}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
+        </div>
       </div>
 
-      <div className="bg-white border rounded-xl shadow-sm p-4 sm:p-5">
-        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--copper)]">Language</p>
+      <div className={box}>
+        <p className={cap}>Post to</p>
+        <div className="grid grid-cols-3 gap-2" role="group" aria-label="App">
+          {PLATFORMS.map((p) => (
+            <button key={p.id} type="button" onClick={() => pickPlatform(p.id)} aria-pressed={platform === p.id} className={seg(platform === p.id)}>
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <p className={`${cap} mt-4`}>Caption language</p>
         <div className="grid grid-cols-3 gap-2" role="group" aria-label="Caption language">
           {LANGS.map((l) => (
-            <button
-              key={l.id}
-              type="button"
-              onClick={() => setLang(l.id)}
-              aria-pressed={lang === l.id}
-              className={`min-h-12 rounded-lg border text-sm font-bold ${
-                lang === l.id ? "border-stone-900 bg-stone-900 text-white" : "border-stone-300 bg-white text-stone-800"
-              }`}
-            >
+            <button key={l.id} type="button" onClick={() => setLang(l.id)} aria-pressed={lang === l.id} className={seg(lang === l.id)}>
               {l.label}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="bg-white border rounded-xl shadow-sm p-4 sm:p-5">
-        <label htmlFor="share-caption" className="mb-2 block text-xs font-bold uppercase tracking-wide text-[var(--copper)]">
-          Caption (you can edit)
+      <div className={box}>
+        <label htmlFor="share-caption" className={`${cap} block`}>
+          {platform === "xiaohongshu" ? "Title + caption (you can edit)" : `Caption for ${PLATFORMS.find((p) => p.id === platform)!.label} (you can edit)`}
         </label>
         <textarea
           id="share-caption"
-          value={caption}
-          onChange={(e) => setCaptionByLang((c) => ({ ...c, [lang]: e.target.value }))}
-          rows={11}
+          value={text}
+          onChange={(e) => setEdited((c) => ({ ...c, [key]: e.target.value }))}
+          rows={platform === "tiktok" ? 9 : 12}
           className="w-full rounded-lg border border-stone-300 bg-white p-3 text-[15px] leading-6 text-stone-900"
         />
-        <p className="mt-2 text-xs text-stone-600">
-          The link carries a hidden tag, so you can see in the visitor counter which channel it came from.
-        </p>
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <button type="button" onClick={() => copyCaption()} className="min-h-12 rounded-lg border border-stone-300 bg-white text-sm font-bold">
-            Copy caption
-          </button>
-          <button type="button" onClick={copyLink} className="min-h-12 rounded-lg border border-stone-300 bg-white text-sm font-bold">
-            Copy link
-          </button>
-        </div>
-        {captionByLang[lang] !== undefined && (
-          <button
-            type="button"
-            onClick={() => setCaptionByLang((c) => ({ ...c, [lang]: undefined }))}
-            className="mt-2 text-xs font-semibold text-stone-600 underline"
-          >
+        {edited[key] !== undefined && (
+          <button type="button" onClick={() => setEdited((c) => { const n = { ...c }; delete n[key]; return n; })} className="mt-1 text-xs font-semibold text-stone-600 underline">
             Reset caption
           </button>
         )}
-      </div>
-
-      <div className="bg-white border rounded-xl shadow-sm p-4 sm:p-5">
-        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--copper)]">Photos and video (tap to choose)</p>
-        {photos.length === 0 && video === null ? (
-          <p className="text-sm text-stone-600">No photos yet. Add them in the Photos tab.</p>
-        ) : (
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {photos.map((url) => {
-              const on = selected.includes(url);
-              return (
-                <button
-                  key={url}
-                  type="button"
-                  onClick={() => toggle(url)}
-                  aria-pressed={on}
-                  aria-label={on ? "Photo selected" : "Photo not selected"}
-                  className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 ${on ? "border-[var(--copper)]" : "border-stone-200"}`}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={url} alt="" className="h-full w-full object-cover" loading="lazy" />
-                  {on && (
-                    <span className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--copper)] text-xs text-white">✓</span>
-                  )}
-                </button>
-              );
-            })}
-            {video && (
-              <button
-                type="button"
-                onClick={() => setUseVideo((v) => !v)}
-                aria-pressed={useVideo}
-                data-testid="video-chip"
-                className={`flex h-16 w-24 shrink-0 items-center justify-center rounded-lg border-2 bg-stone-900 text-xs font-bold text-white ${
-                  useVideo ? "border-[var(--copper)]" : "border-stone-200"
-                }`}
-              >
-                {useVideo ? "✓ " : ""}▶ Video
-              </button>
-            )}
-          </div>
+        {platform === "xiaohongshu" && (
+          <>
+            <p className="mt-3 rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-900 ring-1 ring-inset ring-amber-200">
+              Xiaohongshu may remove phone numbers and links, so this caption asks people to message you instead. Paste the first
+              line into the title box.
+            </p>
+            <label className="mt-2 flex min-h-12 cursor-pointer items-center gap-3 text-sm font-semibold">
+              <input type="checkbox" checked={contact} onChange={(e) => setContact(e.target.checked)} className="h-5 w-5 accent-[var(--copper)]" />
+              Add my WhatsApp number and REN
+            </label>
+          </>
         )}
-        <p className="mt-2 text-xs text-stone-600">
-          {selected.length} photo{selected.length === 1 ? "" : "s"} selected{video ? (useVideo ? " + video" : "") : ""}
-        </p>
+        {platform !== "xiaohongshu" && !live && (
+          <p className="mt-3 rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-900 ring-1 ring-inset ring-amber-200" data-testid="not-live">
+            This listing is not on the website yet, so the address in the caption will not open. Switch &quot;Public website&quot; ON and set the status to Available or Booked.
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">
-        <button
-          type="button"
-          onClick={shareToApps}
-          disabled={busy}
-          data-testid="share-main"
-          className="min-h-14 w-full rounded-xl bg-[var(--copper)] px-4 text-base font-bold text-white disabled:opacity-60"
-        >
-          {busy ? "Preparing…" : "Share to Facebook, Instagram, Xiaohongshu…"}
+        <button type="button" onClick={share} disabled={busy} data-testid="share-main" className="min-h-14 w-full rounded-xl bg-[var(--copper)] px-4 text-base font-bold text-white disabled:opacity-60">
+          {busy ? "Preparing…" : `Share video to ${PLATFORMS.find((p) => p.id === platform)!.label}…`}
         </button>
         <div className="grid grid-cols-2 gap-2">
-          <button type="button" onClick={openWhatsApp} className="min-h-12 rounded-xl bg-[#1fa855] text-sm font-bold text-white">
-            WhatsApp
-          </button>
-          <button type="button" onClick={openFacebook} className="min-h-12 rounded-xl border border-stone-300 bg-white text-sm font-bold">
-            Facebook link
-          </button>
+          <button type="button" onClick={save} disabled={busy} className="min-h-12 rounded-xl border border-stone-300 bg-white text-sm font-bold disabled:opacity-60">Save video to phone</button>
+          <button type="button" onClick={copyCaption} className="min-h-12 rounded-xl border border-stone-300 bg-white text-sm font-bold">Copy caption</button>
         </div>
         <p className="text-xs text-stone-600">
-          Nothing is posted automatically. Your phone&apos;s share menu opens and you tap send yourself. The caption is copied
-          first, so paste it in the app. On Instagram, put the link in your bio or a Story link sticker.
+          Your phone&apos;s share menu opens with the video attached and the caption is copied, so paste it before you post. Nothing is
+          posted automatically. On Instagram you can skip adding music: the video is ready, or pick a trending sound in the app.
         </p>
       </div>
 
