@@ -67,6 +67,8 @@ test("robots, sitemap and assets pass (root only)", () => {
   assert.deepEqual(r("/robots.txt"), { action: "pass" });
   assert.deepEqual(r("/sitemap.xml"), { action: "pass" });
   assert.deepEqual(r("/_next/static/a.js"), { action: "pass" });
+  assert.deepEqual(r("/_vercel/insights/script.js"), { action: "pass" });
+  assert.deepEqual(r("/ms/_vercel/insights"), { action: "notfound" });
   assert.deepEqual(r("/ms/robots.txt"), { action: "notfound" });
   assert.deepEqual(r("/zh/sitemap.xml"), { action: "notfound" });
 });
