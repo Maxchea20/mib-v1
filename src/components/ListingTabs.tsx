@@ -7,6 +7,7 @@ type Props = {
   gallery: React.ReactNode;
   aiDesign: React.ReactNode;
   aiVideo: React.ReactNode;
+  share?: React.ReactNode;
 };
 
 export default function ListingTabs({
@@ -14,8 +15,9 @@ export default function ListingTabs({
   gallery,
   aiDesign,
   aiVideo,
+  share,
 }: Props) {
-  const [tab, setTab] = useState<"details" | "gallery" | "ai" | "video">(
+  const [tab, setTab] = useState<"details" | "gallery" | "ai" | "video" | "share">(
     "details"
   );
 
@@ -24,12 +26,13 @@ export default function ListingTabs({
     { id: "gallery" as const, label: "Photos" },
     { id: "ai" as const, label: "Design" },
     { id: "video" as const, label: "Video" },
+    ...(share ? [{ id: "share" as const, label: "Share" }] : []),
   ];
 
   return (
     <div className="w-full min-w-0">
       <div className="surface mb-4 overflow-hidden">
-        <div className="grid grid-cols-4">
+        <div className={`grid ${share ? "grid-cols-5" : "grid-cols-4"}`}>
           {tabs.map((item) => {
             const active = tab === item.id;
             return (
@@ -55,6 +58,7 @@ export default function ListingTabs({
         {tab === "gallery" && gallery}
         {tab === "ai" && aiDesign}
         {tab === "video" && aiVideo}
+        {tab === "share" && share}
       </div>
     </div>
   );
