@@ -13,6 +13,7 @@ import AIHighlightsButton from "@/components/ai/AIHighlightsButton";
 import AIDesignTab from "@/components/ai/AIDesignTab";
 import AIVideoTab from "@/components/ai/AIVideoTab";
 import PublicToggle from "@/components/listings/PublicToggle";
+import ShareKit from "@/components/listings/ShareKit";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -196,6 +197,7 @@ export default async function ListingProfilePage({ params }: Props) {
         gallery={<MediaManager propertyId={listing.id} category={listing.category} />}
         aiDesign={<AIDesignTab key={`ai-design-${listing.id}`} listing={listing} />}
         aiVideo={<AIVideoTab key={`ai-video-${listing.id}`} listing={listing} />}
+        share={<ShareKit key={`share-${listing.id}`} listing={listing} />}
       />
 
       <div className="mt-4 sm:mt-6"><AIFacebookContentButton listing={listing} /></div>
