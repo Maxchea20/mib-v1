@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ThumbImg from "@/components/ThumbImg";
 
 export default function Gallery({
   images,
@@ -77,8 +78,7 @@ export default function Gallery({
                 i === index ? "border-[var(--mp-accent)]" : "border-transparent"
               }`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt="" loading="lazy" className="h-full w-full object-cover" />
+              <ThumbImg src={src} alt="" loading="lazy" className="h-full w-full object-cover" />
             </button>
           ))}
         </div>

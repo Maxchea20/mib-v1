@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "test:site": "node --import ./src/site/calculators/register-ts.mjs --experimental-strip-types --test src/site/routing.test.mjs src/site/calculators/housingLoan.test.mjs src/site/calculators/dsr.test.mjs src/site/calculators/rpgt.test.mjs src/site/calculators/costs.test.mjs src/site/calculators/costCalcs.test.mjs src/site/calculators/rental.test.mjs src/site/landing.test.mjs src/site/schema.test.mjs src/lib/shareKit.test.mjs src/lib/quickVideo/plan.test.mjs",
+    "test:site": "node --import ./src/site/calculators/register-ts.mjs --experimental-strip-types --test src/site/routing.test.mjs src/site/calculators/housingLoan.test.mjs src/site/calculators/dsr.test.mjs src/site/calculators/rpgt.test.mjs src/site/calculators/costs.test.mjs src/site/calculators/costCalcs.test.mjs src/site/calculators/rental.test.mjs src/site/landing.test.mjs src/site/schema.test.mjs src/lib/shareKit.test.mjs src/lib/quickVideo/plan.test.mjs src/lib/photoSize.test.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

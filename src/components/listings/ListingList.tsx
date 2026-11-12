@@ -3,6 +3,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import ThumbImg from "@/components/ThumbImg";
 import { Search, Bed, Bath, Car, Ruler, Sofa, ImageOff } from "lucide-react";
 import ListingMenu from "./ListingMenu";
 import PublicToggle from "./PublicToggle";
@@ -143,9 +144,10 @@ export default function ListingList({ listings }: Props) {
               {/* COVER PHOTO */}
               <div className="w-full md:w-48 h-52 md:h-36 rounded-lg overflow-hidden bg-slate-50 flex items-center justify-center flex-shrink-0">
                 {coverPhoto ? (
-                  <img
+                  <ThumbImg
                     src={coverPhoto.image_url}
                     alt={coverPhotoType}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
                 ) : (
