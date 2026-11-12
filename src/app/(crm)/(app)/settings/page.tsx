@@ -1,4 +1,4 @@
-
+import PhotoOptimizer from "@/components/settings/PhotoOptimizer";
 
 export default function SettingsPage() {
   return (
@@ -11,6 +11,8 @@ export default function SettingsPage() {
       <p className="mt-2 text-slate-600">
         System configuration.
       </p>
+
+      <PhotoOptimizer />
     </div>
     
   );
