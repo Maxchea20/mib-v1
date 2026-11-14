@@ -53,16 +53,16 @@ test("frames are whole numbers and the cross-fade offsets add up", () => {
 
 /* ---------------------------------------------------------------- camera moves */
 
-test("camera moves are slow and varied: zoom in, pan right, zoom out, pan left", () => {
+test("camera moves are clear and varied: zoom in, pan right, zoom out, pan left", () => {
   const moves = [0, 1, 2, 3, 4, 5].map(motionFor);
-  assert.deepEqual(moves[0], { z0: 1.0, z1: 1.08, dx0: 0, dx1: 0 });                      // opening zooms in
+  assert.deepEqual(moves[0], { z0: 1.0, z1: 1.18, dx0: 0, dx1: 0 });                      // opening zooms in
   assert.equal(new Set(moves.slice(0, 5).map((m) => JSON.stringify(m))).size >= 4, true);  // varied
   for (const m of moves) {
-    assert.ok(Math.abs(m.z1 - m.z0) <= 0.08 + 1e-9, "zoom stays gentle");
+    assert.ok(Math.abs(m.z1 - m.z0) <= 0.18 + 1e-9, "zoom stays gentle");
     assert.ok(Math.abs(m.dx1 - m.dx0) <= 2 && Math.abs(m.dx0) <= 1 && Math.abs(m.dx1) <= 1, "pan is a direction only");
   }
   assert.ok(moves.some((m) => m.dx0 < m.dx1) && moves.some((m) => m.dx0 > m.dx1), "pans both ways");
-  assert.ok(LAYOUT.panMax <= 140, "pan stays slow");
+  assert.ok(LAYOUT.panMax >= 200 && LAYOUT.panMax <= 400, "pan is clearly visible but not wild");
 });
 
 /* ------------------------------------------------------------------ labels */
@@ -95,7 +95,7 @@ test("filter graph: every picture is converted once, then repeated; scenes are j
   assert.equal((g.match(/xfade=/g) || []).length, t.length - 1);
   assert.equal((g.match(/loop=loop=/g) || []).length, n);                // one loop per picture
   assert.ok(g.indexOf("format=yuv420p") < g.indexOf("loop=loop="));      // converted BEFORE it is repeated
-  assert.ok(g.includes("scale=w='2*trunc(1500*(1+0.08*t/") && g.includes("eval=frame"));
+  assert.ok(g.includes("scale=w='2*trunc(1500*(1+0.18*t/") && g.includes("eval=frame"));
   assert.ok(g.includes(`y='${LAYOUT.centerY}-h/2'`));
   assert.ok(LAYOUT.boxH === 1920 && LAYOUT.boxW === 1080, "photo fills the whole screen");
   assert.ok(g.endsWith("[v]"));

@@ -156,7 +156,7 @@ export async function renderQuickVideo(input: RenderInput): Promise<RenderResult
     const bases: Buffer[] = new Array(input.photos.length);
 
     await pool(input.photos, 3, async (buf, i) => {
-      const resized = await sharp(buf, { failOn: "none" }).rotate().resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true }).toBuffer();
+      const resized = await sharp(buf, { failOn: "none" }).rotate().resize({ width: 2600, height: 2600, fit: "inside", withoutEnlargement: true }).toBuffer();
       bases[i] = await touchUp(resized);
     });
 
