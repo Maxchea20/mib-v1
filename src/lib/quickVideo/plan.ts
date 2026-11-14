@@ -36,12 +36,12 @@ export const LAYOUT = {
   bandTop: 1100,
   /** The brand band at the top. */
   topBandH: 320,
-  /** Most a photo ever slides sideways, in pixels, over its whole time on screen (slow on purpose). */
-  panMax: 120,
+  /** Most a photo ever slides sideways from the centre, in pixels (so it travels twice this over its time on screen). */
+  panMax: 300,
   headerTop: 140,
   textTop: 1200,
   /** The source photo is made this much bigger than shown, so zooming in stays sharp. */
-  headroom: 1.1,
+  headroom: 1.3,
 } as const;
 
 /* ------------------------------------------------------------------ labels */
@@ -113,10 +113,10 @@ export type Scene = {
  * Drifts zoom a little so a drifting photo never shows a gap at its edge.
  */
 const MOTIONS: Motion[] = [
-  { z0: 1.0, z1: 1.08, dx0: 0, dx1: 0 }, // slow zoom in
-  { z0: 1.04, z1: 1.04, dx0: -1, dx1: 1 }, // pan left to right
-  { z0: 1.08, z1: 1.0, dx0: 0, dx1: 0 }, // slow zoom out
-  { z0: 1.04, z1: 1.04, dx0: 1, dx1: -1 }, // pan right to left
+  { z0: 1.0, z1: 1.18, dx0: 0, dx1: 0 }, // zoom in
+  { z0: 1.14, z1: 1.14, dx0: -1, dx1: 1 }, // pan left to right
+  { z0: 1.18, z1: 1.0, dx0: 0, dx1: 0 }, // zoom out
+  { z0: 1.14, z1: 1.14, dx0: 1, dx1: -1 }, // pan right to left
 ];
 
 export function motionFor(photoIndex: number): Motion {
@@ -202,13 +202,19 @@ export function buildFilterGraph(scenes: Scene[], inputs: SceneInput[]): string 
     f.push(`[${inp.bg}:v]format=yuv420p,setsar=1,${rep(s.frames)}[b${i}]`);
     if (s.motion && inp.fg !== null) {
       const m = s.motion;
-      const zmin = Math.min(m.z0, m.z1);
+      let { z0, z1 } = m;
+      if (m.dx0 !== m.dx1) {
+        // a pan needs spare width: tall photos are zoomed in a little more so they have room to slide
+        const z = Math.min(1.3, Math.max(z0, (WIDTH + 2 * LAYOUT.panMax) / inp.baseW));
+        z0 = z1 = z;
+      }
+      const zmin = Math.min(z0, z1);
       const amp = Math.max(0, Math.min(LAYOUT.panMax, Math.floor((inp.baseW * zmin - WIDTH) / 2) - 2));
       const x0 = m.dx0 * amp;
       const x1 = m.dx1 * amp;
       f.push(
         `[${inp.fg}:v]format=yuv420p,${rep(s.frames)},` +
-          `scale=w='2*trunc(${inp.baseW}*(${num(m.z0)}+${num(m.z1 - m.z0)}*t/${num(d)})/2)':h=-2:eval=frame:flags=bilinear[f${i}]`
+          `scale=w='2*trunc(${inp.baseW}*(${num(z0)}+${num(z1 - z0)}*t/${num(d)})/2)':h=-2:eval=frame:flags=bilinear[f${i}]`
       );
       let last = `[m${i}]`;
       f.push(
