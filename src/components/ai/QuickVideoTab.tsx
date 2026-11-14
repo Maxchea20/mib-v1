@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { cleanLabel, defaultLabel, MAX_LABEL, MAX_PHOTOS, type Pace, type VideoLang } from "@/lib/quickVideo/plan";
+import { buildTimeline, cleanLabel, defaultLabel, factsCopy, hasFacts, MAX_LABEL, MAX_PHOTOS, totalSeconds, type Length, type VideoLang } from "@/lib/quickVideo/plan";
+import type { ShareListing } from "@/lib/shareKit";
 
 /*
 | QUICK VIDEO. Makes a vertical video from the listing's own photos: slow pans,
@@ -11,7 +12,7 @@ import { cleanLabel, defaultLabel, MAX_LABEL, MAX_PHOTOS, type Pace, type VideoL
 */
 
 type Photo = { id: number; photo_type: string | null; image_url: string | null };
-type Listing = { id: number; category?: string | null; property_photos?: Photo[] };
+type Listing = ShareListing & { headline?: string | null; property_photos?: Photo[] };
 type Project = { id: string; final_video_url: string | null; completed_at: string | null };
 
 /** Photo order: cover first, then the order MIB lists the photo types in. */
@@ -35,7 +36,8 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
   const photos = useMemo(() => sortPhotos(listing.category, listing.property_photos ?? []), [listing]);
 
   const [lang, setLang] = useState<VideoLang>("en");
-  const [pace, setPace] = useState<Pace>("standard");
+  const [length, setLength] = useState<Length>("auto");
+  const [showFacts, setShowFacts] = useState(true);
   const [showPrice, setShowPrice] = useState(true);
   const [chosen, setChosen] = useState<number[]>(() => photos.slice(0, 8).map((p) => p.id));
   const [labels, setLabels] = useState<Record<number, string>>({});
@@ -45,6 +47,10 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
   const [result, setResult] = useState<string | null>(null);
   const [past, setPast] = useState<Project[]>([]);
   const timer = useRef<number | null>(null);
+
+  // The length is worked out from the number of photos, using the same plan as the server.
+  const factsOk = hasFacts(factsCopy(listing, lang, showPrice));
+  const estimate = chosen.length > 0 ? totalSeconds(buildTimeline(chosen.length, [], { length, facts: showFacts && factsOk })) : 0;
 
   const byId = useMemo(() => new Map(photos.map((p) => [p.id, p])), [photos]);
   const labelOf = (p: Photo) => labels[p.id] ?? defaultLabel(p.photo_type, lang);
@@ -98,8 +104,9 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
           photoIds: chosen,
           labels: chosen.map((id) => cleanLabel(labelOf(byId.get(id)!))),
           lang,
-          pace,
+          length,
           showPrice,
+          showFacts,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -198,20 +205,29 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
 
       <div className={box}>
         <p className={cap}>Text on the video</p>
-        <div className="grid grid-cols-2 gap-2" role="group" aria-label="Video language">
+        <div className="grid grid-cols-3 gap-2" role="group" aria-label="Video language">
           <button type="button" onClick={() => { setLang("en"); setLabels({}); }} aria-pressed={lang === "en"} className={seg(lang === "en")}>English</button>
-          <button type="button" onClick={() => { setLang("ms"); setLabels({}); }} aria-pressed={lang === "ms"} className={seg(lang === "ms")}>Bahasa Malaysia</button>
+          <button type="button" onClick={() => { setLang("ms"); setLabels({}); }} aria-pressed={lang === "ms"} className={seg(lang === "ms")}>BM</button>
+          <button type="button" onClick={() => { setLang("zh"); setLabels({}); }} aria-pressed={lang === "zh"} className={seg(lang === "zh")}>中文</button>
         </div>
-        <p className={`${cap} mt-4`}>Speed</p>
-        <div className="grid grid-cols-2 gap-2" role="group" aria-label="Speed">
-          <button type="button" onClick={() => setPace("standard")} aria-pressed={pace === "standard"} className={seg(pace === "standard")}>Standard</button>
-          <button type="button" onClick={() => setPace("fast")} aria-pressed={pace === "fast"} className={seg(pace === "fast")}>Fast (shorter)</button>
+        <p className={`${cap} mt-4`}>Length</p>
+        <div className="grid grid-cols-2 gap-2" role="group" aria-label="Length">
+          <button type="button" onClick={() => setLength("auto")} aria-pressed={length === "auto"} className={seg(length === "auto")}>Auto (best)</button>
+          <button type="button" onClick={() => setLength("short")} aria-pressed={length === "short"} className={seg(length === "short")}>Shorter</button>
         </div>
-        <label className="mt-4 flex min-h-12 cursor-pointer items-center gap-3 text-sm font-bold">
+        <p className="mt-2 text-sm font-semibold text-stone-700" data-testid="estimate">
+          {estimate > 0 ? `About ${Math.round(estimate)} seconds for ${chosen.length} photo${chosen.length === 1 ? "" : "s"}.` : "Choose at least one photo."}
+        </p>
+        <p className="text-xs text-stone-500">Each photo gets the time it needs: fewer photos stay on screen longer, more photos move on faster.</p>
+        <label className="mt-3 flex min-h-12 cursor-pointer items-center gap-3 text-sm font-bold">
           <input type="checkbox" checked={showPrice} onChange={(e) => setShowPrice(e.target.checked)} className="h-5 w-5 accent-[var(--copper)]" />
           Show the price on the video
         </label>
-        <p className="mt-1 text-xs text-stone-500">Chinese text on the video is not available yet. Chinese captions are in the Share tab.</p>
+        <label className={`flex min-h-12 items-center gap-3 text-sm font-bold ${factsOk ? "cursor-pointer" : "opacity-50"}`}>
+          <input type="checkbox" checked={showFacts && factsOk} disabled={!factsOk} onChange={(e) => setShowFacts(e.target.checked)} className="h-5 w-5 accent-[var(--copper)]" />
+          Add a facts card (price, size, tenure, place)
+        </label>
+        {!factsOk && <p className="text-xs text-stone-500">This listing needs at least two facts filled in (such as size and tenure) for the facts card.</p>}
       </div>
 
       <button
@@ -223,7 +239,7 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
       >
         {busy ? `Making your video… ${seconds}s` : "Make video"}
       </button>
-      {busy && <p className="text-center text-sm text-stone-600">This takes about 15 to 40 seconds. Please keep this page open.</p>}
+      {busy && <p className="text-center text-sm text-stone-600">This takes about 20 to 40 seconds. Please keep this page open.</p>}
       {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-800 ring-1 ring-inset ring-red-200" data-testid="video-error">{error}</p>}
 
       {result && (

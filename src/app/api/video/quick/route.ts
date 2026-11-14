@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient as createAdmin } from "@supabase/supabase-js";
 import { requireUser } from "@/lib/apiAuth";
 import { createClient } from "@/lib/supabase/server";
-import { cleanLabel, MAX_PHOTOS, type Pace, type VideoLang } from "@/lib/quickVideo/plan";
-import { renderQuickVideo } from "@/lib/quickVideo/render";
+import { cleanLabel, MAX_PHOTOS, type Length, type VideoLang } from "@/lib/quickVideo/plan";
+import { renderQuickVideo, RenderTimeoutError } from "@/lib/quickVideo/render";
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +23,10 @@ import { renderQuickVideo } from "@/lib/quickVideo/render";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// The hosting plan allows 60 seconds. The renderer stops FFmpeg at about 50 so a slow server
+// gives a clear message instead of a failed request.
 export const maxDuration = 60;
+const TOTAL_BUDGET_MS = 51_000;
 
 const MAX_PHOTO_BYTES = 20 * 1024 * 1024;
 
@@ -46,6 +49,7 @@ async function download(url: string): Promise<Buffer> {
 }
 
 export async function POST(request: Request) {
+  const startedAt = Date.now();
   const auth = await requireUser();
   if (!auth.user) return auth.response;
 
@@ -58,9 +62,10 @@ export async function POST(request: Request) {
 
   const propertyId = Number(body.propertyId);
   const photoIds = Array.isArray(body.photoIds) ? body.photoIds.map(Number) : [];
-  const lang: VideoLang = body.lang === "ms" ? "ms" : "en";
-  const pace: Pace = body.pace === "fast" ? "fast" : "standard";
+  const lang: VideoLang = body.lang === "ms" ? "ms" : body.lang === "zh" ? "zh" : "en";
+  const length: Length = body.length === "short" ? "short" : "auto";
   const showPrice = body.showPrice !== false;
+  const showFacts = body.showFacts !== false;
   const labelsIn = Array.isArray(body.labels) ? body.labels : [];
 
   if (!Number.isSafeInteger(propertyId) || propertyId <= 0) return bad("Missing listing.");
@@ -100,14 +105,18 @@ export async function POST(request: Request) {
 
   try {
     const photos = await Promise.all((urls as string[]).map(download));
-    const video = await renderQuickVideo({
+    const downloaded = Date.now() - startedAt;
+    const rendered = await renderQuickVideo({
       listing,
       photos,
       labels: photoIds.map((_, i) => cleanLabel(labelsIn[i])),
       lang,
-      pace,
+      length,
       showPrice,
+      showFacts,
+      ffmpegBudgetMs: TOTAL_BUDGET_MS - downloaded,
     });
+    const video = rendered.video;
 
     const storagePath = `property-${propertyId}/projects/${project.id}/final-video.mp4`;
     const { error: uploadError } = await db.storage.from("ai-videos").upload(storagePath, video, { contentType: "video/mp4", upsert: true });
@@ -118,12 +127,14 @@ export async function POST(request: Request) {
     const url = `${pub.publicUrl}?v=${encodeURIComponent(completedAt)}`;
     await db.from("ai_video_projects").update({ status: "completed", final_video_url: url, completed_at: completedAt, error_message: null }).eq("id", project.id);
 
-    return NextResponse.json({ ok: true, projectId: project.id, url, bytes: video.length });
+    const timing = { downloadMs: downloaded, ...rendered.ms, totalMs: Date.now() - startedAt };
+    console.log("Quick video:", photoIds.length, "photos,", rendered.scenes, "scenes,", rendered.seconds, "s,", Math.round(video.length / 1024), "KB,", JSON.stringify(timing));
+    return NextResponse.json({ ok: true, projectId: project.id, url, bytes: video.length, seconds: rendered.seconds, timing });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Video failed.";
     console.error("Quick video error:", message);
     await fail(message);
-    return bad(message, 500);
+    return bad(message, e instanceof RenderTimeoutError ? 504 : 500);
   }
 }
 
