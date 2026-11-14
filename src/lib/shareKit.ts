@@ -121,7 +121,7 @@ export function priceText(l: Pick<ShareListing, "price" | "purpose">, lang: Lang
   return `${amount} ${lang === "ms" ? "/ bulan" : lang === "zh" ? "/ 每月" : "/ month"}`;
 }
 
-const sizeWithUnit = (v: string | null | undefined) => {
+export const sizeWithUnit = (v: string | null | undefined) => {
   const t = (v ?? "").trim();
   if (!t) return "";
   return /^[\d,.\s]+$/.test(t) ? `${t} sqft` : t;
@@ -244,7 +244,7 @@ const ZH_PLACES: Record<string, string> = {
   ipoh: "怡保", perak: "霹雳", taiping: "太平", kampar: "金宝", "batu gajah": "华都牙也",
   "teluk intan": "安顺", sitiawan: "实兆远", lumut: "红土坎", menglembu: "万里望", "kuala kangsar": "江沙",
 };
-const zhPlace = (v: string) => ZH_PLACES[v.trim().toLowerCase()] ?? v.trim();
+export const zhPlace = (v: string) => ZH_PLACES[v.trim().toLowerCase()] ?? v.trim();
 
 /** RM 1,500,000 -> "RM1.5m" / "150万"; short forms for titles. */
 function shortPrice(price: number, lang: Lang): string {
