@@ -29,9 +29,15 @@ export const MAX_PHOTOS = 12;
 export const MAX_LABEL = 40;
 
 export const LAYOUT = {
-  boxW: 1080, // the photo is fitted inside this box
-  boxH: 880,
-  centerY: 690, // the box is centred here
+  boxW: 1080, // the photo fills the whole 9:16 screen
+  boxH: 1920,
+  centerY: 960, // the photo is centred here
+  /** The word band at the bottom starts here (the picture of the band is this tall to the bottom edge). */
+  bandTop: 1100,
+  /** The brand band at the top. */
+  topBandH: 320,
+  /** Most a photo ever slides sideways, in pixels, over its whole time on screen (slow on purpose). */
+  panMax: 120,
   headerTop: 140,
   textTop: 1200,
   /** The source photo is made this much bigger than shown, so zooming in stays sharp. */
@@ -87,6 +93,7 @@ export function cleanLabel(raw: unknown): string {
 /* ---------------------------------------------------------------- timeline */
 
 export type SceneKind = "opening" | "photo" | "facts" | "end";
+/** dx0/dx1 are -1, 0 or 1: where in the sideways slide the photo starts and ends (scaled to what the photo allows). */
 export type Motion = { z0: number; z1: number; dx0: number; dx1: number };
 
 export type Scene = {
@@ -106,10 +113,10 @@ export type Scene = {
  * Drifts zoom a little so a drifting photo never shows a gap at its edge.
  */
 const MOTIONS: Motion[] = [
-  { z0: 1.0, z1: 1.07, dx0: 0, dx1: 0 },
-  { z0: 1.06, z1: 1.06, dx0: -28, dx1: 28 },
-  { z0: 1.07, z1: 1.0, dx0: 0, dx1: 0 },
-  { z0: 1.06, z1: 1.06, dx0: 28, dx1: -28 },
+  { z0: 1.0, z1: 1.08, dx0: 0, dx1: 0 }, // slow zoom in
+  { z0: 1.04, z1: 1.04, dx0: -1, dx1: 1 }, // pan left to right
+  { z0: 1.08, z1: 1.0, dx0: 0, dx1: 0 }, // slow zoom out
+  { z0: 1.04, z1: 1.04, dx0: 1, dx1: -1 }, // pan right to left
 ];
 
 export function motionFor(photoIndex: number): Motion {
@@ -167,6 +174,9 @@ export function fadeOffsets(scenes: Scene[]): number[] {
 /* ------------------------------------------------------------ ffmpeg graph */
 
 export type SceneInput = {
+  /** Inputs holding the see-through brand band and word band laid over a moving photo. */
+  top?: number | null;
+  bottom?: number | null;
   /** Index of the FFmpeg input holding the scene's background picture. */
   bg: number;
   /** Index of the input holding the moving photo (photo scenes only). */
@@ -192,14 +202,29 @@ export function buildFilterGraph(scenes: Scene[], inputs: SceneInput[]): string 
     f.push(`[${inp.bg}:v]format=yuv420p,setsar=1,${rep(s.frames)}[b${i}]`);
     if (s.motion && inp.fg !== null) {
       const m = s.motion;
+      const zmin = Math.min(m.z0, m.z1);
+      const amp = Math.max(0, Math.min(LAYOUT.panMax, Math.floor((inp.baseW * zmin - WIDTH) / 2) - 2));
+      const x0 = m.dx0 * amp;
+      const x1 = m.dx1 * amp;
       f.push(
         `[${inp.fg}:v]format=yuv420p,${rep(s.frames)},` +
           `scale=w='2*trunc(${inp.baseW}*(${num(m.z0)}+${num(m.z1 - m.z0)}*t/${num(d)})/2)':h=-2:eval=frame:flags=bilinear[f${i}]`
       );
+      let last = `[m${i}]`;
       f.push(
-        `[b${i}][f${i}]overlay=x='(W-w)/2+${num(m.dx0)}+${num(m.dx1 - m.dx0)}*t/${num(d)}':y='${LAYOUT.centerY}-h/2':eval=frame,` +
-          `format=yuv420p,fps=${FPS},${tb}[s${i}]`
+        `[b${i}][f${i}]overlay=x='(W-w)/2+${num(x0)}+${num(x1 - x0)}*t/${num(d)}':y='${LAYOUT.centerY}-h/2':eval=frame,format=yuv420p${last}`
       );
+      if (inp.top != null) {
+        f.push(`[${inp.top}:v]format=yuva420p,${rep(s.frames)}[t${i}]`);
+        f.push(`${last}[t${i}]overlay=0:0:format=yuv420${`[n${i}]`}`);
+        last = `[n${i}]`;
+      }
+      if (inp.bottom != null) {
+        f.push(`[${inp.bottom}:v]format=yuva420p,${rep(s.frames)}[u${i}]`);
+        f.push(`${last}[u${i}]overlay=0:${LAYOUT.bandTop}:format=yuv420[o${i}]`);
+        last = `[o${i}]`;
+      }
+      f.push(`${last}fps=${FPS},${tb}[s${i}]`);
     } else {
       f.push(`[b${i}]fps=${FPS},${tb}[s${i}]`);
     }
