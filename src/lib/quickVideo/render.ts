@@ -76,14 +76,16 @@ async function pool<T>(items: T[], size: number, fn: (item: T, i: number) => Pro
   );
 }
 
-/** Darkening at the top (brand) and bottom (words) so text is always easy to read. */
-const SHADE = Buffer.from(
-  `<svg width="${WIDTH}" height="${HEIGHT}" xmlns="http://www.w3.org/2000/svg"><defs>` +
-    `<linearGradient id="g" x1="0" y1="0" x2="0" y2="1">` +
-    `<stop offset="0" stop-color="#000" stop-opacity="0.45"/><stop offset="0.16" stop-color="#000" stop-opacity="0"/>` +
-    `<stop offset="0.56" stop-color="#000" stop-opacity="0"/><stop offset="0.8" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0.7"/>` +
-    `</linearGradient></defs><rect width="${WIDTH}" height="${HEIGHT}" fill="url(#g)"/></svg>`
-);
+/** See-through darkening at the top (brand) and bottom (words) so text is easy to read on any photo. */
+const bandSvg = (h: number, stops: string) =>
+  Buffer.from(
+    `<svg width="${WIDTH}" height="${h}" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">${stops}</linearGradient></defs>` +
+      `<rect width="${WIDTH}" height="${h}" fill="url(#g)"/></svg>`
+  );
+const stop = (o: number, a: number) => `<stop offset="${o}" stop-color="#000" stop-opacity="${a}"/>`;
+const TOP_SHADE = bandSvg(LAYOUT.topBandH, stop(0, 0.5) + stop(1, 0));
+const BOTTOM_H = HEIGHT - LAYOUT.bandTop;
+const BOTTOM_SHADE = bandSvg(BOTTOM_H, stop(0, 0) + stop(0.35, 0.55) + stop(1, 0.72));
 
 const END_BG = Buffer.from(
   `<svg width="${WIDTH}" height="${HEIGHT}" xmlns="http://www.w3.org/2000/svg"><defs>` +
@@ -162,7 +164,7 @@ export async function renderQuickVideo(input: RenderInput): Promise<RenderResult
     await pool(input.photos, 3, async (_b, i) => {
       const file = path.join(dir, `fg${i}.jpg`);
       const info = await sharp(bases[i])
-        .resize({ width: Math.round(LAYOUT.boxW * LAYOUT.headroom), height: Math.round(LAYOUT.boxH * LAYOUT.headroom), fit: "inside" })
+        .resize({ width: Math.round(LAYOUT.boxW * LAYOUT.headroom), height: Math.round(LAYOUT.boxH * LAYOUT.headroom), fit: "outside" })
         .jpeg({ quality: 90 })
         .toFile(file);
       fgInfo.set(i, { file, baseW: 2 * Math.round(info.width / LAYOUT.headroom / 2) });
@@ -180,20 +182,39 @@ export async function renderQuickVideo(input: RenderInput): Promise<RenderResult
         parts.push({ input: header, left: 0, top: LAYOUT.headerTop });
         parts.push({ input: await cut(sheet.layout.facts!), left: 0, top: Math.round((HEIGHT - sheet.layout.facts!.height) / 2) });
       } else {
-        const photo = s.photo ?? 0;
-        img = sharp(await blurredBackground(bases[photo], 0.5));
-        parts.push({ input: SHADE, left: 0, top: 0 });
-        parts.push({ input: header, left: 0, top: LAYOUT.headerTop });
+        // photo scene: the picture is full-screen and moves; the bands are laid over it afterwards
+        img = sharp({ create: { width: WIDTH, height: HEIGHT, channels: 3, background: "#000" } });
         const text = s.kind === "opening" ? openingText : labelText.get(s.index);
-        if (text) parts.push({ input: text, left: 0, top: s.kind === "opening" ? LAYOUT.textTop - 5 : LAYOUT.textTop + 15 });
+        const bottomParts: Part[] = [{ input: BOTTOM_SHADE, left: 0, top: 0 }];
+        if (text) bottomParts.push({ input: text, left: 0, top: (s.kind === "opening" ? LAYOUT.textTop - 5 : LAYOUT.textTop + 15) - LAYOUT.bandTop });
+        await sharp({ create: { width: WIDTH, height: BOTTOM_H, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+          .composite(bottomParts)
+          .png()
+          .toFile(path.join(dir, `bottom${s.index}.png`));
       }
       await img.composite(parts).jpeg({ quality: 86 }).toFile(bgFile(s.index));
     });
 
+    const topFile = path.join(dir, "top.png");
+    await sharp({ create: { width: WIDTH, height: LAYOUT.topBandH, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+      .composite([
+        { input: TOP_SHADE, left: 0, top: 0 },
+        { input: header, left: 0, top: LAYOUT.headerTop },
+      ])
+      .png()
+      .toFile(topFile);
+
     for (const s of scenes) {
       const bg = files.push(bgFile(s.index)) - 1;
       const fg = s.photo !== null && s.motion ? fgInfo.get(s.photo) : undefined;
-      inputs.push({ bg, fg: fg ? files.push(fg.file) - 1 : null, baseW: fg?.baseW ?? 0 });
+      const moving = !!fg;
+      inputs.push({
+        bg,
+        fg: fg ? files.push(fg.file) - 1 : null,
+        baseW: fg?.baseW ?? 0,
+        top: moving ? files.push(topFile) - 1 : null,
+        bottom: moving ? files.push(path.join(dir, `bottom${s.index}.png`)) - 1 : null,
+      });
     }
     lap("pictures");
 
