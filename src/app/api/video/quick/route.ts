@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient as createAdmin } from "@supabase/supabase-js";
 import { requireUser } from "@/lib/apiAuth";
 import { createClient } from "@/lib/supabase/server";
-import { cleanLabel, MAX_PHOTOS, type Length, type VideoLang } from "@/lib/quickVideo/plan";
+import { cleanHook, cleanLabel, HOOK_STYLES, MAX_PHOTOS, type HookStyle, type Length, type VideoLang } from "@/lib/quickVideo/plan";
 import { renderQuickVideo, RenderTimeoutError } from "@/lib/quickVideo/render";
 
 /*
@@ -66,6 +66,8 @@ export async function POST(request: Request) {
   const length: Length = body.length === "short" ? "short" : "auto";
   const showPrice = body.showPrice !== false;
   const showFacts = body.showFacts !== false;
+  const hook: HookStyle = HOOK_STYLES.includes(body.hook as HookStyle) ? (body.hook as HookStyle) : "off";
+  const hookText = cleanHook(body.hookText, lang);
   const labelsIn = Array.isArray(body.labels) ? body.labels : [];
 
   if (!Number.isSafeInteger(propertyId) || propertyId <= 0) return bad("Missing listing.");
@@ -114,6 +116,8 @@ export async function POST(request: Request) {
       length,
       showPrice,
       showFacts,
+      hook,
+      hookText,
       ffmpegBudgetMs: TOTAL_BUDGET_MS - downloaded,
     });
     const video = rendered.video;

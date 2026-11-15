@@ -92,7 +92,7 @@ export function cleanLabel(raw: unknown): string {
 
 /* ---------------------------------------------------------------- timeline */
 
-export type SceneKind = "opening" | "photo" | "facts" | "end";
+export type SceneKind = "opening" | "hook" | "photo" | "facts" | "end";
 /** dx0/dx1 are -1, 0 or 1: where in the sideways slide the photo starts and ends (scaled to what the photo allows). */
 export type Motion = { z0: number; z1: number; dx0: number; dx1: number };
 
@@ -133,7 +133,7 @@ export function secondsPerPhoto(photoCount: number, length: Length): number {
 
 const frames = (seconds: number) => Math.round(seconds * FPS);
 
-export type TimelineOptions = { length: Length; facts: boolean };
+export type TimelineOptions = { length: Length; facts: boolean; /** Open with a short, big "hook" line instead of the title card. */ hook?: boolean };
 
 export function buildTimeline(photoCount: number, labels: string[], o: TimelineOptions): Scene[] {
   const n = Math.max(1, Math.min(MAX_PHOTOS, Math.floor(photoCount)));
@@ -141,7 +141,8 @@ export function buildTimeline(photoCount: number, labels: string[], o: TimelineO
   const short = o.length === "short";
   const scenes: Omit<Scene, "index">[] = [];
 
-  scenes.push({ kind: "opening", photo: 0, frames: frames(per + 0.4), seconds: 0, label: "", motion: motionFor(0) });
+  if (o.hook) scenes.push({ kind: "hook", photo: 0, frames: frames(short ? 2.0 : 2.6), seconds: 0, label: "", motion: motionFor(0) });
+  else scenes.push({ kind: "opening", photo: 0, frames: frames(per + 0.4), seconds: 0, label: "", motion: motionFor(0) });
   if (o.facts) scenes.push({ kind: "facts", photo: null, frames: frames(short ? 2.8 : 3.4), seconds: 0, label: "", motion: null });
   for (let i = 1; i < n; i++) {
     scenes.push({ kind: "photo", photo: i, frames: frames(per), seconds: 0, label: cleanLabel(labels[i]), motion: motionFor(i) });
@@ -259,6 +260,62 @@ export const ENCODER_ARGS = [
   "-an",
   "-movflags", "+faststart",
 ] as const;
+
+/* --------------------------------------------------------------------- hook */
+
+export type HookStyle = "off" | "price" | "question" | "benefit";
+export const HOOK_STYLES: HookStyle[] = ["off", "price", "question", "benefit"];
+export const MAX_HOOK = 60;
+export const MAX_HOOK_ZH = 30;
+
+/** Tidy a hook line: one line of plain text, not too long (Chinese characters are wider). */
+export function cleanHook(v: unknown, lang: VideoLang): string {
+  const t = typeof v === "string" ? v.replace(/[\u0000-\u001f\u007f<>]/g, " ").replace(/\s+/g, " ").trim() : "";
+  return Array.from(t).slice(0, lang === "zh" ? MAX_HOOK_ZH : MAX_HOOK).join("").trim();
+}
+
+/**
+ * A short line to stop the scroll, written only from facts that are really in the listing.
+ * Falls back to the question style when the chosen style has nothing true to say (for example, no price).
+ */
+export function hookCopy(l: Listing, lang: VideoLang, style: HookStyle, showPrice: boolean): string {
+  if (style === "off") return "";
+  const rent = l.purpose === "For Rent";
+  const type = typeLabel(l, lang).split(" / ")[0].trim();
+  const lower = lang === "en" ? type.toLowerCase() : type;
+  const city = (l.city || l.area || "").trim();
+  const beds = l.bedrooms ?? 0;
+  const price = showPrice ? priceText(l, lang) : "";
+  const freehold = (l.tenure ?? "").toLowerCase() === "freehold";
+  const bedWord = lang === "en" ? `${beds}-bed ` : lang === "ms" ? `${beds} bilik ` : `${beds}房`;
+  const homeEn = `${beds > 0 ? bedWord : ""}${lower}`;
+  const land = l.category === "Land";
+  const biz = l.category === "Commercial" || l.category === "Industrial";
+
+  let out = "";
+  if (style === "price" && price && city) {
+    out =
+      lang === "zh" ? `${city} ${beds > 0 ? bedWord : ""}${type}，${price}？` :
+      lang === "ms" ? `${price} untuk ${beds > 0 ? `${lower} ${beds} bilik` : lower} di ${city}?` :
+      `${price} for a ${homeEn} in ${city}?`;
+  } else if (style === "benefit" && city && (freehold || beds > 0 || sizeWithUnit(l.built_up))) {
+    const size = sizeWithUnit(l.built_up) || sizeWithUnit(l.land_size);
+    out =
+      lang === "zh" ? `${city} ${freehold ? "永久地契" : ""}${type}${beds > 0 ? `，${beds}房` : size ? `，${size}` : ""}` :
+      lang === "ms" ? `${freehold ? "Pegangan bebas: " : ""}${type} di ${city}${beds > 0 ? `, ${beds} bilik` : size ? `, ${size}` : ""}` :
+      `${freehold ? "Freehold " : ""}${lower} in ${city}${beds > 0 ? `, ${beds} bedrooms` : size ? `, ${size}` : ""}`;
+    if (lang === "en") out = out.charAt(0).toUpperCase() + out.slice(1);
+  }
+  if (!out) {
+    // question style (also the fallback)
+    if (!city) out = lang === "zh" ? `在找${type}？` : lang === "ms" ? `Cari ${lower}?` : `Looking for a ${lower}?`;
+    else if (lang === "zh") out = rent ? `在${city}找${type}出租？` : `在${city}找${type}？`;
+    else if (lang === "ms") out = rent ? `Cari ${lower} untuk disewa di ${city}?` : `Cari ${lower} di ${city}?`;
+    else if (land || biz) out = rent ? `Looking for ${lower} space to rent in ${city}?` : `Looking for ${lower} in ${city}?`;
+    else out = rent ? `Looking for a ${homeEn} to rent in ${city}?` : `Looking for a ${homeEn} in ${city}?`;
+  }
+  return cleanHook(out, lang);
+}
 
 /* -------------------------------------------------------------------- words */
 

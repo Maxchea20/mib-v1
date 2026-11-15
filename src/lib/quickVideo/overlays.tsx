@@ -21,6 +21,7 @@ const MUTED = "#A7A092";
 
 export const HEADER_H = 100;
 export const OPENING_H = 330;
+export const HOOK_H = 420;
 export const LABEL_H = 170;
 export const FACTS_H = 1200;
 export const END_H = 1200;
@@ -29,12 +30,14 @@ export type Slice = { top: number; height: number };
 export type SheetSpec = {
   lang: VideoLang;
   opening: OpeningCopy;
+  /** The big stop-the-scroll line, or null for the normal title card. */
+  hook: string | null;
   /** One entry per label band (empty labels get no band). */
   labels: string[];
   facts: FactsCopy | null;
   end: EndCopy;
 };
-export type SheetLayout = { header: Slice; opening: Slice; labels: Slice[]; facts: Slice | null; end: Slice };
+export type SheetLayout = { header: Slice; opening: Slice; hook: Slice | null; labels: Slice[]; facts: Slice | null; end: Slice };
 
 type Font = { name: string; data: ArrayBuffer; weight: 400 | 600 | 700 | 800; style: "normal" };
 
@@ -74,16 +77,19 @@ export async function renderSheet(spec: SheetSpec): Promise<{ png: Buffer; layou
   const w800 = zh ? 700 : (800 as const);
   const caps = zh ? "none" : ("uppercase" as const);
 
-  const layout: SheetLayout = { header: { top: 0, height: HEADER_H }, opening: { top: 0, height: OPENING_H }, labels: [], facts: null, end: { top: 0, height: END_H } };
+  const layout: SheetLayout = { header: { top: 0, height: HEADER_H }, opening: { top: 0, height: OPENING_H }, hook: null, labels: [], facts: null, end: { top: 0, height: END_H } };
   let y = 0;
   layout.header.top = y; y += HEADER_H;
   layout.opening.top = y; y += OPENING_H;
+  if (spec.hook) { layout.hook = { top: y, height: HOOK_H }; y += HOOK_H; }
   spec.labels.forEach(() => { layout.labels.push({ top: y, height: LABEL_H }); y += LABEL_H; });
   if (spec.facts) { layout.facts = { top: y, height: FACTS_H }; y += FACTS_H; }
   layout.end.top = y; y += END_H;
   const total = y;
 
   const o = spec.opening;
+  const hookLen = Array.from(spec.hook ?? "").length;
+  const hookSize = zh ? (hookLen <= 10 ? 112 : hookLen <= 18 ? 92 : 78) : hookLen <= 22 ? 104 : hookLen <= 38 ? 90 : 78;
   const titleSize = Array.from(o.title).length > 24 ? 60 : 72;
 
   const element = (
@@ -103,6 +109,16 @@ export async function renderSheet(spec: SheetSpec): Promise<{ png: Buffer; layou
         <div style={{ display: "flex", marginTop: 20, fontFamily: head, fontWeight: w700, fontSize: titleSize, lineHeight: 1.12, color: CREAM }}>{o.title}</div>
         {o.sub ? <div style={{ display: "flex", marginTop: 14, fontFamily: body, fontWeight: w600, fontSize: 34, color: SOFT }}>{o.sub}</div> : null}
       </div>
+
+      {/* hook */}
+      {spec.hook ? (
+        <div style={{ width: WIDTH, height: HOOK_H, display: "flex", flexDirection: "column", alignItems: "flex-start", paddingLeft: 60, paddingRight: 60 }}>
+          <div style={{ display: "flex", flexDirection: "column", width: 960, padding: "34px 44px 38px", borderRadius: 32, backgroundColor: "rgba(10,10,11,0.72)", border: "2px solid rgba(212,175,55,0.7)" }}>
+            <div style={{ display: "flex", width: 84, height: 6, backgroundColor: GOLD, borderRadius: 3, marginBottom: 20 }} />
+            <div style={{ display: "flex", fontFamily: head, fontWeight: w700, fontSize: hookSize, lineHeight: 1.14, color: CREAM }}>{spec.hook}</div>
+          </div>
+        </div>
+      ) : null}
 
       {/* room labels */}
       {spec.labels.map((label, i) => (

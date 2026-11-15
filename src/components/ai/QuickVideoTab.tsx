@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { buildTimeline, cleanLabel, defaultLabel, factsCopy, hasFacts, MAX_LABEL, MAX_PHOTOS, totalSeconds, type Length, type VideoLang } from "@/lib/quickVideo/plan";
+import { buildTimeline, cleanHook, cleanLabel, defaultLabel, factsCopy, hasFacts, hookCopy, MAX_HOOK, MAX_LABEL, MAX_PHOTOS, totalSeconds, type HookStyle, type Length, type VideoLang } from "@/lib/quickVideo/plan";
 import type { ShareListing } from "@/lib/shareKit";
 
 /*
@@ -39,6 +39,8 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
   const [length, setLength] = useState<Length>("auto");
   const [showFacts, setShowFacts] = useState(true);
   const [showPrice, setShowPrice] = useState(true);
+  const [hook, setHook] = useState<HookStyle>("question");
+  const [hookEdit, setHookEdit] = useState<string | null>(null);
   const [chosen, setChosen] = useState<number[]>(() => photos.slice(0, 8).map((p) => p.id));
   const [labels, setLabels] = useState<Record<number, string>>({});
   const [busy, setBusy] = useState(false);
@@ -50,7 +52,9 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
 
   // The length is worked out from the number of photos, using the same plan as the server.
   const factsOk = hasFacts(factsCopy(listing, lang, showPrice));
-  const estimate = chosen.length > 0 ? totalSeconds(buildTimeline(chosen.length, [], { length, facts: showFacts && factsOk })) : 0;
+  const autoHook = hookCopy(listing, lang, hook, showPrice);
+  const hookLine = hook === "off" ? "" : cleanHook(hookEdit ?? autoHook, lang) || autoHook;
+  const estimate = chosen.length > 0 ? totalSeconds(buildTimeline(chosen.length, [], { length, facts: showFacts && factsOk, hook: hookLine !== "" })) : 0;
 
   const byId = useMemo(() => new Map(photos.map((p) => [p.id, p])), [photos]);
   const labelOf = (p: Photo) => labels[p.id] ?? defaultLabel(p.photo_type, lang);
@@ -107,6 +111,8 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
           length,
           showPrice,
           showFacts,
+          hook,
+          hookText: hook === "off" ? "" : hookLine,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -206,10 +212,30 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
       <div className={box}>
         <p className={cap}>Text on the video</p>
         <div className="grid grid-cols-3 gap-2" role="group" aria-label="Video language">
-          <button type="button" onClick={() => { setLang("en"); setLabels({}); }} aria-pressed={lang === "en"} className={seg(lang === "en")}>English</button>
-          <button type="button" onClick={() => { setLang("ms"); setLabels({}); }} aria-pressed={lang === "ms"} className={seg(lang === "ms")}>BM</button>
-          <button type="button" onClick={() => { setLang("zh"); setLabels({}); }} aria-pressed={lang === "zh"} className={seg(lang === "zh")}>中文</button>
+          <button type="button" onClick={() => { setLang("en"); setLabels({}); setHookEdit(null); }} aria-pressed={lang === "en"} className={seg(lang === "en")}>English</button>
+          <button type="button" onClick={() => { setLang("ms"); setLabels({}); setHookEdit(null); }} aria-pressed={lang === "ms"} className={seg(lang === "ms")}>BM</button>
+          <button type="button" onClick={() => { setLang("zh"); setLabels({}); setHookEdit(null); }} aria-pressed={lang === "zh"} className={seg(lang === "zh")}>中文</button>
         </div>
+        <p className={`${cap} mt-4`}>Hook (the first 2 seconds)</p>
+        <div className="grid grid-cols-4 gap-2" role="group" aria-label="Hook style">
+          {([["off", "Off"], ["price", "Price"], ["question", "Question"], ["benefit", "Benefit"]] as const).map(([k, name]) => (
+            <button key={k} type="button" onClick={() => { setHook(k); setHookEdit(null); }} aria-pressed={hook === k} className={seg(hook === k)}>{name}</button>
+          ))}
+        </div>
+        {hook !== "off" && (
+          <>
+            <input
+              type="text"
+              value={hookEdit ?? autoHook}
+              maxLength={MAX_HOOK}
+              onChange={(e) => setHookEdit(e.target.value)}
+              aria-label="Hook words"
+              data-testid="hook-text"
+              className="mt-2 min-h-12 w-full rounded border border-stone-300 px-3 text-base"
+            />
+            <p className="text-xs text-stone-500">Written from this listing&apos;s own details. You can change the words. It replaces the title card at the start.{hook === "price" && !showPrice ? " Price style needs “Show the price” turned on, so a question is used instead." : ""}</p>
+          </>
+        )}
         <p className={`${cap} mt-4`}>Length</p>
         <div className="grid grid-cols-2 gap-2" role="group" aria-label="Length">
           <button type="button" onClick={() => setLength("auto")} aria-pressed={length === "auto"} className={seg(length === "auto")}>Auto (best)</button>

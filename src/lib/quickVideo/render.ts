@@ -7,8 +7,8 @@ import sharp, { type Sharp } from "sharp";
 import { renderSheet, type Slice } from "./overlays";
 import {
   ENCODER_ARGS, HEIGHT, LAYOUT, WIDTH,
-  buildFilterGraph, buildTimeline, endCopy, factsCopy, hasFacts, openingCopy, totalSeconds,
-  type Length, type SceneInput, type VideoLang,
+  buildFilterGraph, buildTimeline, cleanHook, endCopy, hookCopy, factsCopy, hasFacts, openingCopy, totalSeconds,
+  type HookStyle, type Length, type SceneInput, type VideoLang,
 } from "./plan";
 import type { ShareListing } from "../shareKit";
 
@@ -31,6 +31,10 @@ export type RenderInput = {
   length: Length;
   showPrice: boolean;
   showFacts: boolean;
+  /** Opening style: "off" keeps the title card. */
+  hook?: HookStyle;
+  /** Hook words as edited by the user; empty means the automatic line. */
+  hookText?: string;
   /** Give up (and say so) when FFmpeg runs past this many milliseconds. */
   ffmpegBudgetMs?: number;
 };
@@ -130,13 +134,16 @@ export async function renderQuickVideo(input: RenderInput): Promise<RenderResult
 
   const facts = input.showFacts ? factsCopy(input.listing, input.lang, input.showPrice) : null;
   const useFacts = facts !== null && hasFacts(facts);
-  const scenes = buildTimeline(input.photos.length, input.labels, { length: input.length, facts: useFacts });
+  const hookStyle: HookStyle = input.hook ?? "off";
+  const hookLine = hookStyle === "off" ? "" : cleanHook(input.hookText, input.lang) || hookCopy(input.listing, input.lang, hookStyle, input.showPrice);
+  const scenes = buildTimeline(input.photos.length, input.labels, { length: input.length, facts: useFacts, hook: hookLine !== "" });
 
   // words: one drawing pass for the whole video
   const labelScenes = scenes.filter((s) => s.kind === "photo" && s.label !== "");
   const sheet = await renderSheet({
     lang: input.lang,
     opening: openingCopy(input.listing, input.lang, input.showPrice),
+    hook: hookLine || null,
     labels: labelScenes.map((s) => s.label),
     facts: useFacts ? facts : null,
     end: endCopy(input.lang),
@@ -144,6 +151,7 @@ export async function renderQuickVideo(input: RenderInput): Promise<RenderResult
   const cut = (s: Slice) => sharp(sheet.png).extract({ left: 0, top: s.top, width: WIDTH, height: s.height }).png().toBuffer();
   const header = await cut(sheet.layout.header);
   const openingText = await cut(sheet.layout.opening);
+  const hookText = sheet.layout.hook ? await cut(sheet.layout.hook) : null;
   const labelText = new Map<number, Buffer>();
   for (let i = 0; i < labelScenes.length; i++) labelText.set(labelScenes[i].index, await cut(sheet.layout.labels[i]));
   lap("words");
@@ -184,9 +192,10 @@ export async function renderQuickVideo(input: RenderInput): Promise<RenderResult
       } else {
         // photo scene: the picture is full-screen and moves; the bands are laid over it afterwards
         img = sharp({ create: { width: WIDTH, height: HEIGHT, channels: 3, background: "#000" } });
-        const text = s.kind === "opening" ? openingText : labelText.get(s.index);
+        const text = s.kind === "hook" ? hookText : s.kind === "opening" ? openingText : labelText.get(s.index);
+        const textTop = s.kind === "hook" ? LAYOUT.textTop - 90 : s.kind === "opening" ? LAYOUT.textTop - 5 : LAYOUT.textTop + 15;
         const bottomParts: Part[] = [{ input: BOTTOM_SHADE, left: 0, top: 0 }];
-        if (text) bottomParts.push({ input: text, left: 0, top: (s.kind === "opening" ? LAYOUT.textTop - 5 : LAYOUT.textTop + 15) - LAYOUT.bandTop });
+        if (text) bottomParts.push({ input: text, left: 0, top: textTop - LAYOUT.bandTop });
         await sharp({ create: { width: WIDTH, height: BOTTOM_H, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
           .composite(bottomParts)
           .png()
