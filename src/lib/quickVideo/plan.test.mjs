@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   buildTimeline, secondsPerPhoto, totalFrames, totalSeconds, fadeOffsets, motionFor, defaultLabel, cleanLabel,
-  buildFilterGraph, ENCODER_ARGS, openingCopy, endCopy, factsCopy, hasFacts, FPS, FADE_FRAMES, MAX_PHOTOS, MAX_LABEL, LAYOUT,
+  buildFilterGraph, ENCODER_ARGS, openingCopy, hookCopy, cleanHook, MAX_HOOK, endCopy, factsCopy, hasFacts, FPS, FADE_FRAMES, MAX_PHOTOS, MAX_LABEL, LAYOUT,
 } from "./plan.ts";
 
 const L = (o = {}) => ({ id: 3, title: "Double storey terrace", category: "Residential", purpose: "For Sale", price: 595000, area: "Bandar Seri Botani",
@@ -153,4 +153,43 @@ test("facts card is skipped when there is almost nothing to show; land uses land
   assert.ok(land.rows.some((r) => r.value === "2 acres") && !JSON.stringify(land).includes("999"));
   assert.equal(hasFacts(land), true);
   assert.ok(factsCopy(L({ headline: null, address: "12 Jalan Rahsia", postal_code: "34600" }), "en", true).rows.every((r) => !r.value.includes("Rahsia")));
+});
+
+/* -------------------------------------------------------------------- hook */
+
+test("hook lines are written only from the listing's facts, in all three languages", () => {
+  assert.equal(hookCopy(L(), "en", "off", true), "");
+  assert.equal(hookCopy(L(), "en", "price", true), "RM 595,000 for a 4-bed terrace in Ipoh?");
+  assert.equal(hookCopy(L(), "en", "question", true), "Looking for a 4-bed terrace in Ipoh?");
+  assert.ok(hookCopy(L(), "en", "benefit", true).startsWith("Freehold "));
+  assert.ok(hookCopy(L(), "zh", "price", true).includes("RM 595,000"));
+  assert.ok(/[一-鿿]/.test(hookCopy(L(), "zh", "question", true)));
+  assert.ok(hookCopy(L(), "ms", "price", true).includes("RM 595,000"));
+  assert.ok(hookCopy(L({ purpose: "For Rent", price: 2500 }), "en", "price", true).includes("/ month"));
+});
+
+test("hook never shows a price that is hidden, and never invents a fact", () => {
+  const noPrice = hookCopy(L(), "en", "price", false);
+  assert.ok(!/RM/.test(noPrice) && noPrice.startsWith("Looking for"), "falls back to a question");
+  const bare = hookCopy(L({ tenure: "leasehold", bedrooms: null, built_up: null }), "en", "benefit", true);
+  assert.ok(!/freehold/i.test(bare), "no tenure claim when it is not freehold");
+  assert.ok(!/RM/.test(hookCopy(L({ price: null }), "en", "price", true)));
+});
+
+test("hook text is cleaned and kept short", () => {
+  assert.equal(cleanHook("  Hi\n  <b>there</b>  ", "en"), "Hi b there /b");
+  assert.equal(Array.from(cleanHook("x".repeat(200), "en")).length, MAX_HOOK);
+  assert.equal(Array.from(cleanHook("字".repeat(200), "zh")).length, 30);
+  assert.equal(cleanHook(undefined, "en"), "");
+});
+
+test("a hook replaces the title card with a shorter first scene", () => {
+  const plain = buildTimeline(5, [], { length: "auto", facts: true });
+  const hooked = buildTimeline(5, [], { length: "auto", facts: true, hook: true });
+  assert.equal(plain[0].kind, "opening");
+  assert.equal(hooked[0].kind, "hook");
+  assert.equal(hooked.length, plain.length);
+  assert.ok(hooked[0].frames < plain[0].frames);
+  assert.equal(hooked[0].photo, 0);
+  assert.ok(hooked[0].motion);
 });
