@@ -1,4 +1,5 @@
 import PhotoOptimizer from "@/components/settings/PhotoOptimizer";
+import VideoCleaner from "@/components/settings/VideoCleaner";
 
 export default function SettingsPage() {
   return (
@@ -13,6 +14,8 @@ export default function SettingsPage() {
       </p>
 
       <PhotoOptimizer />
+
+      <VideoCleaner />
     </div>
     
   );
