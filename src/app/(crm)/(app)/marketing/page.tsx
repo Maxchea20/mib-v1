@@ -3,6 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
 import MarketingTabs from "@/components/marketing/MarketingTabs";
 
 export default async function MarketingPage() {
@@ -67,6 +68,13 @@ export default async function MarketingPage() {
         <p className="text-gray-500 mt-2">
           Select a listing to create and publish marketing content.
         </p>
+
+        <Link
+          href="/marketing/today"
+          className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-[var(--copper)] px-4 text-sm font-semibold text-white"
+        >
+          Today: what to share now
+        </Link>
 
       </div>
 

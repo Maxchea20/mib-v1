@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 type Props = {
   details: React.ReactNode;
@@ -17,8 +18,10 @@ export default function ListingTabs({
   aiVideo,
   share,
 }: Props) {
+  // a link such as /listings/12?tab=share opens that tab
+  const wanted = useSearchParams().get("tab");
   const [tab, setTab] = useState<"details" | "gallery" | "ai" | "video" | "share">(
-    "details"
+    wanted === "gallery" || wanted === "ai" || wanted === "video" || (wanted === "share" && share) ? wanted : "details"
   );
 
   const tabs = [
