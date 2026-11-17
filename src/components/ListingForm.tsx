@@ -3581,6 +3581,186 @@ export default function ListingForm({
             Wah Loong
           </option>
 
+          <option>
+            Batu Undan
+          </option>
+
+          <option>
+            Desa Manjung Point
+          </option>
+
+          <option>
+            Desa Manjung Point 2
+          </option>
+
+          <option>
+            Desa Manjung Raya
+          </option>
+
+          <option>
+            Kampung Acheh
+          </option>
+
+          <option>
+            Kampung Acheh Baru
+          </option>
+
+          <option>
+            Kampung Baharu
+          </option>
+
+          <option>
+            Kampung Batu 3 Segari
+          </option>
+
+          <option>
+            Kampung Pundut
+          </option>
+
+          <option>
+            Kampung Telaga Nenas
+          </option>
+
+          <option>
+            Kampung Teluk
+          </option>
+
+          <option>
+            Kampung Teluk Batik
+          </option>
+
+          <option>
+            Kampung Teluk Muroh
+          </option>
+
+          <option>
+            Kampung Tersusun Pundut
+          </option>
+
+          <option>
+            Lumut Port Industrial Park
+          </option>
+
+          <option>
+            Manjung Point Seksyen 1
+          </option>
+
+          <option>
+            Pekan Lumut
+          </option>
+
+          <option>
+            Pengkalan Tldm Teluk Muruk
+          </option>
+
+          <option>
+            Pengkalan Tudm
+          </option>
+
+          <option>
+            Persiaran Manjung Raya
+          </option>
+
+          <option>
+            Sungai Pinang Besar
+          </option>
+
+          <option>
+            Taman Bukit Maju
+          </option>
+
+          <option>
+            Taman Desa Bayu
+          </option>
+
+          <option>
+            Taman Desa Manjung Point
+          </option>
+
+          <option>
+            Taman Desa Manjung Point Seksyen 1
+          </option>
+
+          <option>
+            Taman Desa Manjung Point Seksyen 2
+          </option>
+
+          <option>
+            Taman Desa Manjung Point Seksyen 3
+          </option>
+
+          <option>
+            Taman Desa Pangkor
+          </option>
+
+          <option>
+            Taman Lestari Baru
+          </option>
+
+          <option>
+            Taman Maju Bukit
+          </option>
+
+          <option>
+            Taman Manjung Point
+          </option>
+
+          <option>
+            Taman Melati
+          </option>
+
+          <option>
+            Taman Nakhoda Bestari 2
+          </option>
+
+          <option>
+            Taman Permata
+          </option>
+
+          <option>
+            Taman Samudera
+          </option>
+
+          <option>
+            Taman Samudera 1
+          </option>
+
+          <option>
+            Taman Samudera Baru
+          </option>
+
+          <option>
+            Taman Segari Maju
+          </option>
+
+          <option>
+            Taman Seri Acheh
+          </option>
+
+          <option>
+            Taman Seri Wangsa
+          </option>
+
+          <option>
+            Taman Seri Wangsa 2
+          </option>
+
+          <option>
+            Taman Sri Batik
+          </option>
+
+          <option>
+            Teluk Batik
+          </option>
+
+          <option>
+            Teluk Segin
+          </option>
+
+          <option>
+            Venice Of Perak
+          </option>
+
         </datalist>
 
         {/* ================================================================ */}
