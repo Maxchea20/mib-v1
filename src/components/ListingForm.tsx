@@ -3177,6 +3177,102 @@ export default function ListingForm({
             Taman Ria
           </option>
 
+          <option>
+            Desa Lawan Kuda
+          </option>
+
+          <option>
+            Desa Lawan Kuda 2
+          </option>
+
+          <option>
+            Gopeng Industrial Park
+          </option>
+
+          <option>
+            Kampung Baru Lawan Kuda
+          </option>
+
+          <option>
+            Kampung Changkat Tualang
+          </option>
+
+          <option>
+            Kampung Gunung Mesah Hulu
+          </option>
+
+          <option>
+            Kampung Jelintoh
+          </option>
+
+          <option>
+            Kampung Pintu Padang
+          </option>
+
+          <option>
+            Kampung Rawa
+          </option>
+
+          <option>
+            Kampung Sangly
+          </option>
+
+          <option>
+            Kampung Tersusun Batu 3 1/2
+          </option>
+
+          <option>
+            Kampung Tersusun Jelintoh
+          </option>
+
+          <option>
+            Kampung Tersusun Kampung Pulai
+          </option>
+
+          <option>
+            Kampung Tersusun Kampung Rawa
+          </option>
+
+          <option>
+            Kampung Tersusun Kopisan Baru
+          </option>
+
+          <option>
+            Kampung Tersusun Muhibbah Kopisan Baru
+          </option>
+
+          <option>
+            Kopisan Baru
+          </option>
+
+          <option>
+            Kota Bahru
+          </option>
+
+          <option>
+            Taman Gopeng Baru
+          </option>
+
+          <option>
+            Taman Gopeng Jaya
+          </option>
+
+          <option>
+            Taman Gopeng Tambahan
+          </option>
+
+          <option>
+            Taman Kinta
+          </option>
+
+          <option>
+            Taman Kinta Baru
+          </option>
+
+          <option>
+            Taman Lawan Kuda
+          </option>
+
         </datalist>
 
         {/* ================================================================ */}
