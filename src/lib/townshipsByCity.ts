@@ -9,6 +9,8 @@
 | To add a township, add it to its city below.
 */
 
+export const CITIES: string[] = ["Ipoh", "Lahat", "Chemor", "Menglembu", "Batu Gajah", "Pusing", "Ulu Kinta", "Gopeng", "Jelapang", "Kampar", "Kampung Kepayang", "Lumut", "Malim Nawar", "Simpang Pulai"];
+
 export const TOWNSHIPS_BY_CITY: Record<string, string[]> = {
   "Ipoh": [
     "Anjung Bercham Indah",

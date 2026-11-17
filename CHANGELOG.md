@@ -1,5 +1,26 @@
 # MIB Changelog
 
+## 2026-11-17 - Township memory and iProperty location data
+
+### Added
+
+- Township memory: saving a listing remembers township + city + postal code. Picking that township again fills City and Postal Code (table `township_lookup`, keyed by township and city)
+- Township suggestions follow the chosen city, using iProperty's own names (`src/lib/townshipsByCity.ts`)
+- Postcodes for 672 Perak townships across 12 cities (seed files `supabase/audit/10_*` and `11_*`)
+- City dropdown: Gopeng, Jelapang, Kampar, Kampung Kepayang, Lumut, Malim Nawar, Simpang Pulai
+- Note under Township when the name is not on iProperty's list (MIB Desktop then ticks "My listing is not in any township")
+
+### Fixed
+
+- Edit listing: a saved city that is not in the dropdown now shows instead of looking blank
+
+### Notes
+
+- Run `supabase/audit/08` to `11` in order in the Supabase SQL editor
+- Jelapang and Kampung Kepayang have no townships on iProperty
+
+---
+
 ## V1.0 - 2026-08-04
 
 ### Added

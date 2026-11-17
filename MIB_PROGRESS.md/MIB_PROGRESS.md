@@ -1519,3 +1519,23 @@ with as little repetitive manual work as possible.
 
 
 END OF ROADMAP
+
+---
+
+**==================================================**
+
+UPDATE — 2026-11-17 — iPROPERTY LOCATION DATA
+
+**==================================================**
+
+[x] Township memory (township + city -> postal code)
+
+[x] Township suggestions per city (iProperty names)
+
+[x] Postcodes loaded for 672 Perak townships (12 cities)
+
+[x] MIB Desktop: city regex fix, "not in any township" fallback, Next check
+
+[ ] Run one Perak listing end to end through MIB Desktop to iProperty
+
+[ ] Review remaining iProperty steps (unit details, price, description, gallery)
