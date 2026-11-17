@@ -3817,6 +3817,138 @@ export default function ListingForm({
             Taman Malim Nawar
           </option>
 
+          <option>
+            Bandar Pulai Jaya
+          </option>
+
+          <option>
+            Desa Pulai Impian
+          </option>
+
+          <option>
+            Desa Pulai Jaya
+          </option>
+
+          <option>
+            Desa Pulai Sentosa
+          </option>
+
+          <option>
+            Kampung Baru Simpang Pulai
+          </option>
+
+          <option>
+            Kampung Keramat Pulai
+          </option>
+
+          <option>
+            Kampung Kurnia
+          </option>
+
+          <option>
+            Kampung Merawan Indah
+          </option>
+
+          <option>
+            Kampung Paya Rengas
+          </option>
+
+          <option>
+            Kampung Pengkalan Baru
+          </option>
+
+          <option>
+            Kampung Simpang Pulai
+          </option>
+
+          <option>
+            Kampung Sungai Ular
+          </option>
+
+          <option>
+            Kampung Tanjung Tambahan
+          </option>
+
+          <option>
+            Kampung Tekah
+          </option>
+
+          <option>
+            Kampung Tersusun Sengat
+          </option>
+
+          <option>
+            Kampung Tersusun Serdang Permai
+          </option>
+
+          <option>
+            Kampung Tersusun Tekah Baru
+          </option>
+
+          <option>
+            Pulai Business Centre
+          </option>
+
+          <option>
+            Pulai Mutiara
+          </option>
+
+          <option>
+            Seri Palma
+          </option>
+
+          <option>
+            Taman Chandan Desa
+          </option>
+
+          <option>
+            Taman Chandran Desa
+          </option>
+
+          <option>
+            Taman Lapangan Pelangi
+          </option>
+
+          <option>
+            Taman Mesra Raia
+          </option>
+
+          <option>
+            Taman Muda
+          </option>
+
+          <option>
+            Taman Pulai Jaya
+          </option>
+
+          <option>
+            Taman Pulai Mutiara
+          </option>
+
+          <option>
+            Taman Pulai Raya
+          </option>
+
+          <option>
+            Taman Pulai Timur
+          </option>
+
+          <option>
+            Taman Raia Damai
+          </option>
+
+          <option>
+            Taman Raia Mesra
+          </option>
+
+          <option>
+            Taman Sengat Baru
+          </option>
+
+          <option>
+            Taman Seri Raia
+          </option>
+
         </datalist>
 
         {/* ================================================================ */}
