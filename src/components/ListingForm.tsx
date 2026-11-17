@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { TOWNSHIPS_BY_CITY } from "@/lib/townshipsByCity";
+import { CITIES, TOWNSHIPS_BY_CITY } from "@/lib/townshipsByCity";
 
 type Props = {
   mode: "create" | "edit";
@@ -200,6 +200,10 @@ export default function ListingForm({
     ])
   );
 
+  const townshipOnIproperty = (TOWNSHIPS_BY_CITY[city] ?? []).some(
+    (name) => name.toLowerCase() === area.trim().toLowerCase()
+  );
+
   function handleTownshipChange(value: string) {
     setArea(value);
     applyTownshipMemory(value, city);
@@ -209,79 +213,6 @@ export default function ListingForm({
     setCity(value);
 
     if (area.trim()) applyTownshipMemory(area, value);
-  }
-
-  /*
-  | Postcode finder. Asks OpenStreetMap (Nominatim) for postcodes near
-  | "township, city, state". Results are only SUGGESTIONS: click one to
-  | use it. Once a listing is saved, township_lookup remembers it.
-  */
-  const [postcodeHints, setPostcodeHints] =
-    useState<string[]>([]);
-  const [postcodeBusy, setPostcodeBusy] =
-    useState(false);
-  const [postcodeMsg, setPostcodeMsg] =
-    useState("");
-
-  function placeQuery() {
-    return [area, city, state, "Malaysia"]
-      .map((v) => v.trim())
-      .filter(Boolean)
-      .join(", ");
-  }
-
-  async function findPostcode() {
-    if (!area.trim() && !city.trim()) {
-      setPostcodeMsg("Pick a township or city first.");
-      setPostcodeHints([]);
-      return;
-    }
-
-    setPostcodeBusy(true);
-    setPostcodeMsg("");
-    setPostcodeHints([]);
-
-    try {
-      const url =
-        "https://nominatim.openstreetmap.org/search?" +
-        new URLSearchParams({
-          q: placeQuery(),
-          format: "jsonv2",
-          addressdetails: "1",
-          countrycodes: "my",
-          limit: "8",
-        }).toString();
-
-      const res = await fetch(url);
-
-      if (!res.ok) throw new Error(String(res.status));
-
-      const rows: {
-        address?: { postcode?: string };
-      }[] = await res.json();
-
-      const codes = Array.from(
-        new Set(
-          rows
-            .map((r) => r.address?.postcode?.trim())
-            .filter((v): v is string => !!v && /^\d{5}$/.test(v))
-        )
-      );
-
-      setPostcodeHints(codes);
-
-      if (codes.length === 0) {
-        setPostcodeMsg(
-          "No postcode found. Use the Google Maps link to check."
-        );
-      }
-    } catch {
-      setPostcodeMsg(
-        "Postcode lookup failed. Use the Google Maps link to check."
-      );
-    } finally {
-      setPostcodeBusy(false);
-    }
   }
 
   const [landSize, setLandSize] =
@@ -1326,61 +1257,15 @@ export default function ListingForm({
             City
           </option>
 
-          <option>
-            Ipoh
-          </option>
+          {CITIES.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
 
-          <option>
-            Lahat
-          </option>
-
-          <option>
-            Chemor
-          </option>
-
-          <option>
-            Menglembu
-          </option>
-
-          <option>
-            Batu Gajah
-          </option>
-
-          <option>
-            Pusing
-          </option>
-
-          <option>
-            Ulu Kinta
-          </option>
-
-          <option>
-            Gopeng
-          </option>
-
-          <option>
-            Jelapang
-          </option>
-
-          <option>
-            Kampar
-          </option>
-
-          <option>
-            Kampung Kepayang
-          </option>
-
-          <option>
-            Lumut
-          </option>
-
-          <option>
-            Malim Nawar
-          </option>
-
-          <option>
-            Simpang Pulai
-          </option>
+          {city && !CITIES.includes(city) && (
+            <option value={city}>{city}</option>
+          )}
         </select>
 
         {/* ================================================================ */}
@@ -1408,6 +1293,15 @@ export default function ListingForm({
             <option key={name} value={name} />
           ))}
         </datalist>
+
+        {city && area.trim() && !townshipOnIproperty && (
+          <p className="text-sm text-amber-700">
+            {townshipSuggestions.length === 0
+              ? `iProperty has no townships for ${city}.`
+              : `"${area.trim()}" is not on iProperty's list for ${city}.`}{" "}
+            MIB Desktop will tick &quot;My listing is not in any township&quot;.
+          </p>
+        )}
 
         {/* ================================================================ */}
         {/* ADDRESS */}
@@ -1440,48 +1334,6 @@ export default function ListingForm({
             inputClass
           }
         />
-
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <button
-            type="button"
-            onClick={findPostcode}
-            disabled={postcodeBusy}
-            className="rounded border border-gray-300 px-3 py-1 text-black"
-          >
-            {postcodeBusy
-              ? "Searching..."
-              : "Find postcode"}
-          </button>
-
-          <a
-            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeQuery())}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 underline"
-          >
-            Check on Google Maps
-          </a>
-
-          {postcodeHints.map((code) => (
-            <button
-              key={code}
-              type="button"
-              onClick={() => {
-                setPostalCode(code);
-                setPostcodeHints([]);
-              }}
-              className="rounded bg-gray-100 px-2 py-1 text-black"
-            >
-              Use {code}
-            </button>
-          ))}
-
-          {postcodeMsg && (
-            <span className="text-gray-600">
-              {postcodeMsg}
-            </span>
-          )}
-        </div>
 
         {/* ================================================================ */}
         {/* PROPERTY DETAILS */}
