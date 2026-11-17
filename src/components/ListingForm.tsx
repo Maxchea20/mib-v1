@@ -116,13 +116,14 @@ export default function ListingForm({
   | Remembered township -> city + postal code (table: township_lookup).
   | Learned from saved listings, so you only set each township once.
   */
-  const [townshipLookup, setTownshipLookup] =
-    useState<
-      Record<
-        string,
-        { city: string | null; postal_code: string }
-      >
-    >({});
+  type TownshipRow = {
+    township: string;
+    city: string;
+    postal_code: string;
+  };
+
+  const [townshipRows, setTownshipRows] =
+    useState<TownshipRow[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -133,19 +134,13 @@ export default function ListingForm({
       .then(({ data }) => {
         if (cancelled || !data) return;
 
-        const map: Record<
-          string,
-          { city: string | null; postal_code: string }
-        > = {};
-
-        for (const row of data) {
-          map[row.township] = {
-            city: row.city,
-            postal_code: row.postal_code,
-          };
-        }
-
-        setTownshipLookup(map);
+        setTownshipRows(
+          data.map((r) => ({
+            township: r.township,
+            city: r.city ?? "",
+            postal_code: r.postal_code,
+          }))
+        );
       });
 
     return () => {
@@ -153,16 +148,47 @@ export default function ListingForm({
     };
   }, []);
 
+  /*
+  | Same township name can exist in different cities with different
+  | postcodes, so remembered rows are matched on township AND city.
+  */
+  function applyTownshipMemory(
+    township: string,
+    currentCity: string
+  ) {
+    const matches = townshipRows.filter(
+      (r) =>
+        r.township === township.trim().toLowerCase()
+    );
+
+    if (matches.length === 0) return;
+
+    const sameCity = matches.find(
+      (r) =>
+        currentCity &&
+        r.city.toLowerCase() === currentCity.toLowerCase()
+    );
+
+    if (sameCity) {
+      setPostalCode(sameCity.postal_code);
+      return;
+    }
+
+    if (matches.length === 1) {
+      setPostalCode(matches[0].postal_code);
+      if (matches[0].city) setCity(matches[0].city);
+    }
+  }
+
   function handleTownshipChange(value: string) {
     setArea(value);
+    applyTownshipMemory(value, city);
+  }
 
-    const known =
-      townshipLookup[value.trim().toLowerCase()];
+  function handleCityChange(value: string) {
+    setCity(value);
 
-    if (!known) return;
-
-    if (known.postal_code) setPostalCode(known.postal_code);
-    if (known.city) setCity(known.city);
+    if (area.trim()) applyTownshipMemory(area, value);
   }
 
   /*
@@ -753,14 +779,17 @@ export default function ListingForm({
 
       if (!t || !pc) return;
 
-      await supabase.from("township_lookup").upsert({
-        township: t.toLowerCase(),
-        label: t,
-        state: state.trim() || null,
-        city: city.trim() || null,
-        postal_code: pc,
-        updated_at: new Date().toISOString(),
-      });
+      await supabase.from("township_lookup").upsert(
+        {
+          township: t.toLowerCase(),
+          label: t,
+          state: state.trim() || null,
+          city: city.trim(),
+          postal_code: pc,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "township,city" }
+      );
     }
 
     /*
@@ -1265,7 +1294,7 @@ export default function ListingForm({
         <select
           value={city}
           onChange={(e) =>
-            setCity(
+            handleCityChange(
               e.target.value
             )
           }
@@ -4020,6 +4049,18 @@ export default function ListingForm({
 
           <option>
             Taman Seri Raia
+          </option>
+
+          <option>
+            Pusat Bandar Baru Bercham
+          </option>
+
+          <option>
+            Taman Kaya
+          </option>
+
+          <option>
+            Taman Villa Medan Desa Perpaduan
           </option>
 
         </datalist>
