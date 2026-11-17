@@ -2621,6 +2621,34 @@ export default function ListingForm({
             Sunway City Ipoh
           </option>
 
+          <option>
+            Kampung Baru Bukit Merah
+          </option>
+
+          <option>
+            Kampung Baru Lahat
+          </option>
+
+          <option>
+            Kampung Changkat Larang
+          </option>
+
+          <option>
+            Kampung Pengkalan Gate
+          </option>
+
+          <option>
+            Kampung Pengkalan Gate Tambahan 1
+          </option>
+
+          <option>
+            Kampung Pengkalan Gate Tambahan 2
+          </option>
+
+          <option>
+            Kampung Pengkalan Pegoh Tambahan 2
+          </option>
+
         </datalist>
 
         {/* ================================================================ */}
