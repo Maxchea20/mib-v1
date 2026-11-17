@@ -77,8 +77,12 @@ export default function TodayBoard({
 
   const [history, setHistory] = useState<Entry[]>(initialHistory);
   // The pick is chosen once when the page opens, so ticking Posted does not make it jump to another listing.
+  // If you already ticked a listing today, the page reopens on it so you can tick more apps.
   const [selectedId, setSelectedId] = useState<number | null>(() => {
     const first = rankListings(listings, initialHistory, serverNow);
+    const today = startOfMyDay(serverNow);
+    const started = initialHistory.find((h) => h.property_id != null && Date.parse(h.shared_at) >= today && first.some((r) => r.listing.id === h.property_id));
+    if (started) return started.property_id;
     return (first.find((r) => !r.cooling) ?? first[0])?.listing.id ?? null;
   });
   const [ideaKey, setIdeaKey] = useState<string | null>(null);
@@ -130,6 +134,11 @@ export default function TodayBoard({
   async function copy(id: string, text: string) {
     setNotice((await copyText(text)) ? "Caption copied." : "Could not copy. Select the text and copy it yourself.");
     void id;
+  }
+
+  function openListing(id: number) {
+    setSelectedId(id);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function another() {
@@ -342,6 +351,20 @@ export default function TodayBoard({
           </section>
 
           <section className={card}>
+            <h2 className="text-lg font-bold text-stone-900">Choose any listing</h2>
+            <p className="mb-2 text-sm text-stone-600">Use this to go back to a listing you already shared, or to pick one yourself.</p>
+            <label className="sr-only" htmlFor="today-any-listing">Choose a listing</label>
+            <select id="today-any-listing" data-testid="any-listing" value={current?.listing.id ?? ""} onChange={(e) => openListing(Number(e.target.value))}
+              className="min-h-12 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm text-stone-900">
+              {[...ranked].sort((a, b) => title(a.listing).localeCompare(title(b.listing))).map((r) => (
+                <option key={r.listing.id} value={r.listing.id}>
+                  {title(r.listing)}{r.daysSince === 0 ? " (shared today)" : r.daysSince === null ? " (never shared)" : ""}
+                </option>
+              ))}
+            </select>
+          </section>
+
+          <section className={card}>
             <h2 className="text-lg font-bold text-stone-900">Old listings, longest unshared first</h2>
             <p className="mb-2 text-sm text-stone-600">Tap one to make it today&apos;s listing.</p>
             {old.length === 0 && <p className="text-sm text-stone-700">No listing is ready yet.</p>}
@@ -366,11 +389,22 @@ export default function TodayBoard({
                 const l = h.property_id != null ? lookup.get(h.property_id) : null;
                 const what = l ? title(l) : h.idea_key ? IDEAS.find((x) => x.key === h.idea_key)?.title ?? "Idea" : `Listing ${h.property_id}`;
                 const days = Math.max(0, Math.floor((now - Date.parse(h.shared_at)) / 86_400_000));
-                return (
-                  <div key={h.id ?? i} className="border-t border-stone-200 py-2">
+                const canOpen = h.property_id != null && ranked.some((r) => r.listing.id === h.property_id);
+                const inner = (
+                  <>
                     <div className="text-sm font-semibold text-stone-900">{what}</div>
-                    <div className="text-xs text-stone-600">{PLATFORM_LABEL[h.platform as SharePlatform] ?? h.platform} · {agoText(days)}</div>
-                  </div>
+                    <div className="text-xs text-stone-600">
+                      {PLATFORM_LABEL[h.platform as SharePlatform] ?? h.platform} · {agoText(days)}
+                      {canOpen ? " · tap to open" : ""}
+                    </div>
+                  </>
+                );
+                return canOpen ? (
+                  <button key={h.id ?? i} type="button" onClick={() => openListing(h.property_id as number)} className="border-t border-stone-200 py-2 text-left">
+                    {inner}
+                  </button>
+                ) : (
+                  <div key={h.id ?? i} className="border-t border-stone-200 py-2">{inner}</div>
                 );
               })}
             </div>
