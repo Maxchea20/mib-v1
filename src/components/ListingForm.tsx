@@ -3761,6 +3761,62 @@ export default function ListingForm({
             Venice Of Perak
           </option>
 
+          <option>
+            Kampung Baru
+          </option>
+
+          <option>
+            Kampung Baru Jeram
+          </option>
+
+          <option>
+            Kampung Bunga Tanjung
+          </option>
+
+          <option>
+            Kampung Changkat Baru
+          </option>
+
+          <option>
+            Kampung Gunung Mesah Hilir
+          </option>
+
+          <option>
+            Kampung Gunung Panjang
+          </option>
+
+          <option>
+            Kampung Jelutong Baru
+          </option>
+
+          <option>
+            Kampung Jeram
+          </option>
+
+          <option>
+            Kampung Jernih
+          </option>
+
+          <option>
+            Kampung Pulau Pisang
+          </option>
+
+          <option>
+            Kampung Tersusun Batu 20
+          </option>
+
+          <option>
+            Kampung Tualang Sekah
+          </option>
+
+          <option>
+            Taman Bina Jaya
+          </option>
+
+          <option>
+            Taman Malim Nawar
+          </option>
+
         </datalist>
 
         {/* ================================================================ */}
