@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 type Props = {
@@ -111,6 +111,132 @@ export default function ListingForm({
       listing?.postal_code ??
       ""
     );
+
+  /*
+  | Remembered township -> city + postal code (table: township_lookup).
+  | Learned from saved listings, so you only set each township once.
+  */
+  const [townshipLookup, setTownshipLookup] =
+    useState<
+      Record<
+        string,
+        { city: string | null; postal_code: string }
+      >
+    >({});
+
+  useEffect(() => {
+    let cancelled = false;
+
+    supabase
+      .from("township_lookup")
+      .select("township, city, postal_code")
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+
+        const map: Record<
+          string,
+          { city: string | null; postal_code: string }
+        > = {};
+
+        for (const row of data) {
+          map[row.township] = {
+            city: row.city,
+            postal_code: row.postal_code,
+          };
+        }
+
+        setTownshipLookup(map);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function handleTownshipChange(value: string) {
+    setArea(value);
+
+    const known =
+      townshipLookup[value.trim().toLowerCase()];
+
+    if (!known) return;
+
+    if (known.postal_code) setPostalCode(known.postal_code);
+    if (known.city) setCity(known.city);
+  }
+
+  /*
+  | Postcode finder. Asks OpenStreetMap (Nominatim) for postcodes near
+  | "township, city, state". Results are only SUGGESTIONS: click one to
+  | use it. Once a listing is saved, township_lookup remembers it.
+  */
+  const [postcodeHints, setPostcodeHints] =
+    useState<string[]>([]);
+  const [postcodeBusy, setPostcodeBusy] =
+    useState(false);
+  const [postcodeMsg, setPostcodeMsg] =
+    useState("");
+
+  function placeQuery() {
+    return [area, city, state, "Malaysia"]
+      .map((v) => v.trim())
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  async function findPostcode() {
+    if (!area.trim() && !city.trim()) {
+      setPostcodeMsg("Pick a township or city first.");
+      setPostcodeHints([]);
+      return;
+    }
+
+    setPostcodeBusy(true);
+    setPostcodeMsg("");
+    setPostcodeHints([]);
+
+    try {
+      const url =
+        "https://nominatim.openstreetmap.org/search?" +
+        new URLSearchParams({
+          q: placeQuery(),
+          format: "jsonv2",
+          addressdetails: "1",
+          countrycodes: "my",
+          limit: "8",
+        }).toString();
+
+      const res = await fetch(url);
+
+      if (!res.ok) throw new Error(String(res.status));
+
+      const rows: {
+        address?: { postcode?: string };
+      }[] = await res.json();
+
+      const codes = Array.from(
+        new Set(
+          rows
+            .map((r) => r.address?.postcode?.trim())
+            .filter((v): v is string => !!v && /^\d{5}$/.test(v))
+        )
+      );
+
+      setPostcodeHints(codes);
+
+      if (codes.length === 0) {
+        setPostcodeMsg(
+          "No postcode found. Use the Google Maps link to check."
+        );
+      }
+    } catch {
+      setPostcodeMsg(
+        "Postcode lookup failed. Use the Google Maps link to check."
+      );
+    } finally {
+      setPostcodeBusy(false);
+    }
+  }
 
   const [landSize, setLandSize] =
     useState(
@@ -617,6 +743,26 @@ export default function ListingForm({
             : null,
     };
 
+
+    /*
+    | Remember township -> city + postal code for next time.
+    */
+    async function rememberTownship() {
+      const t = area.trim();
+      const pc = postalCode.trim();
+
+      if (!t || !pc) return;
+
+      await supabase.from("township_lookup").upsert({
+        township: t.toLowerCase(),
+        label: t,
+        state: state.trim() || null,
+        city: city.trim() || null,
+        postal_code: pc,
+        updated_at: new Date().toISOString(),
+      });
+    }
+
     /*
     |--------------------------------------------------------------------------
     | CREATE
@@ -646,6 +792,8 @@ export default function ListingForm({
         );
         return;
       }
+
+      await rememberTownship();
 
       alert(
         "Listing added successfully."
@@ -689,6 +837,8 @@ export default function ListingForm({
       );
       return;
     }
+
+    await rememberTownship();
 
     alert(
       "Listing updated successfully."
@@ -1154,6 +1304,34 @@ export default function ListingForm({
           <option>
             Ulu Kinta
           </option>
+
+          <option>
+            Gopeng
+          </option>
+
+          <option>
+            Jelapang
+          </option>
+
+          <option>
+            Kampar
+          </option>
+
+          <option>
+            Kampung Kepayang
+          </option>
+
+          <option>
+            Lumut
+          </option>
+
+          <option>
+            Malim Nawar
+          </option>
+
+          <option>
+            Simpang Pulai
+          </option>
         </select>
 
         {/* ================================================================ */}
@@ -1166,7 +1344,7 @@ export default function ListingForm({
           placeholder="Township"
           value={area}
           onChange={(e) =>
-            setArea(
+            handleTownshipChange(
               e.target.value
             )
           }
@@ -1458,6 +1636,206 @@ export default function ListingForm({
 
           <option>
             Jelapang Tambahan
+          </option>
+
+          <option>
+            Kampung Ampang Baru
+          </option>
+
+          <option>
+            Kampung Baharu Gunung Rapat
+          </option>
+
+          <option>
+            Kampung Baru Jelapang
+          </option>
+
+          <option>
+            Kampung Baru Pasir Pinji
+          </option>
+
+          <option>
+            Kampung Batu Bertudung
+          </option>
+
+          <option>
+            Kampung Bercham
+          </option>
+
+          <option>
+            Kampung Buntong 2
+          </option>
+
+          <option>
+            Kampung Buntong 4
+          </option>
+
+          <option>
+            Kampung Cempaka Sari
+          </option>
+
+          <option>
+            Kampung Chan Thye Lee
+          </option>
+
+          <option>
+            Kampung Dato&#39; Ahmad Said
+          </option>
+
+          <option>
+            Kampung Dato&#39; Ahmad Said Tambahan 2
+          </option>
+
+          <option>
+            Kampung Dato&#39; Ahmad Said Tambahan 3
+          </option>
+
+          <option>
+            Kampung Gunung Genting
+          </option>
+
+          <option>
+            Kampung Jalan Spooner
+          </option>
+
+          <option>
+            Kampung Jawa
+          </option>
+
+          <option>
+            Kampung Jelapang Baru
+          </option>
+
+          <option>
+            Kampung Jelapang Tambahan
+          </option>
+
+          <option>
+            Kampung Kacang Putih
+          </option>
+
+          <option>
+            Kampung Kepayang
+          </option>
+
+          <option>
+            Kampung Kepayang Fair Park
+          </option>
+
+          <option>
+            Kampung Kuala Pari
+          </option>
+
+          <option>
+            Kampung Kuala Pari Hilir
+          </option>
+
+          <option>
+            Kampung Kuchai
+          </option>
+
+          <option>
+            Kampung Manjoi
+          </option>
+
+          <option>
+            Kampung Manjoi Baru
+          </option>
+
+          <option>
+            Kampung Melayu Sg Rapat Tambahan
+          </option>
+
+          <option>
+            Kampung Melayu Sungai Rapat
+          </option>
+
+          <option>
+            Kampung Melayu Sungai Rapat Tambahan
+          </option>
+
+          <option>
+            Kampung Meru Tin
+          </option>
+
+          <option>
+            Kampung Paloh
+          </option>
+
+          <option>
+            Kampung Pasir Pinji Baru
+          </option>
+
+          <option>
+            Kampung Pasir Puteh
+          </option>
+
+          <option>
+            Kampung Pasir Puteh Baru
+          </option>
+
+          <option>
+            Kampung Pasir Putih Baru
+          </option>
+
+          <option>
+            Kampung Pasir Putih Tambahan
+          </option>
+
+          <option>
+            Kampung Pinji
+          </option>
+
+          <option>
+            Kampung Rancangan Tersusun Buntong
+          </option>
+
+          <option>
+            Kampung Rapat Jaya
+          </option>
+
+          <option>
+            Kampung Rapat Jaya Tambahan
+          </option>
+
+          <option>
+            Kampung Seberang Sungai Tapah
+          </option>
+
+          <option>
+            Kampung Seri Klebang
+          </option>
+
+          <option>
+            Kampung Seri Klebang Tambahan 1
+          </option>
+
+          <option>
+            Kampung Simee
+          </option>
+
+          <option>
+            Kampung Sri Ampang
+          </option>
+
+          <option>
+            Kampung Sri Ampang A
+          </option>
+
+          <option>
+            Kampung Sri Keramat
+          </option>
+
+          <option>
+            Kampung Sri Kinta
+          </option>
+
+          <option>
+            Kampung Sri Klebang
+          </option>
+
+          <option>
+            Kampung Sri Klebang Tambahan 1
           </option>
 
           <option>
@@ -2316,6 +2694,1334 @@ export default function ListingForm({
             Sunway City Ipoh
           </option>
 
+          <option>
+            Kampung Baru Bukit Merah
+          </option>
+
+          <option>
+            Kampung Baru Lahat
+          </option>
+
+          <option>
+            Kampung Changkat Larang
+          </option>
+
+          <option>
+            Kampung Pengkalan Gate
+          </option>
+
+          <option>
+            Kampung Pengkalan Gate Tambahan 1
+          </option>
+
+          <option>
+            Kampung Pengkalan Gate Tambahan 2
+          </option>
+
+          <option>
+            Kampung Pengkalan Pegoh Tambahan 2
+          </option>
+
+          <option>
+            Kampung Baru Menglembu
+          </option>
+
+          <option>
+            Kampung Batu
+          </option>
+
+          <option>
+            Kampung Menglembu Barat
+          </option>
+
+          <option>
+            Kampung Menglembu Timur
+          </option>
+
+          <option>
+            Kampung Menglembu Utara
+          </option>
+
+          <option>
+            Taman Kamay
+          </option>
+
+          <option>
+            Bandar Baru Sri Klebang
+          </option>
+
+          <option>
+            Chemor Park
+          </option>
+
+          <option>
+            Desa Chemor Impian
+          </option>
+
+          <option>
+            Desa Chemor Makmur
+          </option>
+
+          <option>
+            Desa Chemor Permai
+          </option>
+
+          <option>
+            Desa Chemor Saujana
+          </option>
+
+          <option>
+            Desa Chemor Sejahtera
+          </option>
+
+          <option>
+            Desa Chemor Seri Kuang
+          </option>
+
+          <option>
+            Desa Chemor Setia
+          </option>
+
+          <option>
+            Desa Chemor Sinaran
+          </option>
+
+          <option>
+            Desa Intan Kanthan
+          </option>
+
+          <option>
+            Desa Naga Kanthan
+          </option>
+
+          <option>
+            Desa Permata
+          </option>
+
+          <option>
+            Desa Tanjung Murni
+          </option>
+
+          <option>
+            Kampung Baru Kanthan
+          </option>
+
+          <option>
+            Kampung Baru Kuala Kuang
+          </option>
+
+          <option>
+            Kampung Baru Tanah Hitam
+          </option>
+
+          <option>
+            Kampung Baru Ulu Chemor
+          </option>
+
+          <option>
+            Kampung Che Zainal
+          </option>
+
+          <option>
+            Kampung Chepor Dalam
+          </option>
+
+          <option>
+            Kampung Haridas
+          </option>
+
+          <option>
+            Kampung Jasa
+          </option>
+
+          <option>
+            Kampung Kanthan
+          </option>
+
+          <option>
+            Kampung Kuala Kuang
+          </option>
+
+          <option>
+            Kampung Kuang Hilir
+          </option>
+
+          <option>
+            Kampung Kuang Tengah
+          </option>
+
+          <option>
+            Kampung Sellapan
+          </option>
+
+          <option>
+            Kampung Tersusun Batu 10
+          </option>
+
+          <option>
+            Kampung Tersusun Tanah Hitam
+          </option>
+
+          <option>
+            Kampung Ulu Chepor Tambahan
+          </option>
+
+          <option>
+            Kampung Ulu Kuang
+          </option>
+
+          <option>
+            Kawasan Perindustrian Kanthan
+          </option>
+
+          <option>
+            Klebang Damai
+          </option>
+
+          <option>
+            Klebang Impian
+          </option>
+
+          <option>
+            Klebang Ria
+          </option>
+
+          <option>
+            Medan Klebang Elit
+          </option>
+
+          <option>
+            Medan Klebang Harmoni
+          </option>
+
+          <option>
+            Medan Klebang Mewah
+          </option>
+
+          <option>
+            Medan Klebang Prima
+          </option>
+
+          <option>
+            Medan Klebang Putra
+          </option>
+
+          <option>
+            Medan Klebang Restu
+          </option>
+
+          <option>
+            Medan Klebang Sentosa
+          </option>
+
+          <option>
+            Meru Desa Park
+          </option>
+
+          <option>
+            Parklane Residences
+          </option>
+
+          <option>
+            Pusat Perindustrian Seramik
+          </option>
+
+          <option>
+            Seri Desa
+          </option>
+
+          <option>
+            Sri Klebang
+          </option>
+
+          <option>
+            Strand Park
+          </option>
+
+          <option>
+            Taman Cemerlang Kanthan
+          </option>
+
+          <option>
+            Taman Chemor Cemerlang
+          </option>
+
+          <option>
+            Taman Chemor Idaman
+          </option>
+
+          <option>
+            Taman Chemor Indah
+          </option>
+
+          <option>
+            Taman Chemor Mesra
+          </option>
+
+          <option>
+            Taman Chemor Mutiara
+          </option>
+
+          <option>
+            Taman Chemor Perdana
+          </option>
+
+          <option>
+            Taman Chemor Ria
+          </option>
+
+          <option>
+            Taman Chepor Damai
+          </option>
+
+          <option>
+            Taman Chepor Impian
+          </option>
+
+          <option>
+            Taman Chepor Indah
+          </option>
+
+          <option>
+            Taman Chepor Jaya
+          </option>
+
+          <option>
+            Taman Chepor Raya
+          </option>
+
+          <option>
+            Taman Chepor Sentosa
+          </option>
+
+          <option>
+            Taman Hartawan
+          </option>
+
+          <option>
+            Taman Intan Kanthan
+          </option>
+
+          <option>
+            Taman Kanthan Baru
+          </option>
+
+          <option>
+            Taman Kinding Hijauan
+          </option>
+
+          <option>
+            Taman Kinding Permai
+          </option>
+
+          <option>
+            Taman Klebang Bistari
+          </option>
+
+          <option>
+            Taman Klebang Damai
+          </option>
+
+          <option>
+            Taman Klebang Impian
+          </option>
+
+          <option>
+            Taman Klebang Jaya
+          </option>
+
+          <option>
+            Taman Klebang Perdana
+          </option>
+
+          <option>
+            Taman Klebang Putra
+          </option>
+
+          <option>
+            Taman Klebang Restu
+          </option>
+
+          <option>
+            Taman Klebang Ria
+          </option>
+
+          <option>
+            Taman Kuala Kuang
+          </option>
+
+          <option>
+            Taman Leow Sum
+          </option>
+
+          <option>
+            Taman Liew Sum
+          </option>
+
+          <option>
+            Taman Mas Baru
+          </option>
+
+          <option>
+            Taman Meru Perdana
+          </option>
+
+          <option>
+            Taman Rasi Chemor
+          </option>
+
+          <option>
+            Taman Seri Desa
+          </option>
+
+          <option>
+            Taman Sri Kanthan
+          </option>
+
+          <option>
+            Tamil Settlement
+          </option>
+
+          <option>
+            Kampung Ara Payung
+          </option>
+
+          <option>
+            Kampung Bakap Baru
+          </option>
+
+          <option>
+            Kampung Baru Bemban
+          </option>
+
+          <option>
+            Kampung Baru Mtd
+          </option>
+
+          <option>
+            Kampung Baru Sungai Terap
+          </option>
+
+          <option>
+            Kampung Batu 3
+          </option>
+
+          <option>
+            Kampung Meranti 8
+          </option>
+
+          <option>
+            Kampung Muhibbah
+          </option>
+
+          <option>
+            Kampung Pasir Baru Sungai Terap
+          </option>
+
+          <option>
+            Kampung Pasir Lama
+          </option>
+
+          <option>
+            Kampung Serani
+          </option>
+
+          <option>
+            Kampung Seri Indah
+          </option>
+
+          <option>
+            Kampung Seri Jaya
+          </option>
+
+          <option>
+            Kampung Seri Kulim
+          </option>
+
+          <option>
+            Kampung Seri Mariah
+          </option>
+
+          <option>
+            Kampung Seri Meriah
+          </option>
+
+          <option>
+            Kampung Seri Rahmat
+          </option>
+
+          <option>
+            Kampung Sungai Terap
+          </option>
+
+          <option>
+            Kampung Tasek Permai
+          </option>
+
+          <option>
+            Kampung Tersusun Bemban
+          </option>
+
+          <option>
+            Kampung Tersusun Desa Changkat
+          </option>
+
+          <option>
+            Kampung Tersusun Jalan Gopeng
+          </option>
+
+          <option>
+            Kampung Tersusun Sentang
+          </option>
+
+          <option>
+            Kampung Tersusun Seri Jaya 1
+          </option>
+
+          <option>
+            Kampung Tersusun Seri Jaya I
+          </option>
+
+          <option>
+            Kampung Tersusun Seri Rahmat
+          </option>
+
+          <option>
+            Anjung Bemban Maju
+          </option>
+
+          <option>
+            Bandar Baru Puspa
+          </option>
+
+          <option>
+            Kampung Baru Gunung Hijau
+          </option>
+
+          <option>
+            Kampung Baru Papan
+          </option>
+
+          <option>
+            Kampung Papan Baru
+          </option>
+
+          <option>
+            Kampung Pig
+          </option>
+
+          <option>
+            Medan Pusing Baru
+          </option>
+
+          <option>
+            Papan Baru
+          </option>
+
+          <option>
+            Papan Lala
+          </option>
+
+          <option>
+            Taman Pusing Baru
+          </option>
+
+          <option>
+            Taman Pusing Mewah
+          </option>
+
+          <option>
+            Taman Pusing Murni
+          </option>
+
+          <option>
+            Taman Pusing Mutiara
+          </option>
+
+          <option>
+            Taman Pusing Utusan
+          </option>
+
+          <option>
+            Taman Puspa Indah
+          </option>
+
+          <option>
+            Taman Ria
+          </option>
+
+          <option>
+            Desa Lawan Kuda
+          </option>
+
+          <option>
+            Desa Lawan Kuda 2
+          </option>
+
+          <option>
+            Gopeng Industrial Park
+          </option>
+
+          <option>
+            Kampung Baru Lawan Kuda
+          </option>
+
+          <option>
+            Kampung Changkat Tualang
+          </option>
+
+          <option>
+            Kampung Gunung Mesah Hulu
+          </option>
+
+          <option>
+            Kampung Jelintoh
+          </option>
+
+          <option>
+            Kampung Pintu Padang
+          </option>
+
+          <option>
+            Kampung Rawa
+          </option>
+
+          <option>
+            Kampung Sangly
+          </option>
+
+          <option>
+            Kampung Tersusun Batu 3 1/2
+          </option>
+
+          <option>
+            Kampung Tersusun Jelintoh
+          </option>
+
+          <option>
+            Kampung Tersusun Kampung Pulai
+          </option>
+
+          <option>
+            Kampung Tersusun Kampung Rawa
+          </option>
+
+          <option>
+            Kampung Tersusun Kopisan Baru
+          </option>
+
+          <option>
+            Kampung Tersusun Muhibbah Kopisan Baru
+          </option>
+
+          <option>
+            Kopisan Baru
+          </option>
+
+          <option>
+            Kota Bahru
+          </option>
+
+          <option>
+            Taman Gopeng Baru
+          </option>
+
+          <option>
+            Taman Gopeng Jaya
+          </option>
+
+          <option>
+            Taman Gopeng Tambahan
+          </option>
+
+          <option>
+            Taman Kinta
+          </option>
+
+          <option>
+            Taman Kinta Baru
+          </option>
+
+          <option>
+            Taman Lawan Kuda
+          </option>
+
+          <option>
+            Aston Settlement
+          </option>
+
+          <option>
+            Bandar Agacia
+          </option>
+
+          <option>
+            Bandar Barat
+          </option>
+
+          <option>
+            Bandar Baru Kampar
+          </option>
+
+          <option>
+            Bandar Baru Mambang Diawan
+          </option>
+
+          <option>
+            Bandar Baru Utama
+          </option>
+
+          <option>
+            Kampar Putra
+          </option>
+
+          <option>
+            Kampung Air Hitam Labu
+          </option>
+
+          <option>
+            Kampung Baru Batu Berangkai
+          </option>
+
+          <option>
+            Kampung Baru Kuala Dipang
+          </option>
+
+          <option>
+            Kampung Baru Mambang Diawan
+          </option>
+
+          <option>
+            Kampung Baru Sek Kranji
+          </option>
+
+          <option>
+            Kampung Baru Tronoh Mines
+          </option>
+
+          <option>
+            Kampung Batu 20
+          </option>
+
+          <option>
+            Kampung Batu Karang
+          </option>
+
+          <option>
+            Kampung Bukit Pekan
+          </option>
+
+          <option>
+            Kampung Changkat
+          </option>
+
+          <option>
+            Kampung Changkat Bendera
+          </option>
+
+          <option>
+            Kampung Changkat Jering
+          </option>
+
+          <option>
+            Kampung Chulek
+          </option>
+
+          <option>
+            Kampung Kuala Dipang
+          </option>
+
+          <option>
+            Kampung Kurnia Bukit Pekan
+          </option>
+
+          <option>
+            Kampung Kurnia Tambahan
+          </option>
+
+          <option>
+            Kampung Malaya
+          </option>
+
+          <option>
+            Kampung Malim Nawar
+          </option>
+
+          <option>
+            Kampung Masjid
+          </option>
+
+          <option>
+            Kampung Mutu Kuci
+          </option>
+
+          <option>
+            Kampung Padang Tembak
+          </option>
+
+          <option>
+            Kampung Sultan
+          </option>
+
+          <option>
+            Kampung Sungai Siput Selatan
+          </option>
+
+          <option>
+            Kampung Tanjung Bangkong
+          </option>
+
+          <option>
+            Kampung Tengah Bukit Pekan
+          </option>
+
+          <option>
+            Kampung Tersusun Batu Karang
+          </option>
+
+          <option>
+            Kampung Tersusun Batu Putih
+          </option>
+
+          <option>
+            Kampung Tersusun Paya Basong
+          </option>
+
+          <option>
+            Kampung Tersusun Seri Malim
+          </option>
+
+          <option>
+            Kampung Tronoh Mines
+          </option>
+
+          <option>
+            Mambang Diawan
+          </option>
+
+          <option>
+            New Wah Loong
+          </option>
+
+          <option>
+            Pearl Park
+          </option>
+
+          <option>
+            Perumahan Awam 2
+          </option>
+
+          <option>
+            Sungai Siput Selatan
+          </option>
+
+          <option>
+            Taman Aman Baru
+          </option>
+
+          <option>
+            Taman Aman Mambang Diawan
+          </option>
+
+          <option>
+            Taman Angkasa
+          </option>
+
+          <option>
+            Taman Aston Settlement
+          </option>
+
+          <option>
+            Taman Awan Mas
+          </option>
+
+          <option>
+            Taman Bandar Baru
+          </option>
+
+          <option>
+            Taman Bandar Baru Jaya
+          </option>
+
+          <option>
+            Taman Bandar Baru Selatan
+          </option>
+
+          <option>
+            Taman Bandar Baru Utama
+          </option>
+
+          <option>
+            Taman Eastern
+          </option>
+
+          <option>
+            Taman Golden Dragon
+          </option>
+
+          <option>
+            Taman Julong
+          </option>
+
+          <option>
+            Taman Kampar Jaya
+          </option>
+
+          <option>
+            Taman Kampar Perdana
+          </option>
+
+          <option>
+            Taman Kampar Permai
+          </option>
+
+          <option>
+            Taman Kampar Siswa
+          </option>
+
+          <option>
+            Taman Kolej Perdana
+          </option>
+
+          <option>
+            Taman Mahsuri
+          </option>
+
+          <option>
+            Taman Mahsuri Impian
+          </option>
+
+          <option>
+            Taman Mambang
+          </option>
+
+          <option>
+            Taman Melayu Jaya
+          </option>
+
+          <option>
+            Taman Mesra Rakyat
+          </option>
+
+          <option>
+            Taman Perak
+          </option>
+
+          <option>
+            Taman Perak Indah
+          </option>
+
+          <option>
+            Taman Perak Mewah
+          </option>
+
+          <option>
+            Taman Perak Permai
+          </option>
+
+          <option>
+            Taman Puncak Kampar
+          </option>
+
+          <option>
+            Taman Sejahtera
+          </option>
+
+          <option>
+            Taman Sejahtera Fasa 2
+          </option>
+
+          <option>
+            Taman Sejahtera Indah
+          </option>
+
+          <option>
+            Taman Sejahtera Utama
+          </option>
+
+          <option>
+            Taman Seri Emas
+          </option>
+
+          <option>
+            Taman Sri Kampar
+          </option>
+
+          <option>
+            Taman Tasik Emas
+          </option>
+
+          <option>
+            Wah Loong
+          </option>
+
+          <option>
+            Batu Undan
+          </option>
+
+          <option>
+            Desa Manjung Point
+          </option>
+
+          <option>
+            Desa Manjung Point 2
+          </option>
+
+          <option>
+            Desa Manjung Raya
+          </option>
+
+          <option>
+            Kampung Acheh
+          </option>
+
+          <option>
+            Kampung Acheh Baru
+          </option>
+
+          <option>
+            Kampung Baharu
+          </option>
+
+          <option>
+            Kampung Batu 3 Segari
+          </option>
+
+          <option>
+            Kampung Pundut
+          </option>
+
+          <option>
+            Kampung Telaga Nenas
+          </option>
+
+          <option>
+            Kampung Teluk
+          </option>
+
+          <option>
+            Kampung Teluk Batik
+          </option>
+
+          <option>
+            Kampung Teluk Muroh
+          </option>
+
+          <option>
+            Kampung Tersusun Pundut
+          </option>
+
+          <option>
+            Lumut Port Industrial Park
+          </option>
+
+          <option>
+            Manjung Point Seksyen 1
+          </option>
+
+          <option>
+            Pekan Lumut
+          </option>
+
+          <option>
+            Pengkalan Tldm Teluk Muruk
+          </option>
+
+          <option>
+            Pengkalan Tudm
+          </option>
+
+          <option>
+            Persiaran Manjung Raya
+          </option>
+
+          <option>
+            Sungai Pinang Besar
+          </option>
+
+          <option>
+            Taman Bukit Maju
+          </option>
+
+          <option>
+            Taman Desa Bayu
+          </option>
+
+          <option>
+            Taman Desa Manjung Point
+          </option>
+
+          <option>
+            Taman Desa Manjung Point Seksyen 1
+          </option>
+
+          <option>
+            Taman Desa Manjung Point Seksyen 2
+          </option>
+
+          <option>
+            Taman Desa Manjung Point Seksyen 3
+          </option>
+
+          <option>
+            Taman Desa Pangkor
+          </option>
+
+          <option>
+            Taman Lestari Baru
+          </option>
+
+          <option>
+            Taman Maju Bukit
+          </option>
+
+          <option>
+            Taman Manjung Point
+          </option>
+
+          <option>
+            Taman Melati
+          </option>
+
+          <option>
+            Taman Nakhoda Bestari 2
+          </option>
+
+          <option>
+            Taman Permata
+          </option>
+
+          <option>
+            Taman Samudera
+          </option>
+
+          <option>
+            Taman Samudera 1
+          </option>
+
+          <option>
+            Taman Samudera Baru
+          </option>
+
+          <option>
+            Taman Segari Maju
+          </option>
+
+          <option>
+            Taman Seri Acheh
+          </option>
+
+          <option>
+            Taman Seri Wangsa
+          </option>
+
+          <option>
+            Taman Seri Wangsa 2
+          </option>
+
+          <option>
+            Taman Sri Batik
+          </option>
+
+          <option>
+            Teluk Batik
+          </option>
+
+          <option>
+            Teluk Segin
+          </option>
+
+          <option>
+            Venice Of Perak
+          </option>
+
+          <option>
+            Kampung Baru
+          </option>
+
+          <option>
+            Kampung Baru Jeram
+          </option>
+
+          <option>
+            Kampung Bunga Tanjung
+          </option>
+
+          <option>
+            Kampung Changkat Baru
+          </option>
+
+          <option>
+            Kampung Gunung Mesah Hilir
+          </option>
+
+          <option>
+            Kampung Gunung Panjang
+          </option>
+
+          <option>
+            Kampung Jelutong Baru
+          </option>
+
+          <option>
+            Kampung Jeram
+          </option>
+
+          <option>
+            Kampung Jernih
+          </option>
+
+          <option>
+            Kampung Pulau Pisang
+          </option>
+
+          <option>
+            Kampung Tersusun Batu 20
+          </option>
+
+          <option>
+            Kampung Tualang Sekah
+          </option>
+
+          <option>
+            Taman Bina Jaya
+          </option>
+
+          <option>
+            Taman Malim Nawar
+          </option>
+
+          <option>
+            Bandar Pulai Jaya
+          </option>
+
+          <option>
+            Desa Pulai Impian
+          </option>
+
+          <option>
+            Desa Pulai Jaya
+          </option>
+
+          <option>
+            Desa Pulai Sentosa
+          </option>
+
+          <option>
+            Kampung Baru Simpang Pulai
+          </option>
+
+          <option>
+            Kampung Keramat Pulai
+          </option>
+
+          <option>
+            Kampung Kurnia
+          </option>
+
+          <option>
+            Kampung Merawan Indah
+          </option>
+
+          <option>
+            Kampung Paya Rengas
+          </option>
+
+          <option>
+            Kampung Pengkalan Baru
+          </option>
+
+          <option>
+            Kampung Simpang Pulai
+          </option>
+
+          <option>
+            Kampung Sungai Ular
+          </option>
+
+          <option>
+            Kampung Tanjung Tambahan
+          </option>
+
+          <option>
+            Kampung Tekah
+          </option>
+
+          <option>
+            Kampung Tersusun Sengat
+          </option>
+
+          <option>
+            Kampung Tersusun Serdang Permai
+          </option>
+
+          <option>
+            Kampung Tersusun Tekah Baru
+          </option>
+
+          <option>
+            Pulai Business Centre
+          </option>
+
+          <option>
+            Pulai Mutiara
+          </option>
+
+          <option>
+            Seri Palma
+          </option>
+
+          <option>
+            Taman Chandan Desa
+          </option>
+
+          <option>
+            Taman Chandran Desa
+          </option>
+
+          <option>
+            Taman Lapangan Pelangi
+          </option>
+
+          <option>
+            Taman Mesra Raia
+          </option>
+
+          <option>
+            Taman Muda
+          </option>
+
+          <option>
+            Taman Pulai Jaya
+          </option>
+
+          <option>
+            Taman Pulai Mutiara
+          </option>
+
+          <option>
+            Taman Pulai Raya
+          </option>
+
+          <option>
+            Taman Pulai Timur
+          </option>
+
+          <option>
+            Taman Raia Damai
+          </option>
+
+          <option>
+            Taman Raia Mesra
+          </option>
+
+          <option>
+            Taman Sengat Baru
+          </option>
+
+          <option>
+            Taman Seri Raia
+          </option>
+
         </datalist>
 
         {/* ================================================================ */}
@@ -2349,6 +4055,48 @@ export default function ListingForm({
             inputClass
           }
         />
+
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <button
+            type="button"
+            onClick={findPostcode}
+            disabled={postcodeBusy}
+            className="rounded border border-gray-300 px-3 py-1 text-black"
+          >
+            {postcodeBusy
+              ? "Searching..."
+              : "Find postcode"}
+          </button>
+
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeQuery())}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            Check on Google Maps
+          </a>
+
+          {postcodeHints.map((code) => (
+            <button
+              key={code}
+              type="button"
+              onClick={() => {
+                setPostalCode(code);
+                setPostcodeHints([]);
+              }}
+              className="rounded bg-gray-100 px-2 py-1 text-black"
+            >
+              Use {code}
+            </button>
+          ))}
+
+          {postcodeMsg && (
+            <span className="text-gray-600">
+              {postcodeMsg}
+            </span>
+          )}
+        </div>
 
         {/* ================================================================ */}
         {/* PROPERTY DETAILS */}
