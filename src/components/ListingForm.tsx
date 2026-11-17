@@ -3273,6 +3273,314 @@ export default function ListingForm({
             Taman Lawan Kuda
           </option>
 
+          <option>
+            Aston Settlement
+          </option>
+
+          <option>
+            Bandar Agacia
+          </option>
+
+          <option>
+            Bandar Barat
+          </option>
+
+          <option>
+            Bandar Baru Kampar
+          </option>
+
+          <option>
+            Bandar Baru Mambang Diawan
+          </option>
+
+          <option>
+            Bandar Baru Utama
+          </option>
+
+          <option>
+            Kampar Putra
+          </option>
+
+          <option>
+            Kampung Air Hitam Labu
+          </option>
+
+          <option>
+            Kampung Baru Batu Berangkai
+          </option>
+
+          <option>
+            Kampung Baru Kuala Dipang
+          </option>
+
+          <option>
+            Kampung Baru Mambang Diawan
+          </option>
+
+          <option>
+            Kampung Baru Sek Kranji
+          </option>
+
+          <option>
+            Kampung Baru Tronoh Mines
+          </option>
+
+          <option>
+            Kampung Batu 20
+          </option>
+
+          <option>
+            Kampung Batu Karang
+          </option>
+
+          <option>
+            Kampung Bukit Pekan
+          </option>
+
+          <option>
+            Kampung Changkat
+          </option>
+
+          <option>
+            Kampung Changkat Bendera
+          </option>
+
+          <option>
+            Kampung Changkat Jering
+          </option>
+
+          <option>
+            Kampung Chulek
+          </option>
+
+          <option>
+            Kampung Kuala Dipang
+          </option>
+
+          <option>
+            Kampung Kurnia Bukit Pekan
+          </option>
+
+          <option>
+            Kampung Kurnia Tambahan
+          </option>
+
+          <option>
+            Kampung Malaya
+          </option>
+
+          <option>
+            Kampung Malim Nawar
+          </option>
+
+          <option>
+            Kampung Masjid
+          </option>
+
+          <option>
+            Kampung Mutu Kuci
+          </option>
+
+          <option>
+            Kampung Padang Tembak
+          </option>
+
+          <option>
+            Kampung Sultan
+          </option>
+
+          <option>
+            Kampung Sungai Siput Selatan
+          </option>
+
+          <option>
+            Kampung Tanjung Bangkong
+          </option>
+
+          <option>
+            Kampung Tengah Bukit Pekan
+          </option>
+
+          <option>
+            Kampung Tersusun Batu Karang
+          </option>
+
+          <option>
+            Kampung Tersusun Batu Putih
+          </option>
+
+          <option>
+            Kampung Tersusun Paya Basong
+          </option>
+
+          <option>
+            Kampung Tersusun Seri Malim
+          </option>
+
+          <option>
+            Kampung Tronoh Mines
+          </option>
+
+          <option>
+            Mambang Diawan
+          </option>
+
+          <option>
+            New Wah Loong
+          </option>
+
+          <option>
+            Pearl Park
+          </option>
+
+          <option>
+            Perumahan Awam 2
+          </option>
+
+          <option>
+            Sungai Siput Selatan
+          </option>
+
+          <option>
+            Taman Aman Baru
+          </option>
+
+          <option>
+            Taman Aman Mambang Diawan
+          </option>
+
+          <option>
+            Taman Angkasa
+          </option>
+
+          <option>
+            Taman Aston Settlement
+          </option>
+
+          <option>
+            Taman Awan Mas
+          </option>
+
+          <option>
+            Taman Bandar Baru
+          </option>
+
+          <option>
+            Taman Bandar Baru Jaya
+          </option>
+
+          <option>
+            Taman Bandar Baru Selatan
+          </option>
+
+          <option>
+            Taman Bandar Baru Utama
+          </option>
+
+          <option>
+            Taman Eastern
+          </option>
+
+          <option>
+            Taman Golden Dragon
+          </option>
+
+          <option>
+            Taman Julong
+          </option>
+
+          <option>
+            Taman Kampar Jaya
+          </option>
+
+          <option>
+            Taman Kampar Perdana
+          </option>
+
+          <option>
+            Taman Kampar Permai
+          </option>
+
+          <option>
+            Taman Kampar Siswa
+          </option>
+
+          <option>
+            Taman Kolej Perdana
+          </option>
+
+          <option>
+            Taman Mahsuri
+          </option>
+
+          <option>
+            Taman Mahsuri Impian
+          </option>
+
+          <option>
+            Taman Mambang
+          </option>
+
+          <option>
+            Taman Melayu Jaya
+          </option>
+
+          <option>
+            Taman Mesra Rakyat
+          </option>
+
+          <option>
+            Taman Perak
+          </option>
+
+          <option>
+            Taman Perak Indah
+          </option>
+
+          <option>
+            Taman Perak Mewah
+          </option>
+
+          <option>
+            Taman Perak Permai
+          </option>
+
+          <option>
+            Taman Puncak Kampar
+          </option>
+
+          <option>
+            Taman Sejahtera
+          </option>
+
+          <option>
+            Taman Sejahtera Fasa 2
+          </option>
+
+          <option>
+            Taman Sejahtera Indah
+          </option>
+
+          <option>
+            Taman Sejahtera Utama
+          </option>
+
+          <option>
+            Taman Seri Emas
+          </option>
+
+          <option>
+            Taman Sri Kampar
+          </option>
+
+          <option>
+            Taman Tasik Emas
+          </option>
+
+          <option>
+            Wah Loong
+          </option>
+
         </datalist>
 
         {/* ================================================================ */}
