@@ -2673,6 +2673,342 @@ export default function ListingForm({
             Taman Kamay
           </option>
 
+          <option>
+            Bandar Baru Sri Klebang
+          </option>
+
+          <option>
+            Chemor Park
+          </option>
+
+          <option>
+            Desa Chemor Impian
+          </option>
+
+          <option>
+            Desa Chemor Makmur
+          </option>
+
+          <option>
+            Desa Chemor Permai
+          </option>
+
+          <option>
+            Desa Chemor Saujana
+          </option>
+
+          <option>
+            Desa Chemor Sejahtera
+          </option>
+
+          <option>
+            Desa Chemor Seri Kuang
+          </option>
+
+          <option>
+            Desa Chemor Setia
+          </option>
+
+          <option>
+            Desa Chemor Sinaran
+          </option>
+
+          <option>
+            Desa Intan Kanthan
+          </option>
+
+          <option>
+            Desa Naga Kanthan
+          </option>
+
+          <option>
+            Desa Permata
+          </option>
+
+          <option>
+            Desa Tanjung Murni
+          </option>
+
+          <option>
+            Kampung Baru Kanthan
+          </option>
+
+          <option>
+            Kampung Baru Kuala Kuang
+          </option>
+
+          <option>
+            Kampung Baru Tanah Hitam
+          </option>
+
+          <option>
+            Kampung Baru Ulu Chemor
+          </option>
+
+          <option>
+            Kampung Che Zainal
+          </option>
+
+          <option>
+            Kampung Chepor Dalam
+          </option>
+
+          <option>
+            Kampung Haridas
+          </option>
+
+          <option>
+            Kampung Jasa
+          </option>
+
+          <option>
+            Kampung Kanthan
+          </option>
+
+          <option>
+            Kampung Kuala Kuang
+          </option>
+
+          <option>
+            Kampung Kuang Hilir
+          </option>
+
+          <option>
+            Kampung Kuang Tengah
+          </option>
+
+          <option>
+            Kampung Sellapan
+          </option>
+
+          <option>
+            Kampung Tersusun Batu 10
+          </option>
+
+          <option>
+            Kampung Tersusun Tanah Hitam
+          </option>
+
+          <option>
+            Kampung Ulu Chepor Tambahan
+          </option>
+
+          <option>
+            Kampung Ulu Kuang
+          </option>
+
+          <option>
+            Kawasan Perindustrian Kanthan
+          </option>
+
+          <option>
+            Klebang Damai
+          </option>
+
+          <option>
+            Klebang Impian
+          </option>
+
+          <option>
+            Klebang Ria
+          </option>
+
+          <option>
+            Medan Klebang Elit
+          </option>
+
+          <option>
+            Medan Klebang Harmoni
+          </option>
+
+          <option>
+            Medan Klebang Mewah
+          </option>
+
+          <option>
+            Medan Klebang Prima
+          </option>
+
+          <option>
+            Medan Klebang Putra
+          </option>
+
+          <option>
+            Medan Klebang Restu
+          </option>
+
+          <option>
+            Medan Klebang Sentosa
+          </option>
+
+          <option>
+            Meru Desa Park
+          </option>
+
+          <option>
+            Parklane Residences
+          </option>
+
+          <option>
+            Pusat Perindustrian Seramik
+          </option>
+
+          <option>
+            Seri Desa
+          </option>
+
+          <option>
+            Sri Klebang
+          </option>
+
+          <option>
+            Strand Park
+          </option>
+
+          <option>
+            Taman Cemerlang Kanthan
+          </option>
+
+          <option>
+            Taman Chemor Cemerlang
+          </option>
+
+          <option>
+            Taman Chemor Idaman
+          </option>
+
+          <option>
+            Taman Chemor Indah
+          </option>
+
+          <option>
+            Taman Chemor Mesra
+          </option>
+
+          <option>
+            Taman Chemor Mutiara
+          </option>
+
+          <option>
+            Taman Chemor Perdana
+          </option>
+
+          <option>
+            Taman Chemor Ria
+          </option>
+
+          <option>
+            Taman Chepor Damai
+          </option>
+
+          <option>
+            Taman Chepor Impian
+          </option>
+
+          <option>
+            Taman Chepor Indah
+          </option>
+
+          <option>
+            Taman Chepor Jaya
+          </option>
+
+          <option>
+            Taman Chepor Raya
+          </option>
+
+          <option>
+            Taman Chepor Sentosa
+          </option>
+
+          <option>
+            Taman Hartawan
+          </option>
+
+          <option>
+            Taman Intan Kanthan
+          </option>
+
+          <option>
+            Taman Kanthan Baru
+          </option>
+
+          <option>
+            Taman Kinding Hijauan
+          </option>
+
+          <option>
+            Taman Kinding Permai
+          </option>
+
+          <option>
+            Taman Klebang Bistari
+          </option>
+
+          <option>
+            Taman Klebang Damai
+          </option>
+
+          <option>
+            Taman Klebang Impian
+          </option>
+
+          <option>
+            Taman Klebang Jaya
+          </option>
+
+          <option>
+            Taman Klebang Perdana
+          </option>
+
+          <option>
+            Taman Klebang Putra
+          </option>
+
+          <option>
+            Taman Klebang Restu
+          </option>
+
+          <option>
+            Taman Klebang Ria
+          </option>
+
+          <option>
+            Taman Kuala Kuang
+          </option>
+
+          <option>
+            Taman Leow Sum
+          </option>
+
+          <option>
+            Taman Liew Sum
+          </option>
+
+          <option>
+            Taman Mas Baru
+          </option>
+
+          <option>
+            Taman Meru Perdana
+          </option>
+
+          <option>
+            Taman Rasi Chemor
+          </option>
+
+          <option>
+            Taman Seri Desa
+          </option>
+
+          <option>
+            Taman Sri Kanthan
+          </option>
+
+          <option>
+            Tamil Settlement
+          </option>
+
         </datalist>
 
         {/* ================================================================ */}
