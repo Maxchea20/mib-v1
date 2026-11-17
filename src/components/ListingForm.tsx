@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 type Props = {
@@ -111,6 +111,59 @@ export default function ListingForm({
       listing?.postal_code ??
       ""
     );
+
+  /*
+  | Remembered township -> city + postal code (table: township_lookup).
+  | Learned from saved listings, so you only set each township once.
+  */
+  const [townshipLookup, setTownshipLookup] =
+    useState<
+      Record<
+        string,
+        { city: string | null; postal_code: string }
+      >
+    >({});
+
+  useEffect(() => {
+    let cancelled = false;
+
+    supabase
+      .from("township_lookup")
+      .select("township, city, postal_code")
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+
+        const map: Record<
+          string,
+          { city: string | null; postal_code: string }
+        > = {};
+
+        for (const row of data) {
+          map[row.township] = {
+            city: row.city,
+            postal_code: row.postal_code,
+          };
+        }
+
+        setTownshipLookup(map);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function handleTownshipChange(value: string) {
+    setArea(value);
+
+    const known =
+      townshipLookup[value.trim().toLowerCase()];
+
+    if (!known) return;
+
+    if (known.postal_code) setPostalCode(known.postal_code);
+    if (known.city) setCity(known.city);
+  }
 
   const [landSize, setLandSize] =
     useState(
@@ -617,6 +670,26 @@ export default function ListingForm({
             : null,
     };
 
+
+    /*
+    | Remember township -> city + postal code for next time.
+    */
+    async function rememberTownship() {
+      const t = area.trim();
+      const pc = postalCode.trim();
+
+      if (!t || !pc) return;
+
+      await supabase.from("township_lookup").upsert({
+        township: t.toLowerCase(),
+        label: t,
+        state: state.trim() || null,
+        city: city.trim() || null,
+        postal_code: pc,
+        updated_at: new Date().toISOString(),
+      });
+    }
+
     /*
     |--------------------------------------------------------------------------
     | CREATE
@@ -646,6 +719,8 @@ export default function ListingForm({
         );
         return;
       }
+
+      await rememberTownship();
 
       alert(
         "Listing added successfully."
@@ -689,6 +764,8 @@ export default function ListingForm({
       );
       return;
     }
+
+    await rememberTownship();
 
     alert(
       "Listing updated successfully."
@@ -1166,7 +1243,7 @@ export default function ListingForm({
           placeholder="Township"
           value={area}
           onChange={(e) =>
-            setArea(
+            handleTownshipChange(
               e.target.value
             )
           }
