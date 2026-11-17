@@ -1231,6 +1231,34 @@ export default function ListingForm({
           <option>
             Ulu Kinta
           </option>
+
+          <option>
+            Gopeng
+          </option>
+
+          <option>
+            Jelapang
+          </option>
+
+          <option>
+            Kampar
+          </option>
+
+          <option>
+            Kampung Kepayang
+          </option>
+
+          <option>
+            Lumut
+          </option>
+
+          <option>
+            Malim Nawar
+          </option>
+
+          <option>
+            Simpang Pulai
+          </option>
         </select>
 
         {/* ================================================================ */}
