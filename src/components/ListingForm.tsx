@@ -3009,6 +3009,110 @@ export default function ListingForm({
             Tamil Settlement
           </option>
 
+          <option>
+            Kampung Ara Payung
+          </option>
+
+          <option>
+            Kampung Bakap Baru
+          </option>
+
+          <option>
+            Kampung Baru Bemban
+          </option>
+
+          <option>
+            Kampung Baru Mtd
+          </option>
+
+          <option>
+            Kampung Baru Sungai Terap
+          </option>
+
+          <option>
+            Kampung Batu 3
+          </option>
+
+          <option>
+            Kampung Meranti 8
+          </option>
+
+          <option>
+            Kampung Muhibbah
+          </option>
+
+          <option>
+            Kampung Pasir Baru Sungai Terap
+          </option>
+
+          <option>
+            Kampung Pasir Lama
+          </option>
+
+          <option>
+            Kampung Serani
+          </option>
+
+          <option>
+            Kampung Seri Indah
+          </option>
+
+          <option>
+            Kampung Seri Jaya
+          </option>
+
+          <option>
+            Kampung Seri Kulim
+          </option>
+
+          <option>
+            Kampung Seri Mariah
+          </option>
+
+          <option>
+            Kampung Seri Meriah
+          </option>
+
+          <option>
+            Kampung Seri Rahmat
+          </option>
+
+          <option>
+            Kampung Sungai Terap
+          </option>
+
+          <option>
+            Kampung Tasek Permai
+          </option>
+
+          <option>
+            Kampung Tersusun Bemban
+          </option>
+
+          <option>
+            Kampung Tersusun Desa Changkat
+          </option>
+
+          <option>
+            Kampung Tersusun Jalan Gopeng
+          </option>
+
+          <option>
+            Kampung Tersusun Sentang
+          </option>
+
+          <option>
+            Kampung Tersusun Seri Jaya 1
+          </option>
+
+          <option>
+            Kampung Tersusun Seri Jaya I
+          </option>
+
+          <option>
+            Kampung Tersusun Seri Rahmat
+          </option>
+
         </datalist>
 
         {/* ================================================================ */}
