@@ -1566,6 +1566,206 @@ export default function ListingForm({
           </option>
 
           <option>
+            Kampung Ampang Baru
+          </option>
+
+          <option>
+            Kampung Baharu Gunung Rapat
+          </option>
+
+          <option>
+            Kampung Baru Jelapang
+          </option>
+
+          <option>
+            Kampung Baru Pasir Pinji
+          </option>
+
+          <option>
+            Kampung Batu Bertudung
+          </option>
+
+          <option>
+            Kampung Bercham
+          </option>
+
+          <option>
+            Kampung Buntong 2
+          </option>
+
+          <option>
+            Kampung Buntong 4
+          </option>
+
+          <option>
+            Kampung Cempaka Sari
+          </option>
+
+          <option>
+            Kampung Chan Thye Lee
+          </option>
+
+          <option>
+            Kampung Dato&#39; Ahmad Said
+          </option>
+
+          <option>
+            Kampung Dato&#39; Ahmad Said Tambahan 2
+          </option>
+
+          <option>
+            Kampung Dato&#39; Ahmad Said Tambahan 3
+          </option>
+
+          <option>
+            Kampung Gunung Genting
+          </option>
+
+          <option>
+            Kampung Jalan Spooner
+          </option>
+
+          <option>
+            Kampung Jawa
+          </option>
+
+          <option>
+            Kampung Jelapang Baru
+          </option>
+
+          <option>
+            Kampung Jelapang Tambahan
+          </option>
+
+          <option>
+            Kampung Kacang Putih
+          </option>
+
+          <option>
+            Kampung Kepayang
+          </option>
+
+          <option>
+            Kampung Kepayang Fair Park
+          </option>
+
+          <option>
+            Kampung Kuala Pari
+          </option>
+
+          <option>
+            Kampung Kuala Pari Hilir
+          </option>
+
+          <option>
+            Kampung Kuchai
+          </option>
+
+          <option>
+            Kampung Manjoi
+          </option>
+
+          <option>
+            Kampung Manjoi Baru
+          </option>
+
+          <option>
+            Kampung Melayu Sg Rapat Tambahan
+          </option>
+
+          <option>
+            Kampung Melayu Sungai Rapat
+          </option>
+
+          <option>
+            Kampung Melayu Sungai Rapat Tambahan
+          </option>
+
+          <option>
+            Kampung Meru Tin
+          </option>
+
+          <option>
+            Kampung Paloh
+          </option>
+
+          <option>
+            Kampung Pasir Pinji Baru
+          </option>
+
+          <option>
+            Kampung Pasir Puteh
+          </option>
+
+          <option>
+            Kampung Pasir Puteh Baru
+          </option>
+
+          <option>
+            Kampung Pasir Putih Baru
+          </option>
+
+          <option>
+            Kampung Pasir Putih Tambahan
+          </option>
+
+          <option>
+            Kampung Pinji
+          </option>
+
+          <option>
+            Kampung Rancangan Tersusun Buntong
+          </option>
+
+          <option>
+            Kampung Rapat Jaya
+          </option>
+
+          <option>
+            Kampung Rapat Jaya Tambahan
+          </option>
+
+          <option>
+            Kampung Seberang Sungai Tapah
+          </option>
+
+          <option>
+            Kampung Seri Klebang
+          </option>
+
+          <option>
+            Kampung Seri Klebang Tambahan 1
+          </option>
+
+          <option>
+            Kampung Simee
+          </option>
+
+          <option>
+            Kampung Sri Ampang
+          </option>
+
+          <option>
+            Kampung Sri Ampang A
+          </option>
+
+          <option>
+            Kampung Sri Keramat
+          </option>
+
+          <option>
+            Kampung Sri Kinta
+          </option>
+
+          <option>
+            Kampung Sri Klebang
+          </option>
+
+          <option>
+            Kampung Sri Klebang Tambahan 1
+          </option>
+
+          <option>
             Kawasan Perindustrian Batu Gajah 2
           </option>
 
