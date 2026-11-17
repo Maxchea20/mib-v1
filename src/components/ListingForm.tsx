@@ -3113,6 +3113,70 @@ export default function ListingForm({
             Kampung Tersusun Seri Rahmat
           </option>
 
+          <option>
+            Anjung Bemban Maju
+          </option>
+
+          <option>
+            Bandar Baru Puspa
+          </option>
+
+          <option>
+            Kampung Baru Gunung Hijau
+          </option>
+
+          <option>
+            Kampung Baru Papan
+          </option>
+
+          <option>
+            Kampung Papan Baru
+          </option>
+
+          <option>
+            Kampung Pig
+          </option>
+
+          <option>
+            Medan Pusing Baru
+          </option>
+
+          <option>
+            Papan Baru
+          </option>
+
+          <option>
+            Papan Lala
+          </option>
+
+          <option>
+            Taman Pusing Baru
+          </option>
+
+          <option>
+            Taman Pusing Mewah
+          </option>
+
+          <option>
+            Taman Pusing Murni
+          </option>
+
+          <option>
+            Taman Pusing Mutiara
+          </option>
+
+          <option>
+            Taman Pusing Utusan
+          </option>
+
+          <option>
+            Taman Puspa Indah
+          </option>
+
+          <option>
+            Taman Ria
+          </option>
+
         </datalist>
 
         {/* ================================================================ */}
