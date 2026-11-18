@@ -157,6 +157,13 @@ export default async function SiteLayout({
             {BRAND.renNumber && (
               <p className="mt-1">{text.footerReg}: {BRAND.renNumber}</p>
             )}
+            {BRAND.googleProfileUrl && (
+              <p className="mt-1">
+                <a href={BRAND.googleProfileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-8 items-center underline hover:text-[var(--mp-accent)]">
+                  {text.footerGoogle}
+                </a>
+              </p>
+            )}
           </div>
         </div>
       </footer>

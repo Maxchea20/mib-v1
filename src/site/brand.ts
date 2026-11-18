@@ -19,6 +19,8 @@ export const BRAND = {
   // Profile pages that belong to the business (Google Business Profile, Facebook, ...).
   // Add the full URLs here and they are published as "sameAs" in the structured data.
   sameAs: [] as string[],
+  // The Google Business Profile page. Shown as a link in the website footer when set.
+  googleProfileUrl: "https://share.google/sEIOZNMoqIxh2QUlW" as string,
   // Where the business works. Used as the service area in the structured data.
   serviceAreas: ["Ipoh", "Perak"] as string[],
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://maxproperty.my",
