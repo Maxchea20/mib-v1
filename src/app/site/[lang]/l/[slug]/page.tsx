@@ -10,6 +10,7 @@ import { whatsappUrl } from "@/site/format";
 import { basePath, fill, t } from "@/site/i18n";
 import { LANDINGS, landingFromSlug, matchesLanding, placesOf, sortForLanding } from "@/site/landing";
 import { landingCommon, landingText } from "@/site/landingText";
+import { landGuide } from "@/site/landGuide";
 import { ct } from "@/site/costText";
 import { alternatesFor, OG_LOCALE } from "@/site/seo";
 
@@ -73,6 +74,7 @@ export default async function LandingPage({ params }: Props) {
   const { listings } = found;
   const photos = await getPhotosForListings(listings.map((l) => l.id));
   const areas = placesOf(listings);
+  const guide = landGuide(slug, lang);
   const canonical = alternatesFor(lang, `/${slug}`).canonical;
 
   const others = LANDINGS.filter((l) => l.slug !== slug);
@@ -181,6 +183,21 @@ export default async function LandingPage({ params }: Props) {
             ))}
           </div>
         </section>
+
+        {guide && (
+          <section aria-labelledby="guide" className="rounded-2xl border border-[var(--mp-line)] bg-[var(--mp-card)] p-6 sm:p-8" data-testid="guide">
+            <h2 id="guide" className="mp-display text-2xl font-bold">{guide.title}</h2>
+            <div className="mt-4 grid gap-5 sm:grid-cols-2">
+              {guide.sections.map((g) => (
+                <div key={g.h}>
+                  <h3 className="text-base font-extrabold text-[var(--mp-accent)]">{g.h}</h3>
+                  <p className="mt-1.5 leading-relaxed text-[var(--mp-ink2)]">{g.p}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-5 text-sm text-[var(--mp-muted)]">{guide.note}</p>
+          </section>
+        )}
 
         <section aria-labelledby="tools" className="flex flex-col gap-3">
           <h2 id="tools" className="text-sm font-extrabold uppercase tracking-wide text-[var(--mp-accent)]">{c.toolsTitle}</h2>
