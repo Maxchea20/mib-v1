@@ -80,7 +80,7 @@ export default async function AboutPage({ params }: Props) {
             width={360}
             height={450}
             fetchPriority="high"
-            className="aspect-[4/5] w-full max-w-[320px] flex-none self-center rounded-2xl border border-[var(--mp-line-strong)] object-cover sm:self-start"
+            className="aspect-[4/5] w-full max-w-[320px] flex-none self-center rounded-2xl border border-[var(--mp-line-strong)] object-cover object-top sm:self-start"
           />
         ) : null}
 
