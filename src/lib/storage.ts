@@ -2,7 +2,7 @@
 
 import { supabase } from "./supabase";
 import { shrinkImage } from "./imageResize";
-import { BUCKET as PHOTO_BUCKET, CACHE_SECONDS, MAIN_MAX, MAIN_QUALITY, THUMB_MAX, THUMB_QUALITY, jpgName, thumbPathFor } from "./photoSize";
+import { BUCKET as PHOTO_BUCKET, CACHE_SECONDS, MAIN_MAX, MAIN_QUALITY, MEDIUM_MAX, MEDIUM_QUALITY, THUMB_MAX, THUMB_QUALITY, jpgName, mediumPathFor, thumbPathFor } from "./photoSize";
 
 
 /*
@@ -55,6 +55,18 @@ export async function uploadPropertyPhoto(
     });
   }
 
+  // Mid-size version for the big photo on public listing pages (about 100 to 150 KB).
+  // A failure here is not fatal either: the website falls back to the full photo.
+  const medium = main ? await shrinkImage(main, MEDIUM_MAX, MEDIUM_QUALITY) : null;
+  const mediumPath = mediumPathFor(filePath);
+  if (medium && mediumPath) {
+    await supabase.storage.from(PHOTO_BUCKET).upload(mediumPath, medium, {
+      upsert: true,
+      cacheControl: CACHE_SECONDS,
+      contentType: "image/jpeg",
+    });
+  }
+
   const { data } =
     supabase.storage
       .from(PHOTO_BUCKET)
@@ -84,7 +96,8 @@ export async function uploadPropertyPhoto(
   if (previous?.file_name && previous.file_name !== fileName) {
     const oldPath = `${propertyId}/${previous.file_name}`;
     const oldThumb = thumbPathFor(oldPath);
-    await supabase.storage.from(PHOTO_BUCKET).remove(oldThumb ? [oldPath, oldThumb] : [oldPath]);
+    const oldMedium = mediumPathFor(oldPath);
+    await supabase.storage.from(PHOTO_BUCKET).remove([oldPath, ...(oldThumb ? [oldThumb] : []), ...(oldMedium ? [oldMedium] : [])]);
   }
 
   return imageUrl;

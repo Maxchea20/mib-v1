@@ -7,19 +7,23 @@
 | and shown to every visitor at that size. That used up the Supabase data
 | allowance. Now every photo is kept as:
 |
-|   main    1600 px on the longest side, JPEG   (listing page, brochures, posters)
-|   thumb   480 px on the longest side, JPEG    (cards and the photo strip)
+|   main    1600 px on the longest side, JPEG   (brochures, posters, the video maker)
+|   medium  1200 px on the longest side, JPEG    (the big photo on public listing pages)
+|   thumb   480 px on the longest side, JPEG     (cards and the photo strip)
 |
-| The thumbnail lives next to the photo, found by name:
+| The smaller copies live next to the photo, found by name:
 |   <id>/Living_Room.jpg          main
+|   <id>/medium/Living_Room.jpg   medium
 |   <id>/thumb/Living_Room.jpg    thumbnail
 |
 */
 
 export const BUCKET = "property-images";
 export const MAIN_MAX = 1600;
+export const MEDIUM_MAX = 1200;
 export const THUMB_MAX = 480;
 export const MAIN_QUALITY = 0.82;
+export const MEDIUM_QUALITY = 0.8;
 export const THUMB_QUALITY = 0.78;
 export const CACHE_SECONDS = "31536000"; // one year: a replaced photo gets a new ?t= address
 /** A heavy picture that is not a JPEG (a PNG, say) is converted once, whatever its size in pixels. */
@@ -58,7 +62,7 @@ export function parsePhotoUrl(url: string | null | undefined) {
   const m = URL_RE.exec(url ?? "");
   if (!m) return null;
   const [, base, id, name, ext = "", query = ""] = m;
-  return { base, id, name, ext, query, path: `${id}/${name}${ext}`, thumbPath: `${id}/thumb/${name}.jpg` };
+  return { base, id, name, ext, query, path: `${id}/${name}${ext}`, thumbPath: `${id}/thumb/${name}.jpg`, mediumPath: `${id}/medium/${name}.jpg` };
 }
 
 /** Address of the small version of a photo (same ?t= tag), or null if the address is not ours. */
@@ -71,4 +75,16 @@ export function thumbUrlFor(url: string | null | undefined): string | null {
 export function thumbPathFor(path: string): string | null {
   const m = /^(\d+)\/([^/]+?)(\.[A-Za-z0-9]+)?$/.exec(path);
   return m ? `${m[1]}/thumb/${m[2]}.jpg` : null;
+}
+
+/** Address of the mid-size version of a photo (same ?t= tag), or null if the address is not ours. */
+export function mediumUrlFor(url: string | null | undefined): string | null {
+  const p = parsePhotoUrl(url);
+  return p ? `${p.base}${p.mediumPath}${p.query}` : null;
+}
+
+/** Storage path of the mid-size version of a stored photo path ("12/Kitchen.png" -> "12/medium/Kitchen.jpg"). */
+export function mediumPathFor(path: string): string | null {
+  const m = /^(\d+)\/([^/]+?)(\.[A-Za-z0-9]+)?$/.exec(path);
+  return m ? `${m[1]}/medium/${m[2]}.jpg` : null;
 }

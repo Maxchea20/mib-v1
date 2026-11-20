@@ -28,8 +28,8 @@ export default function Gallery({
   return (
     <div className="flex flex-col gap-3">
       <div className="relative overflow-hidden rounded-2xl bg-[var(--mp-accent-soft)]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <ThumbImg
+          size="medium"
           src={images[index]}
           alt={`${alt} (${index + 1}/${images.length})`}
           className="aspect-[16/10] w-full object-cover"

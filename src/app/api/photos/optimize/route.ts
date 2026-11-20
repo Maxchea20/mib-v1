@@ -3,7 +3,7 @@ import { createClient as createAdmin } from "@supabase/supabase-js";
 import sharp from "sharp";
 import { requireUser } from "@/lib/apiAuth";
 import {
-  BUCKET, CACHE_SECONDS, MAIN_MAX, MAIN_QUALITY, THUMB_MAX, THUMB_QUALITY,
+  BUCKET, CACHE_SECONDS, MAIN_MAX, MAIN_QUALITY, MEDIUM_MAX, MEDIUM_QUALITY, THUMB_MAX, THUMB_QUALITY,
   needsShrink, parsePhotoUrl,
 } from "@/lib/photoSize";
 
@@ -86,14 +86,15 @@ export async function POST(request: Request) {
 
   /* ------------------------------------------------------------- scan */
   if (mode === "scan") {
-    let photos = 0, bytes = 0, heavy = 0, heavyBytes = 0, noThumb = 0, unknown = 0;
+    let photos = 0, bytes = 0, heavy = 0, heavyBytes = 0, noThumb = 0, noMedium = 0, unknown = 0;
     await Promise.all(
       rows.map(async (r) => {
         const p = parsePhotoUrl(r.image_url);
         if (!p) return;
         photos++;
-        const [size, hasThumb] = await Promise.all([headSize(`${p.base}${p.path}`), exists(`${p.base}${p.thumbPath}`)]);
+        const [size, hasThumb, hasMedium] = await Promise.all([headSize(`${p.base}${p.path}`), exists(`${p.base}${p.thumbPath}`), exists(`${p.base}${p.mediumPath}`)]);
         if (!hasThumb) noThumb++;
+        if (!hasMedium) noMedium++;
         if (size === null) return void unknown++;
         bytes += size;
         if (size > 450_000) {
@@ -102,11 +103,11 @@ export async function POST(request: Request) {
         }
       })
     );
-    return NextResponse.json({ ok: true, mode, nextAfter, done, photos, bytes, heavy, heavyBytes, noThumb, unknown });
+    return NextResponse.json({ ok: true, mode, nextAfter, done, photos, bytes, heavy, heavyBytes, noThumb, noMedium, unknown });
   }
 
   /* -------------------------------------------------------------- run */
-  const results: { id: number; status: "shrunk" | "kept" | "skipped" | "error"; before: number; after: number; thumb: boolean; note?: string }[] = [];
+  const results: { id: number; status: "shrunk" | "kept" | "skipped" | "error"; before: number; after: number; thumb: boolean; medium?: boolean; note?: string }[] = [];
 
   for (const r of rows) {
     const p = parsePhotoUrl(r.image_url);
@@ -160,6 +161,19 @@ export async function POST(request: Request) {
         thumb = !thErr;
       }
 
+      // mid-size version (only if there is none yet)
+      const mediumPath = `${r.property_id}/medium/${p.name}.jpg`;
+      let medium = await exists(`${p.base}${mediumPath}`);
+      if (!medium) {
+        const mid = await sharp(current, { failOn: "none" })
+          .rotate()
+          .resize({ width: MEDIUM_MAX, height: MEDIUM_MAX, fit: "inside", withoutEnlargement: true })
+          .jpeg({ quality: Math.round(MEDIUM_QUALITY * 100), mozjpeg: true, progressive: true })
+          .toBuffer();
+        const { error: mdErr } = await db.storage.from(BUCKET).upload(mediumPath, mid, { upsert: true, contentType: "image/jpeg", cacheControl: CACHE_SECONDS });
+        medium = !mdErr;
+      }
+
       if (newUrl) {
         const patch: Record<string, string> = { image_url: newUrl };
         if (newFileName) patch.file_name = newFileName;
@@ -168,7 +182,7 @@ export async function POST(request: Request) {
         // the old file under a different name is no longer used
         if (path !== p.path) await db.storage.from(BUCKET).remove([p.path]);
       }
-      results.push({ id: r.id, status, before: original.length, after: current.length, thumb });
+      results.push({ id: r.id, status, before: original.length, after: current.length, thumb, medium });
     } catch (e) {
       results.push({ id: r.id, status: "error", before: 0, after: 0, thumb: false, note: e instanceof Error ? e.message : "failed" });
     }
@@ -183,6 +197,7 @@ export async function POST(request: Request) {
     skipped: results.filter((x) => x.status === "skipped").length,
     errors: results.filter((x) => x.status === "error").map((x) => ({ id: x.id, note: x.note })),
     thumbs: results.filter((x) => x.thumb).length,
+    mediums: results.filter((x) => x.medium).length,
     savedBytes: saved,
   });
 }
