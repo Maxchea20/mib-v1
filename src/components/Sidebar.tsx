@@ -41,6 +41,16 @@ export default function Sidebar({ userInitial = "M" }: { userInitial?: string })
         >
           Settings
         </Link>
+        <Link
+          href="/queue"
+          className={`flex items-center px-3 py-2.5 rounded-xl text-sm ${
+            pathname?.startsWith("/queue")
+              ? "bg-[#f3eee6] text-[#1c1917]"
+              : "text-[#d6d3d1] hover:bg-white/5"
+          }`}
+        >
+          Worker queue
+        </Link>
       </nav>
 
       <div className="px-6 py-5 border-t border-white/10">
