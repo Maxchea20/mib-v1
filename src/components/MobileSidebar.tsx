@@ -46,6 +46,13 @@ export default function MobileSidebar({ open, onClose }: Props) {
           >
             Settings
           </Link>
+          <Link
+            href="/queue"
+            onClick={onClose}
+            className="flex items-center rounded-xl px-4 py-3 text-[var(--ink)] hover:bg-[var(--paper)]"
+          >
+            Worker queue
+          </Link>
         </nav>
       </aside>
     </>
