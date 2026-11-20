@@ -84,7 +84,7 @@ export default async function AboutPage({ params }: Props) {
           />
         ) : null}
 
-        <div className="flex min-w-0 flex-1 flex-col gap-4">
+        <div className="flex min-w-0 flex-1 flex-col gap-4 rounded-2xl border border-[var(--mp-line)] bg-[var(--mp-card)] p-5 sm:p-7">
           <div>
             <h1 className="mp-display text-3xl font-bold leading-tight text-[var(--mp-ink)] sm:text-4xl">{name}</h1>
             {headline ? <p className="mt-2 text-lg text-[var(--mp-accent)]">{headline}</p> : null}
