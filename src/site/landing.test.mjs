@@ -71,3 +71,22 @@ test("every landing page has text in all three languages", () => {
   assert.equal(landingFromSlug("nope"), null);
   assert.ok(landingCommon("zh").emptyTitle);
 });
+
+test("the two land pages carry a general guide in all three languages, the others do not", async () => {
+  const { landGuide } = await import("./landGuide.ts");
+  for (const slug of ["land-for-sale-perak", "industrial-land-perak"]) for (const lang of ["en", "ms", "zh"]) {
+    const g = landGuide(slug, lang);
+    assert.ok(g && g.title.length > 5, `${slug} ${lang}`);
+    assert.equal(g.sections.length, 6);
+    for (const s of g.sections) assert.ok(s.h.length > 3 && s.p.length > (lang === "zh" ? 20 : 40), `${slug} ${lang} ${s.h}`);
+    assert.ok(g.note.length > 20);
+    const all = JSON.stringify(g);
+    assert.ok(!/RM\s?\d|guarantee|jamin|保证|best price/i.test(all), "no prices or promises");
+  }
+  assert.equal(landGuide("houses-for-sale-ipoh", "en"), null);
+  assert.equal(landGuide("nope", "zh"), null);
+  // the land page names Ipoh, because that is what people search for
+  assert.ok(landingText("land-for-sale-perak", "en").h1.includes("Ipoh"));
+  assert.ok(landingText("land-for-sale-perak", "ms").h1.includes("Ipoh"));
+  assert.ok(landingText("land-for-sale-perak", "zh").h1.includes("怡保"));
+});

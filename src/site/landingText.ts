@@ -252,11 +252,11 @@ const TEXT: Record<string, Record<Lang, LandingText>> = {
   },
   "land-for-sale-perak": {
     en: {
-      nav: "Land for sale in Perak",
-      h1: "Land for sale in Perak",
-      metaTitle: "Land for sale in Perak",
-      metaDesc: "Land for sale in Perak: residential, commercial, industrial and agricultural. Chat directly with Max, a registered estate negotiator (REN 31953).",
-      intro: "Land for sale in Perak, including residential, commercial, industrial and agricultural land. Each listing shows the size, area and asking price. Ask Max about the title, tenure and what the land can be used for.",
+      nav: "Land for sale in Ipoh and Perak",
+      h1: "Land for sale in Ipoh and Perak",
+      metaTitle: "Land for sale in Ipoh and Perak",
+      metaDesc: "Land for sale in Ipoh and Perak: residential, commercial, industrial and agricultural. Chat directly with Max, a registered estate negotiator (REN 31953).",
+      intro: "Land for sale in Ipoh and across Perak, including residential, commercial, industrial and agricultural land. Each listing shows the size, area and asking price. Ask Max about the title, tenure and what the land can be used for.",
       faq: [
         { q: "What should I check before buying land?", a: "Check the title and tenure, the category of land use, road access, utilities and any conditions or restrictions. A lawyer can confirm the title before you commit." },
         { q: "Can I build on any land?", a: "No. What you can build depends on the land's category and approvals. Always confirm with the local authority before buying." },
@@ -264,11 +264,11 @@ const TEXT: Record<string, Record<Lang, LandingText>> = {
       ],
     },
     ms: {
-      nav: "Tanah dijual di Perak",
-      h1: "Tanah dijual di Perak",
-      metaTitle: "Tanah dijual di Perak",
-      metaDesc: "Tanah dijual di Perak: kediaman, komersial, perindustrian dan pertanian. Berbual terus dengan Max, ejen harta tanah berdaftar (REN 31953).",
-      intro: "Tanah dijual di Perak, termasuk tanah kediaman, komersial, perindustrian dan pertanian. Setiap senarai menunjukkan saiz, kawasan dan harga. Tanya Max tentang hak milik, pegangan dan kegunaan tanah.",
+      nav: "Tanah dijual di Ipoh dan Perak",
+      h1: "Tanah dijual di Ipoh dan Perak",
+      metaTitle: "Tanah dijual di Ipoh dan Perak",
+      metaDesc: "Tanah dijual di Ipoh dan Perak: kediaman, komersial, perindustrian dan pertanian. Berbual terus dengan Max, ejen harta tanah berdaftar (REN 31953).",
+      intro: "Tanah dijual di Ipoh dan seluruh Perak, termasuk tanah kediaman, komersial, perindustrian dan pertanian. Setiap senarai menunjukkan saiz, kawasan dan harga. Tanya Max tentang hak milik, pegangan dan kegunaan tanah.",
       faq: [
         { q: "Apa yang perlu disemak sebelum membeli tanah?", a: "Semak hak milik dan pegangan, kategori kegunaan tanah, akses jalan, utiliti dan sebarang syarat atau sekatan. Peguam boleh mengesahkan hak milik sebelum anda berkomitmen." },
         { q: "Bolehkah saya membina di atas sebarang tanah?", a: "Tidak. Apa yang boleh dibina bergantung pada kategori dan kelulusan tanah. Sentiasa sahkan dengan pihak berkuasa tempatan sebelum membeli." },
@@ -276,11 +276,11 @@ const TEXT: Record<string, Record<Lang, LandingText>> = {
       ],
     },
     zh: {
-      nav: "霹雳土地出售",
-      h1: "霹雳土地出售",
-      metaTitle: "霹雳土地出售",
-      metaDesc: "霹雳土地出售：住宅、商业、工业和农业用地。直接联系注册房地产经纪 Max (REN 31953)。",
-      intro: "霹雳土地出售，包括住宅、商业、工业和农业用地。每个房源都列明面积、区域和售价。关于地契、年限和土地用途，可向 Max 查询。",
+      nav: "怡保及霹雳土地出售",
+      h1: "怡保及霹雳土地出售",
+      metaTitle: "怡保及霹雳土地出售",
+      metaDesc: "怡保及霹雳土地出售：住宅、商业、工业和农业用地。直接联系注册房地产经纪 Max (REN 31953)。",
+      intro: "怡保及霹雳各地的土地出售，包括住宅、商业、工业和农业用地。每个房源都列明面积、区域和售价。关于地契、年限和土地用途，可向 Max 查询。",
       faq: [
         { q: "购买土地前应该检查什么？", a: "请检查地契和年限、土地用途类别、道路出入、公用设施以及任何条件或限制。您可以在做决定前请律师确认地契。" },
         { q: "任何土地都可以建房吗？", a: "不可以。能建什么取决于土地类别和批准。购买前务必向地方政府确认。" },
