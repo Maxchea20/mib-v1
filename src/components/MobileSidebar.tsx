@@ -60,6 +60,13 @@ export default function MobileSidebar({ open, onClose }: Props) {
           >
             My profile
           </Link>
+          <Link
+            href="/vlog"
+            onClick={onClose}
+            className="flex items-center rounded-xl px-4 py-3 text-[var(--ink)] hover:bg-[var(--paper)]"
+          >
+            Vlog
+          </Link>
         </nav>
       </aside>
     </>
