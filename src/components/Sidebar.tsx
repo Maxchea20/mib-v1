@@ -61,6 +61,16 @@ export default function Sidebar({ userInitial = "M" }: { userInitial?: string })
         >
           My profile
         </Link>
+        <Link
+          href="/vlog"
+          className={`flex items-center px-3 py-2.5 rounded-xl text-sm ${
+            pathname?.startsWith("/vlog")
+              ? "bg-[#f3eee6] text-[#1c1917]"
+              : "text-[#d6d3d1] hover:bg-white/5"
+          }`}
+        >
+          Vlog
+        </Link>
       </nav>
 
       <div className="px-6 py-5 border-t border-white/10">

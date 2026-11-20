@@ -9,7 +9,9 @@ import { requireLang } from "@/site/context";
 import { alternatesFor, OG_LOCALE } from "@/site/seo";
 import { breadcrumbSchema, listingSchema, safeJson } from "@/site/schema";
 import { slugFromCategory } from "@/site/categories";
-import { getPublicListing } from "@/site/data";
+import { getPublicListing, getVideoForListing } from "@/site/data";
+import LiteYouTube from "@/components/site/LiteYouTube";
+import { pickText as pickVideoText, vlogText } from "@/site/vlog";
 import {
   formatPrice,
   listingUrl,
@@ -87,6 +89,7 @@ export default async function ListingPage({ params }: Props) {
   if (!found) notFound();
 
   const { listing, photos } = found;
+  const video = await getVideoForListing(listing.id);
   const lang = requireLang(rawLang);
   const base = basePath(lang);
   const text = t(lang);
@@ -184,6 +187,13 @@ export default async function ListingPage({ params }: Props) {
                   </div>
                 ))}
               </dl>
+            </section>
+          )}
+
+          {video && (
+            <section className="flex flex-col gap-3 rounded-2xl border border-[var(--mp-line)] bg-[var(--mp-card)] p-6">
+              <h2 className="mp-display text-xl font-bold">{vlogText(lang).listingVideo}</h2>
+              <LiteYouTube id={video.youtube_id} title={pickVideoText(video, "title", lang)} playLabel={vlogText(lang).play} />
             </section>
           )}
 

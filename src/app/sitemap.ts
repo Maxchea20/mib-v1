@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { BRAND } from "@/site/brand";
 import { CATEGORIES } from "@/site/categories";
-import { getPublicListingIds, getPublicListings, getPublicProfile } from "@/site/data";
+import { getPublicListingIds, getPublicListings, getPublicProfile, getPublicVideos } from "@/site/data";
 import { isShowable } from "@/site/profile";
 import { LANDINGS, matchesLanding } from "@/site/landing";
 import { HTML_LANG, LANGS, pathFor } from "@/site/i18n";
@@ -33,6 +33,7 @@ function entry(
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const ids = await getPublicListingIds();
   const profile = await getPublicProfile();
+  const videos = await getPublicVideos();
   // Search landing pages are listed only while they have something on them.
   const all = await getPublicListings({}, 1000);
   const landings = LANDINGS.filter((c) => all.some((l) => matchesLanding(l, c)));
@@ -41,6 +42,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...entry("/", "daily", 1),
     ...CATEGORIES.flatMap((c) => entry(`/${c.slug}`, "daily", 0.9)),
     ...(isShowable(profile) ? entry("/about", "monthly", 0.6) : []),
+    ...(videos.length > 0 ? entry("/vlog", "weekly", 0.6) : []),
+    ...videos.flatMap((v) => entry(`/vlog/${v.youtube_id}`, "monthly", 0.5)),
     ...entry("/calculators", "weekly", 0.7),
     ...entry("/calculators/housing-loan", "weekly", 0.8),
     ...entry("/calculators/dsr", "weekly", 0.8),

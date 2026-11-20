@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { AgentProfile } from "./profile";
+import { sortVideos, type VlogVideo } from "./vlog";
 
 /*
 |--------------------------------------------------------------------------
@@ -168,4 +169,26 @@ export async function getPublicProfile(): Promise<AgentProfile | null> {
     return null;
   }
   return (data as AgentProfile | null) ?? null;
+}
+
+/** Published videos, in display order. The view does not exist until 09_vlog.sql has been run: then there are none. */
+export async function getPublicVideos(): Promise<VlogVideo[]> {
+  const { data, error } = await client().from("public_vlog_videos").select("*").limit(200);
+  if (error) return [];
+  return sortVideos((data ?? []) as VlogVideo[]);
+}
+
+export async function getPublicVideo(youtubeId: string): Promise<VlogVideo | null> {
+  if (!/^[A-Za-z0-9_-]{11}$/.test(youtubeId)) return null;
+  const { data, error } = await client().from("public_vlog_videos").select("*").eq("youtube_id", youtubeId).maybeSingle();
+  if (error) return null;
+  return (data as VlogVideo | null) ?? null;
+}
+
+/** The viewing video about one listing (the first one), if any. */
+export async function getVideoForListing(listingId: number): Promise<VlogVideo | null> {
+  if (!Number.isSafeInteger(listingId) || listingId <= 0) return null;
+  const { data, error } = await client().from("public_vlog_videos").select("*").eq("property_id", listingId).limit(5);
+  if (error) return null;
+  return sortVideos((data ?? []) as VlogVideo[])[0] ?? null;
 }

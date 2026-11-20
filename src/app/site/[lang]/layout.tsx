@@ -14,7 +14,8 @@ import { LANDINGS } from "@/site/landing";
 import { landingCommon, landingText } from "@/site/landingText";
 import { HOME_SEO, OG_LOCALE } from "@/site/seo";
 import { whatsappUrl } from "@/site/format";
-import { getPublicProfile } from "@/site/data";
+import { getPublicProfile, getPublicVideos } from "@/site/data";
+import { vlogText } from "@/site/vlog";
 import { isShowable, profileText } from "@/site/profile";
 
 // Self-hosted (see ./fonts/README.md): no download from Google at build time.
@@ -82,6 +83,9 @@ export default async function SiteLayout({
   const profile = await getPublicProfile();
   const showAbout = isShowable(profile);
   const aboutText = profileText(lang);
+  // The Vlog link appears only while at least one video is published (MIB > Vlog).
+  const showVlog = (await getPublicVideos()).length > 0;
+  const vlogWords = vlogText(lang);
 
   return (
     <html lang={HTML_LANG[lang]} style={{ background: BRAND.colors.paper }}>
@@ -117,6 +121,7 @@ export default async function SiteLayout({
             <Link href={`${base}/industrial`} className="hover:text-[var(--mp-accent)]">{text.navIndustrial}</Link>
             <Link href={`${base}/land`} className="hover:text-[var(--mp-accent)]">{text.navLand}</Link>
             <Link href={`${base}/calculators`} className="hover:text-[var(--mp-accent)]">{text.calcNav}</Link>
+            {showVlog && <Link href={`${base}/vlog`} className="hover:text-[var(--mp-accent)]">{vlogWords.nav}</Link>}
             {showAbout && <Link href={`${base}/about`} className="hover:text-[var(--mp-accent)]">{aboutText.nav}</Link>}
           </nav>
 
@@ -163,6 +168,13 @@ export default async function SiteLayout({
             </p>
             {BRAND.renNumber && (
               <p className="mt-1">{text.footerReg}: {BRAND.renNumber}</p>
+            )}
+            {showVlog && (
+              <p className="mt-1">
+                <Link href={`${base}/vlog`} className="inline-flex min-h-8 items-center underline hover:text-[var(--mp-accent)]">
+                  {vlogWords.title}
+                </Link>
+              </p>
             )}
             {showAbout && (
               <p className="mt-1">
