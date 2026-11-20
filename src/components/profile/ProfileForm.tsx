@@ -157,7 +157,7 @@ export default function ProfileForm({ initial, setupNeeded }: { initial: Profile
           <div className="w-32 flex-none">
             {v.photo_url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={v.photo_url} alt="Your profile photo" className="aspect-[4/5] w-32 rounded-xl border object-cover" data-testid="photo" />
+              <img src={v.photo_url} alt="Your profile photo" className="aspect-[4/5] w-32 rounded-xl border object-cover object-top" data-testid="photo" />
             ) : (
               <div className="flex aspect-[4/5] w-32 items-center justify-center rounded-xl border border-dashed text-center text-xs text-slate-500">No photo yet</div>
             )}
