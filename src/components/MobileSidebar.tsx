@@ -53,6 +53,13 @@ export default function MobileSidebar({ open, onClose }: Props) {
           >
             Worker queue
           </Link>
+          <Link
+            href="/profile"
+            onClick={onClose}
+            className="flex items-center rounded-xl px-4 py-3 text-[var(--ink)] hover:bg-[var(--paper)]"
+          >
+            My profile
+          </Link>
         </nav>
       </aside>
     </>

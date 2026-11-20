@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import type { AgentProfile } from "./profile";
 
 /*
 |--------------------------------------------------------------------------
@@ -157,4 +158,14 @@ export async function getPublicListingIds(): Promise<number[]> {
     .limit(5000);
 
   return (data ?? []).map((r: { id: number }) => r.id);
+}
+
+/** The published profile of the owner (null when none is published). Reads only the public view. */
+export async function getPublicProfile(): Promise<AgentProfile | null> {
+  const { data, error } = await client().from("public_agent_profile").select("*").maybeSingle();
+  if (error) {
+    // The view does not exist until 08_agent_profile.sql has been run: show no profile.
+    return null;
+  }
+  return (data as AgentProfile | null) ?? null;
 }

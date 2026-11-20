@@ -14,6 +14,8 @@ import { LANDINGS } from "@/site/landing";
 import { landingCommon, landingText } from "@/site/landingText";
 import { HOME_SEO, OG_LOCALE } from "@/site/seo";
 import { whatsappUrl } from "@/site/format";
+import { getPublicProfile } from "@/site/data";
+import { isShowable, profileText } from "@/site/profile";
 
 // Self-hosted (see ./fonts/README.md): no download from Google at build time.
 const jakarta = localFont({
@@ -76,6 +78,10 @@ export default async function SiteLayout({
   const base = basePath(lang);
   const text = t(lang);
   const home = base || "/";
+  // The About link appears only while a profile is published (MIB > My profile).
+  const profile = await getPublicProfile();
+  const showAbout = isShowable(profile);
+  const aboutText = profileText(lang);
 
   return (
     <html lang={HTML_LANG[lang]} style={{ background: BRAND.colors.paper }}>
@@ -111,6 +117,7 @@ export default async function SiteLayout({
             <Link href={`${base}/industrial`} className="hover:text-[var(--mp-accent)]">{text.navIndustrial}</Link>
             <Link href={`${base}/land`} className="hover:text-[var(--mp-accent)]">{text.navLand}</Link>
             <Link href={`${base}/calculators`} className="hover:text-[var(--mp-accent)]">{text.calcNav}</Link>
+            {showAbout && <Link href={`${base}/about`} className="hover:text-[var(--mp-accent)]">{aboutText.nav}</Link>}
           </nav>
 
           <div className="flex items-center gap-3">
@@ -156,6 +163,13 @@ export default async function SiteLayout({
             </p>
             {BRAND.renNumber && (
               <p className="mt-1">{text.footerReg}: {BRAND.renNumber}</p>
+            )}
+            {showAbout && (
+              <p className="mt-1">
+                <Link href={`${base}/about`} className="inline-flex min-h-8 items-center underline hover:text-[var(--mp-accent)]">
+                  {aboutText.title}
+                </Link>
+              </p>
             )}
             {BRAND.googleProfileUrl && (
               <p className="mt-1">

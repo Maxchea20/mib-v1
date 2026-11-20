@@ -15,6 +15,7 @@
 |   /residential           -> /site/en/residential   (also commercial,
 |   /ms/residential           industrial, land; and each language)
 |   /listing/123           -> /site/en/listing/123   (and /ms /zh)
+|   /about                 -> /site/en/about         (and /ms /zh)
 |   /houses-for-sale-ipoh and the other four search pages -> /site/en/l/<slug>
 |   /calculators, /calculators/housing-loan, /calculators/dsr, /calculators/rpgt, /calculators/legal-fees, /calculators/purchase-cost, /calculators/rental-yield -> /site/en/calculators...
 |   /en  /en/...           -> 308 to the same path without /en
@@ -92,6 +93,10 @@ export function resolvePublicRoute(
   const calculators = /^\/calculators(\/(?:housing-loan|dsr|rpgt|legal-fees|purchase-cost|rental-yield))?\/?$/.exec(rest);
   if (calculators) {
     return { action: "rewrite", path: `/site/${lang}/calculators${calculators[1] ?? ""}` };
+  }
+
+  if (rest === "/about" || rest === "/about/") {
+    return { action: "rewrite", path: `/site/${lang}/about` };
   }
 
   const listing = /^\/listing\/(\d{1,12})\/?$/.exec(rest);
