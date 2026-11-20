@@ -10,8 +10,8 @@ import { useRef, useState } from "react";
 
 const mb = (n: number) => `${(n / 1024 / 1024).toFixed(1)} MB`;
 
-type Scan = { photos: number; bytes: number; heavy: number; heavyBytes: number; noThumb: number; unknown: number };
-type Run = { processed: number; shrunk: number; kept: number; skipped: number; thumbs: number; savedBytes: number; errors: { id: number; note?: string }[] };
+type Scan = { photos: number; bytes: number; heavy: number; heavyBytes: number; noThumb: number; noMedium: number; unknown: number };
+type Run = { processed: number; shrunk: number; kept: number; skipped: number; thumbs: number; mediums: number; savedBytes: number; errors: { id: number; note?: string }[] };
 
 export default function PhotoOptimizer() {
   const [busy, setBusy] = useState<"" | "scan" | "run">("");
@@ -30,7 +30,7 @@ export default function PhotoOptimizer() {
   async function check() {
     setBusy("scan"); setMessage(""); setRun(null);
     stop.current = false;
-    const total: Scan = { photos: 0, bytes: 0, heavy: 0, heavyBytes: 0, noThumb: 0, unknown: 0 };
+    const total: Scan = { photos: 0, bytes: 0, heavy: 0, heavyBytes: 0, noThumb: 0, noMedium: 0, unknown: 0 };
     try {
       let after = 0;
       for (;;) {
@@ -54,14 +54,14 @@ export default function PhotoOptimizer() {
     )) return;
     setBusy("run"); setMessage("");
     stop.current = false;
-    const total: Run = { processed: 0, shrunk: 0, kept: 0, skipped: 0, thumbs: 0, savedBytes: 0, errors: [] };
+    const total: Run = { processed: 0, shrunk: 0, kept: 0, skipped: 0, thumbs: 0, mediums: 0, savedBytes: 0, errors: [] };
     setRun({ ...total });
     try {
       let after = 0;
       for (;;) {
         const d = await call({ mode: "run", after, limit: 4 });
         total.processed += d.processed; total.shrunk += d.shrunk; total.kept += d.kept; total.skipped += d.skipped;
-        total.thumbs += d.thumbs; total.savedBytes += d.savedBytes; total.errors.push(...(d.errors ?? []));
+        total.thumbs += d.thumbs; total.mediums += d.mediums ?? 0; total.savedBytes += d.savedBytes; total.errors.push(...(d.errors ?? []));
         setRun({ ...total, errors: [...total.errors] });
         if (d.done) { setMessage("Finished."); break; }
         if (stop.current) { setMessage("Stopped. You can run it again to continue."); break; }
@@ -98,13 +98,13 @@ export default function PhotoOptimizer() {
 
       {scan && (
         <p className="mt-4 text-sm text-slate-800" data-testid="scan-result">
-          {scan.photos} photos use {mb(scan.bytes)} now. {scan.heavy} are heavier than 450 KB ({mb(scan.heavyBytes)}), and {scan.noThumb} have no small version yet.
+          {scan.photos} photos use {mb(scan.bytes)} now. {scan.heavy} are heavier than 450 KB ({mb(scan.heavyBytes)}), {scan.noThumb} have no small version yet, and {scan.noMedium} have no mid-size version (used for the big photo on the website).
           Shrinking should save roughly {mb(Math.round(scan.heavyBytes * 0.85))}.
         </p>
       )}
       {run && (
         <p className="mt-3 text-sm text-slate-800" data-testid="run-result">
-          {run.processed} photos checked, {run.shrunk} shrunk (saved {mb(run.savedBytes)}), {run.kept} already small, {run.thumbs} small versions ready
+          {run.processed} photos checked, {run.shrunk} shrunk (saved {mb(run.savedBytes)}), {run.kept} already small, {run.thumbs} small and {run.mediums} mid-size versions ready
           {run.skipped ? `, ${run.skipped} skipped` : ""}.
         </p>
       )}

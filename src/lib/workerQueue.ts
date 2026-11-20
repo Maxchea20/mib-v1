@@ -145,7 +145,7 @@ export function sortJobs<T extends Pick<JobRow, "created_at" | "id">>(jobs: T[])
 export function workerSummary(state: WorkerState, counts: Counts, now: number): { tone: "good" | "warn" | "bad"; text: string } {
   if (state.online) {
     if (counts.running > 0) return { tone: "good", text: "The worker is online and busy with a job." };
-    if (counts.waiting > 0) return { tone: "good", text: "The worker is online. Waiting jobs start within a few seconds." };
+    if (counts.waiting > 0) return { tone: "good", text: "The worker is online. Waiting jobs start within about 15 seconds." };
     return { tone: "good", text: "The worker is online and idle. Nothing is waiting." };
   }
   const when = state.lastSeenMs === null ? "It has never reported in." : `It was last seen ${agoText(state.lastSeenMs, now)}.`;

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { fitWithin, needsShrink, jpgName, parsePhotoUrl, thumbUrlFor, thumbPathFor, MAIN_MAX, THUMB_MAX } from "./photoSize.ts";
+import { fitWithin, needsShrink, jpgName, parsePhotoUrl, thumbUrlFor, thumbPathFor, mediumUrlFor, mediumPathFor, MEDIUM_MAX, MAIN_MAX, THUMB_MAX } from "./photoSize.ts";
 
 const U = "https://abc.supabase.co/storage/v1/object/public/property-images/12/Living_Room.jpg?t=1700000000000";
 
@@ -44,4 +44,16 @@ test("thumbnail path from a stored path", () => {
   assert.equal(thumbPathFor("7/Front_House.jpeg"), "7/thumb/Front_House.jpg");
   assert.equal(thumbPathFor("12/thumb/Kitchen.jpg"), null);
   assert.equal(thumbPathFor("nope"), null);
+});
+
+test("mid-size version: address and path follow the same rule as the thumbnail", () => {
+  assert.equal(MEDIUM_MAX, 1200);
+  assert.equal(mediumUrlFor(U), "https://abc.supabase.co/storage/v1/object/public/property-images/12/medium/Living_Room.jpg?t=1700000000000");
+  assert.equal(mediumUrlFor("https://abc.supabase.co/storage/v1/object/public/property-images/12/Kitchen.png"), "https://abc.supabase.co/storage/v1/object/public/property-images/12/medium/Kitchen.jpg");
+  assert.equal(mediumUrlFor("https://img.example/1a.jpg"), null);
+  assert.equal(mediumUrlFor(null), null);
+  assert.equal(mediumUrlFor("https://abc.supabase.co/storage/v1/object/public/property-images/12/medium/Kitchen.jpg"), null);   // a medium has no medium
+  assert.equal(mediumPathFor("12/Kitchen.png"), "12/medium/Kitchen.jpg");
+  assert.equal(mediumPathFor("12/thumb/Kitchen.jpg"), null);
+  assert.equal(parsePhotoUrl(U).mediumPath, "12/medium/Living_Room.jpg");
 });

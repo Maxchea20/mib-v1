@@ -1,17 +1,18 @@
 "use client";
 
 import type { ImgHTMLAttributes } from "react";
-import { thumbUrlFor } from "@/lib/photoSize";
+import { mediumUrlFor, thumbUrlFor } from "@/lib/photoSize";
 
 /*
-| Shows the small version of a listing photo (about 25 KB instead of 3 to 5 MB).
-| If the small version does not exist yet (older photos), it falls back to the full
+| Shows the small version of a listing photo (about 25 KB instead of 3 to 5 MB), or
+| with size="medium" the mid-size version (about 100 to 150 KB, for the big photo).
+| If that version does not exist yet (older photos), it falls back to the full
 | photo once, so nothing ever shows broken.
 */
-type Props = Omit<ImgHTMLAttributes<HTMLImageElement>, "src"> & { src: string };
+type Props = Omit<ImgHTMLAttributes<HTMLImageElement>, "src"> & { src: string; size?: "thumb" | "medium" };
 
-export default function ThumbImg({ src, alt = "", ...rest }: Props) {
-  const thumb = thumbUrlFor(src);
+export default function ThumbImg({ src, alt = "", size = "thumb", ...rest }: Props) {
+  const thumb = size === "medium" ? mediumUrlFor(src) : thumbUrlFor(src);
 
   const fallBack = (el: HTMLImageElement) => {
     if (el.dataset.fallback === "1") return;
