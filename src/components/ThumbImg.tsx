@@ -14,9 +14,11 @@ type Props = Omit<ImgHTMLAttributes<HTMLImageElement>, "src"> & { src: string; s
 export default function ThumbImg({ src, alt = "", size = "thumb", ...rest }: Props) {
   const thumb = size === "medium" ? mediumUrlFor(src) : thumbUrlFor(src);
 
+  // The same <img> is reused when the picture changes (the photo gallery), so remember which
+  // photo already fell back, not just that one did.
   const fallBack = (el: HTMLImageElement) => {
-    if (el.dataset.fallback === "1") return;
-    el.dataset.fallback = "1";
+    if (el.dataset.fallbackFor === src) return;
+    el.dataset.fallbackFor = src;
     el.src = src;
   };
 
