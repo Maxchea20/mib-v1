@@ -35,3 +35,16 @@ export function verticalPlan(width: number, height: number): VerticalPlan {
 
 /** The instruction sent with the picture (the owner's own wording). */
 export const VERTICAL_PROMPT = "Change to 9:16 ratio. Enhance to higher quality.";
+
+/** Image models to try, best first. OPENAI_IMAGE_MODEL (set on Vercel) goes first when present. */
+export function imageModels(preferred?: string | null): string[] {
+  const list = ["gpt-image-2", "gpt-image-1.5", "gpt-image-1", "gpt-image-1-mini"];
+  const p = (preferred ?? "").trim();
+  return /^[A-Za-z0-9._-]{3,60}$/.test(p) ? [p, ...list.filter((m) => m !== p)] : list;
+}
+
+/** Did OpenAI refuse because THIS account cannot use that model (so the next one should be tried)? */
+export function isModelAccessError(status: number | undefined, message: string): boolean {
+  if (status === 404) return true;
+  return status === 400 && /model/i.test(message) && /(does not exist|not found|no access|do not have access|must be verified|not supported|unsupported|invalid)/i.test(message);
+}
