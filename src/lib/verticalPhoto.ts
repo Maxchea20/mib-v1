@@ -4,7 +4,7 @@
 |--------------------------------------------------------------------------
 |
 | OpenAI image editing is given the whole photo with the instruction in
-| VERTICAL_PROMPT (enhance the quality and change to a tall 9:16-style picture).
+| VERTICAL_PROMPT (change to 9:16 ratio, enhance to higher quality).
 | The picture it returns replaces the photo in the vertical copy, so AI may change
 | details; the original photo is never touched. A very wide photo (a panorama)
 | gets a plain blurred background instead.
@@ -14,7 +14,7 @@
 export const V_WIDTH = 1024;
 export const V_HEIGHT = 1536; // 2:3, the tall size the OpenAI image editor accepts; the video maker scales it to 9:16
 export const FEATHER = 14; // px where the real photo fades into the drawn band, so there is no hard line
-export const MAX_AI_BAND_SHARE = 0.62; // more than this share drawn by AI -> blurred fill instead
+export const MAX_AI_BAND_SHARE = 0.75; // only a true panorama (about 2.7:1 or wider) gets the blurred fill instead of the AI
 export const MAX_SOURCE_BYTES = 25 * 1024 * 1024;
 
 export type VerticalPlan =
@@ -34,4 +34,4 @@ export function verticalPlan(width: number, height: number): VerticalPlan {
 }
 
 /** The instruction sent with the picture (the owner's own wording). */
-export const VERTICAL_PROMPT = "Enhance the photo quality to higher pixels. and change to 9:16 ratio";
+export const VERTICAL_PROMPT = "Change to 9:16 ratio. Enhance to higher quality.";

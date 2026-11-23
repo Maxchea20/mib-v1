@@ -23,7 +23,7 @@ test("vertical and square photos are skipped, bad sizes too", () => {
 });
 
 test("the prompt is the owner's wording", () => {
-  assert.equal(VERTICAL_PROMPT, "Enhance the photo quality to higher pixels. and change to 9:16 ratio");
+  assert.equal(VERTICAL_PROMPT, "Change to 9:16 ratio. Enhance to higher quality.");
 });
 
 test("vertical copy addresses", () => {
@@ -33,4 +33,10 @@ test("vertical copy addresses", () => {
   assert.equal(parsePhotoUrl(U).verticalPath, "12/vertical/Living_Room.jpg");
   assert.equal(verticalPathFor("nope"), null);
   assert.equal(verticalUrlFor("https://x.com/a.jpg"), null);
+});
+
+test("a 16:9 photo goes to the AI, only a real panorama is blurred", () => {
+  assert.equal(verticalPlan(1920, 1080).mode, "ai");
+  assert.equal(verticalPlan(2400, 1000).mode, "ai");
+  assert.equal(verticalPlan(3000, 1000).mode, "blur");
 });
