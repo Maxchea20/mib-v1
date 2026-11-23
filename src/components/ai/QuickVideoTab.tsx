@@ -294,8 +294,7 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
         )}
         <p className={`${cap} mt-4`}>Vertical photos</p>
         <p className="text-xs text-stone-500">
-          Wide photos are cropped to fit the tall screen. AI can instead extend the sky, ground, ceiling or floor above and below, so the whole photo shows. The real photo is never changed, only the empty space around it is drawn. Check the result before you post. Each photo costs a little OpenAI credit.
-        </p>
+          Wide photos are cropped to fit the tall screen. AI can instead enhance the photo and change it to a tall 9:16-style picture. The AI redraws the whole picture, so small details may differ from the real property. Check each one before you post. Each photo costs a little OpenAI credit.</p>
         <label className="mt-1 flex min-h-12 cursor-pointer items-center gap-3 text-sm font-bold">
           <input type="checkbox" checked={useVertical} onChange={(e) => setUseVertical(e.target.checked)} className="h-5 w-5 accent-[var(--copper)]" />
           Use vertical photos in the video (when made)

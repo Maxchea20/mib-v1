@@ -22,9 +22,8 @@ test("vertical and square photos are skipped, bad sizes too", () => {
   assert.equal(verticalPlan(0, 10).mode, "skip");
 });
 
-test("the prompt forbids adding or changing anything", () => {
-  assert.match(VERTICAL_PROMPT, /ONLY the transparent areas/);
-  assert.match(VERTICAL_PROMPT, /Do NOT add, remove or change/);
+test("the prompt is the owner's wording", () => {
+  assert.equal(VERTICAL_PROMPT, "Enhance the photo quality to higher pixels. and change to 9:16 ratio");
 });
 
 test("vertical copy addresses", () => {
