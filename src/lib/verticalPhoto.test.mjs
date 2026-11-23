@@ -34,3 +34,9 @@ test("vertical copy addresses", () => {
   assert.equal(verticalPathFor("nope"), null);
   assert.equal(verticalUrlFor("https://x.com/a.jpg"), null);
 });
+
+test("a 16:9 photo goes to the AI, only a real panorama is blurred", () => {
+  assert.equal(verticalPlan(1920, 1080).mode, "ai");
+  assert.equal(verticalPlan(2400, 1000).mode, "ai");
+  assert.equal(verticalPlan(3000, 1000).mode, "blur");
+});

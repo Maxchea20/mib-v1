@@ -14,7 +14,7 @@
 export const V_WIDTH = 1024;
 export const V_HEIGHT = 1536; // 2:3, the tall size the OpenAI image editor accepts; the video maker scales it to 9:16
 export const FEATHER = 14; // px where the real photo fades into the drawn band, so there is no hard line
-export const MAX_AI_BAND_SHARE = 0.62; // more than this share drawn by AI -> blurred fill instead
+export const MAX_AI_BAND_SHARE = 0.75; // only a true panorama (about 2.7:1 or wider) gets the blurred fill instead of the AI
 export const MAX_SOURCE_BYTES = 25 * 1024 * 1024;
 
 export type VerticalPlan =

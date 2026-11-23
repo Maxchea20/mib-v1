@@ -87,7 +87,9 @@ export async function POST(request: Request) {
     let background: Buffer;
     if (plan.mode === "blur") {
       // panorama: a blurred, enlarged copy fills the frame, no AI
-      background = await sharp(oriented).resize(V_WIDTH, V_HEIGHT, { fit: "cover" }).blur(28).modulate({ brightness: 0.7 }).removeAlpha().png().toBuffer();
+      const blurred = await sharp(oriented).resize(V_WIDTH, V_HEIGHT, { fit: "cover" }).blur(28).modulate({ brightness: 0.7 }).removeAlpha().png().toBuffer();
+      const sharpPhoto = await sharp(oriented).resize(plan.photoW, plan.photoH, { fit: "fill" }).removeAlpha().toBuffer();
+      background = await sharp(blurred).composite([{ input: sharpPhoto, left: 0, top: plan.top }]).png().toBuffer();
     } else {
       // The whole photo goes to OpenAI with the instruction; it returns the tall version
       const input = await sharp(oriented).resize({ width: 1536, height: 1536, fit: "inside", withoutEnlargement: true }).removeAlpha().png().toBuffer();
