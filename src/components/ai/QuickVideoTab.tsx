@@ -49,6 +49,10 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
   const [result, setResult] = useState<string | null>(null);
   const [past, setPast] = useState<Project[]>([]);
   const timer = useRef<number | null>(null);
+  const [haveVertical, setHaveVertical] = useState<number[]>([]);
+  const [useVertical, setUseVertical] = useState(true);
+  const [vBusy, setVBusy] = useState(false);
+  const [vNote, setVNote] = useState("");
 
   // The length is worked out from the number of photos, using the same plan as the server.
   const factsOk = hasFacts(factsCopy(listing, lang, showPrice));
@@ -93,6 +97,57 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
       return next;
     });
 
+  // which chosen photos already have a vertical copy
+  const chosenKey = chosen.join(",");
+  useEffect(() => {
+    if (chosen.length === 0) return;
+    let live = true;
+    fetch("/api/photos/vertical", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode: "status", propertyId: listing.id, photoIds: chosen }),
+    })
+      .then((r) => r.json())
+      .then((d) => live && Array.isArray(d.have) && setHaveVertical(d.have))
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chosenKey, listing.id]);
+
+  /** Makes the vertical copy of every chosen photo that has none, one at a time (each takes 20 to 50 seconds). */
+  async function makeVertical() {
+    const todo = chosen.filter((id) => !haveVertical.includes(id));
+    if (todo.length === 0) return;
+    setError("");
+    setVBusy(true);
+    let made = 0, skipped = 0, failed = "";
+    for (let i = 0; i < todo.length; i++) {
+      setVNote(`Making vertical photo ${i + 1} of ${todo.length}. Please keep this page open.`);
+      try {
+        const res = await fetch("/api/photos/vertical", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode: "make", propertyId: listing.id, photoId: todo[i] }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "Could not make the vertical photo.");
+        if (data.status === "skipped") skipped++;
+        else {
+          made++;
+          setHaveVertical((cur) => [...cur, todo[i]]);
+        }
+      } catch (e) {
+        failed = e instanceof Error ? e.message : "Could not make the vertical photo.";
+        break;
+      }
+    }
+    setVBusy(false);
+    setVNote(`${made} vertical photo${made === 1 ? "" : "s"} made${skipped ? `, ${skipped} already vertical` : ""}.`);
+    if (failed) setError(failed);
+  }
+
   async function make() {
     setError("");
     setResult(null);
@@ -113,6 +168,7 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
           showFacts,
           hook,
           hookText: hook === "off" ? "" : hookLine,
+          vertical: useVertical,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -236,6 +292,23 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
             <p className="text-xs text-stone-500">Written from this listing&apos;s own details. You can change the words. It replaces the title card at the start.{hook === "price" && !showPrice ? " Price style needs “Show the price” turned on, so a question is used instead." : ""}</p>
           </>
         )}
+        <p className={`${cap} mt-4`}>Vertical photos</p>
+        <p className="text-xs text-stone-500">
+          Wide photos are cropped to fit the tall screen. AI can instead extend the sky, ground, ceiling or floor above and below, so the whole photo shows. The real photo is never changed, only the empty space around it is drawn. Check the result before you post. Each photo costs a little OpenAI credit.
+        </p>
+        <label className="mt-1 flex min-h-12 cursor-pointer items-center gap-3 text-sm font-bold">
+          <input type="checkbox" checked={useVertical} onChange={(e) => setUseVertical(e.target.checked)} className="h-5 w-5 accent-[var(--copper)]" />
+          Use vertical photos in the video (when made)
+        </label>
+        <button
+          type="button"
+          onClick={makeVertical}
+          disabled={vBusy || busy || chosen.every((id) => haveVertical.includes(id))}
+          className="min-h-12 w-full rounded-lg border border-stone-300 bg-white px-4 text-sm font-bold text-stone-800 disabled:opacity-50"
+        >
+          {vBusy ? "Making…" : chosen.every((id) => haveVertical.includes(id)) ? "All chosen photos are vertical" : `Make vertical photos (${chosen.filter((id) => !haveVertical.includes(id)).length})`}
+        </button>
+        {vNote && <p className="text-xs text-stone-600" role="status">{vNote}</p>}
         <p className={`${cap} mt-4`}>Length</p>
         <div className="grid grid-cols-2 gap-2" role="group" aria-label="Length">
           <button type="button" onClick={() => setLength("auto")} aria-pressed={length === "auto"} className={seg(length === "auto")}>Auto (best)</button>

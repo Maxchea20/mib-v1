@@ -3,6 +3,7 @@ import { createClient as createAdmin } from "@supabase/supabase-js";
 import { requireUser } from "@/lib/apiAuth";
 import { createClient } from "@/lib/supabase/server";
 import { cleanHook, cleanLabel, HOOK_STYLES, MAX_PHOTOS, type HookStyle, type Length, type VideoLang } from "@/lib/quickVideo/plan";
+import { verticalUrlFor } from "@/lib/photoSize";
 import { renderQuickVideo, RenderTimeoutError } from "@/lib/quickVideo/render";
 
 /*
@@ -46,6 +47,19 @@ async function download(url: string): Promise<Buffer> {
   const buf = Buffer.from(await res.arrayBuffer());
   if (buf.length > MAX_PHOTO_BYTES) throw new Error("A photo is too large (over 20 MB).");
   return buf;
+}
+
+/** The vertical (AI-extended) copy when the listing has one for this photo, otherwise the photo itself. */
+async function downloadBest(url: string, useVertical: boolean): Promise<Buffer> {
+  const v = useVertical ? verticalUrlFor(url) : null;
+  if (v) {
+    try {
+      return await download(v);
+    } catch {
+      /* no vertical copy yet: use the original photo */
+    }
+  }
+  return download(url);
 }
 
 export async function POST(request: Request) {
@@ -106,7 +120,8 @@ export async function POST(request: Request) {
   };
 
   try {
-    const photos = await Promise.all((urls as string[]).map(download));
+    const useVertical = body.vertical !== false;
+    const photos = await Promise.all((urls as string[]).map((u) => downloadBest(u, useVertical)));
     const downloaded = Date.now() - startedAt;
     const rendered = await renderQuickVideo({
       listing,

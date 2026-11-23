@@ -2,7 +2,7 @@
 
 import { supabase } from "./supabase";
 import { shrinkImage } from "./imageResize";
-import { BUCKET as PHOTO_BUCKET, CACHE_SECONDS, MAIN_MAX, MAIN_QUALITY, MEDIUM_MAX, MEDIUM_QUALITY, THUMB_MAX, THUMB_QUALITY, jpgName, mediumPathFor, thumbPathFor } from "./photoSize";
+import { BUCKET as PHOTO_BUCKET, CACHE_SECONDS, MAIN_MAX, MAIN_QUALITY, MEDIUM_MAX, MEDIUM_QUALITY, THUMB_MAX, THUMB_QUALITY, jpgName, mediumPathFor, verticalPathFor, thumbPathFor } from "./photoSize";
 
 
 /*
@@ -42,6 +42,10 @@ export async function uploadPropertyPhoto(
       });
 
   if (uploadError) throw uploadError;
+
+  // A replaced photo makes any older vertical (video) copy wrong, so it is removed; it is made again on demand.
+  const staleVertical = verticalPathFor(filePath);
+  if (staleVertical) await supabase.storage.from(PHOTO_BUCKET).remove([staleVertical]);
 
   // Small version for cards and the photo strip. A failure here is not fatal:
   // the website falls back to the full photo.
@@ -97,7 +101,8 @@ export async function uploadPropertyPhoto(
     const oldPath = `${propertyId}/${previous.file_name}`;
     const oldThumb = thumbPathFor(oldPath);
     const oldMedium = mediumPathFor(oldPath);
-    await supabase.storage.from(PHOTO_BUCKET).remove([oldPath, ...(oldThumb ? [oldThumb] : []), ...(oldMedium ? [oldMedium] : [])]);
+    const oldVertical = verticalPathFor(oldPath);
+    await supabase.storage.from(PHOTO_BUCKET).remove([oldPath, ...(oldThumb ? [oldThumb] : []), ...(oldMedium ? [oldMedium] : []), ...(oldVertical ? [oldVertical] : [])]);
   }
 
   return imageUrl;
