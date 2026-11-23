@@ -3,11 +3,12 @@
 | VERTICAL PHOTOS FOR VIDEO (pure, unit-tested)
 |--------------------------------------------------------------------------
 |
-| OpenAI image editing is given the whole photo with the instruction in
-| VERTICAL_PROMPT (enhance the quality and change to a tall 9:16-style picture).
-| The picture it returns replaces the photo in the vertical copy, so AI may change
-| details; the original photo is never touched. A very wide photo (a panorama)
-| gets a plain blurred background instead.
+| A horizontal photo is placed in the middle of a 9:16 frame. AI (OpenAI image
+| editing) only draws the empty bands above and below it, continuing what is
+| already there (sky, road, ground, ceiling, floor). Afterwards the ORIGINAL
+| pixels are pasted back over the middle, so the real property is never changed.
+| A very wide photo (a panorama) would need more than half of the frame drawn by
+| AI, so it gets a plain blurred background instead.
 |
 */
 
@@ -33,5 +34,9 @@ export function verticalPlan(width: number, height: number): VerticalPlan {
   return { mode: share > MAX_AI_BAND_SHARE ? "blur" : "ai", photoW, photoH, top, bottom };
 }
 
-/** The instruction sent with the picture (the owner's own wording). */
-export const VERTICAL_PROMPT = "Enhance the photo quality to higher pixels. and change to 9:16 ratio";
+/** The instruction sent with the picture. Never asks for anything new to appear. */
+export const VERTICAL_PROMPT =
+  "This is a real estate photograph placed in the middle of a tall frame. Fill ONLY the transparent areas above and below it by continuing what is already in the photo: sky and clouds, roof lines, walls, road, driveway, pavement, grass, ground, ceiling or floor. " +
+  "Keep the same light, colours, perspective and camera height. " +
+  "Do NOT add, remove or change any building, house, room, furniture, window, door, fence, vehicle, person, plant, sign, text, number plate or logo. Do not add new objects of any kind. " +
+  "Do not change the photograph itself. Photorealistic, no borders, no watermark.";
