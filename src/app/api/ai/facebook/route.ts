@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { requireUser } from "@/lib/apiAuth";
 import { NextResponse } from "next/server";
+import { captionLang, languageRule } from "@/lib/facebookCaption";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -37,7 +38,10 @@ export async function POST(request: Request) {
       facing,
       highlights,
       description,
+      language,
     } = body;
+
+    const lang = captionLang(language);
 
     const response = await openai.responses.create({
       model: "gpt-5-mini",
@@ -114,7 +118,7 @@ WRITING STYLE
 - Do not repeat the same information unnecessarily.
 - Include a clear call-to-action.
 - Do not use excessive emojis.
-- Use English.
+${languageRule(lang)}
 
 ==================================================
 PLATFORM STYLE
