@@ -1264,7 +1264,7 @@ export default function MarketingListingSelector({
 
               {/* GROUP LIST */}
 
-              <div className="border rounded-lg bg-white max-h-[420px] overflow-y-auto">
+              <div className="border rounded-lg bg-white max-h-[420px] overflow-y-auto overflow-x-hidden overscroll-contain">
 
                 {filteredGroups.length ===
                 0 ? (
@@ -1285,7 +1285,7 @@ export default function MarketingListingSelector({
                           key={
                             group.id
                           }
-                          className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 cursor-pointer hover:bg-blue-50 ${
+                          className={`flex w-full items-center gap-3 px-4 py-3 border-b last:border-b-0 cursor-pointer hover:bg-blue-50 ${
                             checked
                               ? "bg-blue-50"
                               : ""
@@ -1305,12 +1305,12 @@ export default function MarketingListingSelector({
                             disabled={
                               posting
                             }
-                            className="w-4 h-4"
+                            className="w-5 h-5 shrink-0"
                           />
 
                           <div className="flex-1 min-w-0">
 
-                            <p className="text-sm font-medium text-black">
+                            <p className="text-sm font-medium text-black break-words [overflow-wrap:anywhere]">
                               {group.name}
                             </p>
 
