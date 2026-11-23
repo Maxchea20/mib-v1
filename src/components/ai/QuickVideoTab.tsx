@@ -117,8 +117,8 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
   }, [chosenKey, listing.id]);
 
   /** Makes the vertical copy of every chosen photo that has none, one at a time (each takes 20 to 50 seconds). */
-  async function makeVertical() {
-    const todo = chosen.filter((id) => !haveVertical.includes(id));
+  async function makeVertical(redo = false) {
+    const todo = redo ? chosen : chosen.filter((id) => !haveVertical.includes(id));
     if (todo.length === 0) return;
     setError("");
     setVBusy(true);
@@ -129,7 +129,7 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
         const res = await fetch("/api/photos/vertical", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mode: "make", propertyId: listing.id, photoId: todo[i] }),
+          body: JSON.stringify({ mode: "make", propertyId: listing.id, photoId: todo[i], force: redo }),
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.error || "Could not make the vertical photo.");
@@ -301,12 +301,24 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
         </label>
         <button
           type="button"
-          onClick={makeVertical}
+          onClick={() => makeVertical(false)}
           disabled={vBusy || busy || chosen.every((id) => haveVertical.includes(id))}
           className="min-h-12 w-full rounded-lg border border-stone-300 bg-white px-4 text-sm font-bold text-stone-800 disabled:opacity-50"
         >
           {vBusy ? "Making…" : chosen.every((id) => haveVertical.includes(id)) ? "All chosen photos are vertical" : `Make vertical photos (${chosen.filter((id) => !haveVertical.includes(id)).length})`}
         </button>
+        {haveVertical.length > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              if (window.confirm(`Remake all ${chosen.length} chosen vertical photos with the AI? The old vertical copies are replaced and this uses OpenAI credit.`)) makeVertical(true);
+            }}
+            disabled={vBusy || busy}
+            className="min-h-12 w-full rounded-lg border border-stone-300 bg-white px-4 text-sm font-bold text-stone-800 disabled:opacity-50"
+          >
+            Remake all chosen vertical photos
+          </button>
+        )}
         {vNote && <p className="text-xs text-stone-600" role="status">{vNote}</p>}
         <p className={`${cap} mt-4`}>Length</p>
         <div className="grid grid-cols-2 gap-2" role="group" aria-label="Length">
