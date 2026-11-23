@@ -24,7 +24,8 @@ export type VerticalPlan =
 /** How a photo of width x height sits inside the tall frame. */
 export function verticalPlan(width: number, height: number): VerticalPlan {
   if (!(width > 0) || !(height > 0)) return { mode: "skip", reason: "unreadable photo" };
-  if (height >= width) return { mode: "skip", reason: "already vertical" };
+  // a vertical or square photo has no empty bands: it still goes to the AI like every other photo
+  if (height >= width) return { mode: "ai", photoW: V_WIDTH, photoH: V_HEIGHT, top: 0, bottom: 0 };
   const photoW = V_WIDTH;
   const photoH = Math.max(1, Math.round((height * V_WIDTH) / width));
   const top = Math.floor((V_HEIGHT - photoH) / 2);

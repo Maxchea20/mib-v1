@@ -16,9 +16,9 @@ test("a panorama gets a blurred fill, not a mostly-AI picture", () => {
   assert.equal(verticalPlan(4000, 1000).mode, "blur");
 });
 
-test("vertical and square photos are skipped, bad sizes too", () => {
-  assert.equal(verticalPlan(1000, 1500).mode, "skip");
-  assert.equal(verticalPlan(1000, 1000).mode, "skip");
+test("vertical and square photos also go to the AI; only unreadable sizes are skipped", () => {
+  assert.equal(verticalPlan(1000, 1500).mode, "ai");
+  assert.equal(verticalPlan(1000, 1000).mode, "ai");
   assert.equal(verticalPlan(0, 10).mode, "skip");
 });
 
