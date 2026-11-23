@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { CAPTION_LANGS, type CaptionLang } from "@/lib/facebookCaption";
 import { coverPhotoMap } from "@/lib/photoTemplates";
 
 type FacebookGroup = {
@@ -29,6 +30,9 @@ export default function MarketingListingSelector({
 
   const [platform, setPlatform] =
     useState("page");
+
+  const [captionLanguage, setCaptionLanguage] =
+    useState<CaptionLang>("en");
 
   const [selectedGroupIds, setSelectedGroupIds] =
     useState<string[]>([]);
@@ -432,6 +436,8 @@ export default function MarketingListingSelector({
             },
             body: JSON.stringify({
               platform,
+
+              language: captionLanguage,
 
               title:
                 selectedListing.title,
@@ -1028,6 +1034,49 @@ export default function MarketingListingSelector({
               </option>
 
             </select>
+
+          </div>
+
+          {/* CAPTION LANGUAGE */}
+
+          <div className="mb-5">
+
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Caption Language
+            </label>
+
+            <div
+              className="grid grid-cols-3 gap-2"
+              role="group"
+              aria-label="Caption language"
+            >
+              {CAPTION_LANGS.map((l) => (
+                <button
+                  key={l.id}
+                  type="button"
+                  onClick={() => {
+                    setCaptionLanguage(l.id);
+                    setContent("");
+                    setError("");
+                    setSuccess("");
+                    setShowPreview(false);
+                  }}
+                  disabled={generating || posting}
+                  aria-pressed={captionLanguage === l.id}
+                  className={`min-h-12 rounded-lg border px-3 text-sm font-semibold disabled:opacity-50 ${
+                    captionLanguage === l.id
+                      ? "border-black bg-black text-white"
+                      : "border-gray-300 bg-white text-black"
+                  }`}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+
+            <p className="mt-2 text-xs text-gray-500">
+              The caption is written again in this language from the listing&apos;s own details. Please read it before you post.
+            </p>
 
           </div>
 
