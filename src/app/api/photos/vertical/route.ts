@@ -5,7 +5,7 @@ import sharp from "sharp";
 import { requireUser } from "@/lib/apiAuth";
 import { createClient } from "@/lib/supabase/server";
 import { BUCKET, CACHE_SECONDS, parsePhotoUrl } from "@/lib/photoSize";
-import { MAX_SOURCE_BYTES, V_HEIGHT, V_WIDTH, VERTICAL_PROMPT, verticalPlan } from "@/lib/verticalPhoto";
+import { imageModels, isModelAccessError, MAX_SOURCE_BYTES, V_HEIGHT, V_WIDTH, VERTICAL_PROMPT, verticalPlan } from "@/lib/verticalPhoto";
 
 /*
 |--------------------------------------------------------------------------
@@ -94,15 +94,28 @@ export async function POST(request: Request) {
       // The whole photo goes to OpenAI with the instruction; it returns the tall version
       const input = await sharp(oriented).resize({ width: 1536, height: 1536, fit: "inside", withoutEnlargement: true }).removeAlpha().png().toBuffer();
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 52_000, maxRetries: 0 });
-      const out = await openai.images.edit({
-        model: "gpt-image-1",
-        image: await toFile(input, "photo.png", { type: "image/png" }),
-        prompt: VERTICAL_PROMPT,
-        size: "1024x1536",
-        quality: "medium",
-        n: 1,
-      });
-      const b64 = out.data?.[0]?.b64_json;
+      // Try each image model this account may use; a refusal about the MODEL moves on to the next one
+      let out: Awaited<ReturnType<typeof openai.images.edit>> | null = null;
+      let lastModelError = "";
+      for (const model of imageModels(process.env.OPENAI_IMAGE_MODEL)) {
+        try {
+          out = await openai.images.edit({
+            model,
+            image: await toFile(input, "photo.png", { type: "image/png" }),
+            prompt: VERTICAL_PROMPT,
+            size: "1024x1536",
+            n: 1,
+          });
+          break;
+        } catch (e) {
+          const status = (e as { status?: number }).status;
+          const msg = e instanceof Error ? e.message : "";
+          if (!isModelAccessError(status, msg)) throw e;
+          lastModelError = msg;
+        }
+      }
+      if (!out) throw new Error(`Your OpenAI account cannot use any image model yet (${lastModelError}). In OpenAI, open Settings > Organization > General and choose Verify Organization.`);
+      const b64 = (out as { data?: { b64_json?: string }[] }).data?.[0]?.b64_json;
       if (!b64) throw new Error("OpenAI did not return a picture.");
       background = await sharp(Buffer.from(b64, "base64")).resize(V_WIDTH, V_HEIGHT, { fit: "fill" }).removeAlpha().png().toBuffer();
     }
