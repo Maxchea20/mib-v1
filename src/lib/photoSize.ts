@@ -62,7 +62,7 @@ export function parsePhotoUrl(url: string | null | undefined) {
   const m = URL_RE.exec(url ?? "");
   if (!m) return null;
   const [, base, id, name, ext = "", query = ""] = m;
-  return { base, id, name, ext, query, path: `${id}/${name}${ext}`, thumbPath: `${id}/thumb/${name}.jpg`, mediumPath: `${id}/medium/${name}.jpg` };
+  return { base, id, name, ext, query, path: `${id}/${name}${ext}`, verticalPath: `${id}/vertical/${name}.jpg`, thumbPath: `${id}/thumb/${name}.jpg`, mediumPath: `${id}/medium/${name}.jpg` };
 }
 
 /** Address of the small version of a photo (same ?t= tag), or null if the address is not ours. */
@@ -87,4 +87,16 @@ export function mediumUrlFor(url: string | null | undefined): string | null {
 export function mediumPathFor(path: string): string | null {
   const m = /^(\d+)\/([^/]+?)(\.[A-Za-z0-9]+)?$/.exec(path);
   return m ? `${m[1]}/medium/${m[2]}.jpg` : null;
+}
+
+/** Address of the vertical (9:16) version of a photo, or null if the address is not ours. */
+export function verticalUrlFor(url: string | null | undefined): string | null {
+  const p = parsePhotoUrl(url);
+  return p ? `${p.base}${p.verticalPath}${p.query}` : null;
+}
+
+/** Storage path of the vertical version of a stored photo path ("12/Kitchen.png" -> "12/vertical/Kitchen.jpg"). */
+export function verticalPathFor(path: string): string | null {
+  const m = /^(\d+)\/([^/]+?)(\.[A-Za-z0-9]+)?$/.exec(path);
+  return m ? `${m[1]}/vertical/${m[2]}.jpg` : null;
 }
