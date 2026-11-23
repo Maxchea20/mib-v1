@@ -144,7 +144,7 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
       }
     }
     setVBusy(false);
-    setVNote(`${made} vertical photo${made === 1 ? "" : "s"} made${skipped ? `, ${skipped} already vertical` : ""}.`);
+    setVNote(`${made} vertical photo${made === 1 ? "" : "s"} made${skipped ? `, ${skipped} could not be read` : ""}.`);
     if (failed) setError(failed);
   }
 
