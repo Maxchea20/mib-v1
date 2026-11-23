@@ -5,7 +5,7 @@ import sharp from "sharp";
 import { requireUser } from "@/lib/apiAuth";
 import { createClient } from "@/lib/supabase/server";
 import { BUCKET, CACHE_SECONDS, parsePhotoUrl } from "@/lib/photoSize";
-import { FEATHER, MAX_SOURCE_BYTES, V_HEIGHT, V_WIDTH, VERTICAL_PROMPT, verticalPlan } from "@/lib/verticalPhoto";
+import { MAX_SOURCE_BYTES, V_HEIGHT, V_WIDTH, VERTICAL_PROMPT, verticalPlan } from "@/lib/verticalPhoto";
 
 /*
 |--------------------------------------------------------------------------
@@ -17,8 +17,8 @@ import { FEATHER, MAX_SOURCE_BYTES, V_HEIGHT, V_WIDTH, VERTICAL_PROMPT, vertical
 |
 | The copy is saved next to the photo as <listing>/vertical/<name>.jpg. The original is
 | never changed, and the website keeps using the original. The video maker uses the
-| vertical copy when there is one. OpenAI draws only the bands above and below the photo;
-| the real photo is pasted back over the middle afterwards.
+| vertical copy when there is one. OpenAI enhances the photo and returns the tall version
+| (the instruction is VERTICAL_PROMPT in src/lib/verticalPhoto.ts).
 |
 */
 
@@ -38,18 +38,6 @@ async function exists(url: string): Promise<boolean> {
   } catch {
     return false;
   }
-}
-
-/** The real photo, with its top and bottom edges fading out over FEATHER px, so it blends into the drawn bands. */
-async function feathered(photo: Buffer, w: number, h: number): Promise<Buffer> {
-  const f = Math.min(FEATHER, Math.floor(h / 4));
-  const fade = Buffer.from(
-    `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">` +
-      `<stop offset="0" stop-color="#000"/><stop offset="${f / h}" stop-color="#fff"/><stop offset="${1 - f / h}" stop-color="#fff"/><stop offset="1" stop-color="#000"/>` +
-      `</linearGradient></defs><rect width="${w}" height="${h}" fill="url(#g)"/></svg>`
-  );
-  const alpha = await sharp(fade).resize(w, h).greyscale().raw().toBuffer();
-  return sharp(photo).removeAlpha().joinChannel(alpha, { raw: { width: w, height: h, channels: 1 } }).png().toBuffer();
 }
 
 export async function POST(request: Request) {
@@ -96,25 +84,19 @@ export async function POST(request: Request) {
     const plan = verticalPlan(meta.width ?? 0, meta.height ?? 0);
     if (plan.mode === "skip") return NextResponse.json({ ok: true, status: "skipped", reason: plan.reason });
 
-    const placed = await sharp(oriented).resize(plan.photoW, plan.photoH, { fit: "fill" }).removeAlpha().toBuffer();
-    const sheet = { create: { width: V_WIDTH, height: V_HEIGHT, channels: 4 as const, background: { r: 0, g: 0, b: 0, alpha: 0 } } };
-
     let background: Buffer;
     if (plan.mode === "blur") {
       // panorama: a blurred, enlarged copy fills the frame, no AI
-      background = await sharp(oriented).resize(V_WIDTH, V_HEIGHT, { fit: "cover" }).blur(28).modulate({ brightness: 0.7 }).removeAlpha().png().toBuffer();
+      const blurred = await sharp(oriented).resize(V_WIDTH, V_HEIGHT, { fit: "cover" }).blur(28).modulate({ brightness: 0.7 }).removeAlpha().png().toBuffer();
+      const sharpPhoto = await sharp(oriented).resize(plan.photoW, plan.photoH, { fit: "fill" }).removeAlpha().toBuffer();
+      background = await sharp(blurred).composite([{ input: sharpPhoto, left: 0, top: plan.top }]).png().toBuffer();
     } else {
-      // The picture for the editor: photo in the middle, transparent bands above and below
-      const canvas = await sharp(sheet).composite([{ input: placed, left: 0, top: plan.top }]).png().toBuffer();
-      // The mask: transparent where AI may draw (the bands), solid over the photo
-      const solid = await sharp({ create: { width: V_WIDTH, height: plan.photoH, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 1 } } }).png().toBuffer();
-      const mask = await sharp(sheet).composite([{ input: solid, left: 0, top: plan.top }]).png().toBuffer();
-
+      // The whole photo goes to OpenAI with the instruction; it returns the tall version
+      const input = await sharp(oriented).resize({ width: 1536, height: 1536, fit: "inside", withoutEnlargement: true }).removeAlpha().png().toBuffer();
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 52_000, maxRetries: 0 });
       const out = await openai.images.edit({
         model: "gpt-image-1",
-        image: await toFile(canvas, "photo.png", { type: "image/png" }),
-        mask: await toFile(mask, "mask.png", { type: "image/png" }),
+        image: await toFile(input, "photo.png", { type: "image/png" }),
         prompt: VERTICAL_PROMPT,
         size: "1024x1536",
         quality: "medium",
@@ -125,11 +107,7 @@ export async function POST(request: Request) {
       background = await sharp(Buffer.from(b64, "base64")).resize(V_WIDTH, V_HEIGHT, { fit: "fill" }).removeAlpha().png().toBuffer();
     }
 
-    // The real photo goes back over the middle, so it is exactly what was shot
-    const final = await sharp(background)
-      .composite([{ input: await feathered(placed, plan.photoW, plan.photoH), left: 0, top: plan.top }])
-      .jpeg({ quality: 88, mozjpeg: true })
-      .toBuffer();
+    const final = await sharp(background).jpeg({ quality: 88, mozjpeg: true }).toBuffer();
 
     const { error } = await admin().storage.from(BUCKET).upload(`${propertyId}/vertical/${p.name}.jpg`, final, { upsert: true, contentType: "image/jpeg", cacheControl: CACHE_SECONDS });
     if (error) throw new Error(`Upload failed: ${error.message}`);
