@@ -5,6 +5,7 @@ import {
   uploadPropertyPhoto,
   getPropertyPhoto,
 } from "@/lib/storage";
+import { photoFileName, savePhoto } from "@/lib/savePhoto";
 
 type Props = {
   propertyId: number;
@@ -25,6 +26,12 @@ export default function PhotoCard({
   const [uploading, setUploading] =
     useState(false);
 
+  const [saving, setSaving] =
+    useState(false);
+
+  const [saved, setSaved] =
+    useState("");
+
   useEffect(() => {
     loadPhoto();
   }, []);
@@ -38,6 +45,20 @@ export default function PhotoCard({
 
     if (url) {
       setImageUrl(url);
+    }
+  }
+
+  async function handleSave() {
+    if (!imageUrl) return;
+    setSaving(true);
+    setSaved("");
+    try {
+      const r = await savePhoto(imageUrl, photoFileName(photoType, propertyId));
+      setSaved(r === "downloaded" ? "Saved to your downloads." : r === "shared" ? "Choose Save Image in the menu." : "");
+    } catch (error: any) {
+      alert(error.message || "Could not save the photo.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -158,6 +179,25 @@ export default function PhotoCard({
         )}
 
       </div>
+
+      {imageUrl && (
+
+        <>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving || uploading}
+            className="mt-3 min-h-12 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm font-semibold text-black disabled:opacity-50"
+          >
+            {saving ? "Preparing..." : "⬇ Save to phone"}
+          </button>
+
+          {saved && (
+            <p className="mt-1 text-xs text-gray-500" role="status">{saved}</p>
+          )}
+        </>
+
+      )}
 
     </div>
 
