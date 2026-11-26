@@ -193,3 +193,12 @@ test("a hook replaces the title card with a shorter first scene", () => {
   assert.equal(hooked[0].photo, 0);
   assert.ok(hooked[0].motion);
 });
+
+test("the loan card is a slow scene right after the facts card, and only when asked", () => {
+  const withLoan = buildTimeline(5, [], { length: "auto", facts: true, loan: true });
+  assert.deepEqual(withLoan.slice(0, 3).map((s) => s.kind), ["opening", "facts", "loan"]);
+  assert.ok(withLoan[2].seconds >= 5, "shown slowly");
+  assert.ok(withLoan[2].seconds > withLoan[1].seconds);
+  const without = buildTimeline(5, [], { length: "auto", facts: true });
+  assert.ok(!without.some((s) => s.kind === "loan"));
+});

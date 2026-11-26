@@ -92,7 +92,7 @@ export function cleanLabel(raw: unknown): string {
 
 /* ---------------------------------------------------------------- timeline */
 
-export type SceneKind = "opening" | "hook" | "photo" | "facts" | "end";
+export type SceneKind = "opening" | "hook" | "photo" | "facts" | "loan" | "end";
 /** dx0/dx1 are -1, 0 or 1: where in the sideways slide the photo starts and ends (scaled to what the photo allows). */
 export type Motion = { z0: number; z1: number; dx0: number; dx1: number };
 
@@ -133,7 +133,7 @@ export function secondsPerPhoto(photoCount: number, length: Length): number {
 
 const frames = (seconds: number) => Math.round(seconds * FPS);
 
-export type TimelineOptions = { length: Length; facts: boolean; /** Open with a short, big "hook" line instead of the title card. */ hook?: boolean };
+export type TimelineOptions = { length: Length; facts: boolean; /** Add the financing card after the facts card (shown slowly, it has more to read). */ loan?: boolean; /** Open with a short, big "hook" line instead of the title card. */ hook?: boolean };
 
 export function buildTimeline(photoCount: number, labels: string[], o: TimelineOptions): Scene[] {
   const n = Math.max(1, Math.min(MAX_PHOTOS, Math.floor(photoCount)));
@@ -144,6 +144,7 @@ export function buildTimeline(photoCount: number, labels: string[], o: TimelineO
   if (o.hook) scenes.push({ kind: "hook", photo: 0, frames: frames(short ? 2.0 : 2.6), seconds: 0, label: "", motion: motionFor(0) });
   else scenes.push({ kind: "opening", photo: 0, frames: frames(per + 0.4), seconds: 0, label: "", motion: motionFor(0) });
   if (o.facts) scenes.push({ kind: "facts", photo: null, frames: frames(short ? 2.8 : 3.4), seconds: 0, label: "", motion: null });
+  if (o.loan) scenes.push({ kind: "loan", photo: null, frames: frames(short ? 4.4 : 5.4), seconds: 0, label: "", motion: null });
   for (let i = 1; i < n; i++) {
     scenes.push({ kind: "photo", photo: i, frames: frames(per), seconds: 0, label: cleanLabel(labels[i]), motion: motionFor(i) });
   }

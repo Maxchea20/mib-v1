@@ -80,6 +80,7 @@ export async function POST(request: Request) {
   const length: Length = body.length === "short" ? "short" : "auto";
   const showPrice = body.showPrice !== false;
   const showFacts = body.showFacts !== false;
+  const showLoan = body.showLoan !== false;
   const hook: HookStyle = HOOK_STYLES.includes(body.hook as HookStyle) ? (body.hook as HookStyle) : "off";
   const hookText = cleanHook(body.hookText, lang);
   const labelsIn = Array.isArray(body.labels) ? body.labels : [];
@@ -131,6 +132,7 @@ export async function POST(request: Request) {
       length,
       showPrice,
       showFacts,
+      showLoan,
       hook,
       hookText,
       ffmpegBudgetMs: TOTAL_BUDGET_MS - downloaded,

@@ -11,6 +11,7 @@ import {
   type HookStyle, type Length, type SceneInput, type VideoLang,
 } from "./plan";
 import type { ShareListing } from "../shareKit";
+import { loanCopy, loanEstimate, rm as ringgit } from "../../site/loanEstimate";
 
 /*
 | Makes the video. Photos are shown whole on a blurred copy of themselves, with a slow zoom or drift;
@@ -31,6 +32,8 @@ export type RenderInput = {
   length: Length;
   showPrice: boolean;
   showFacts: boolean;
+  /** Add the financing estimate card (for-sale listings with a price only). */
+  showLoan?: boolean;
   /** Opening style: "off" keeps the title card. */
   hook?: HookStyle;
   /** Hook words as edited by the user; empty means the automatic line. */
@@ -134,9 +137,10 @@ export async function renderQuickVideo(input: RenderInput): Promise<RenderResult
 
   const facts = input.showFacts ? factsCopy(input.listing, input.lang, input.showPrice) : null;
   const useFacts = facts !== null && hasFacts(facts);
+  const estimate = input.showLoan ? loanEstimate(input.listing) : null;
   const hookStyle: HookStyle = input.hook ?? "off";
   const hookLine = hookStyle === "off" ? "" : cleanHook(input.hookText, input.lang) || hookCopy(input.listing, input.lang, hookStyle, input.showPrice);
-  const scenes = buildTimeline(input.photos.length, input.labels, { length: input.length, facts: useFacts, hook: hookLine !== "" });
+  const scenes = buildTimeline(input.photos.length, input.labels, { length: input.length, facts: useFacts, loan: estimate !== null, hook: hookLine !== "" });
 
   // words: one drawing pass for the whole video
   const labelScenes = scenes.filter((s) => s.kind === "photo" && s.label !== "");
@@ -146,9 +150,11 @@ export async function renderQuickVideo(input: RenderInput): Promise<RenderResult
     hook: hookLine || null,
     labels: labelScenes.map((s) => s.label),
     facts: useFacts ? facts : null,
+    loan: estimate ? { copy: loanCopy(estimate, input.lang), down: ringgit(estimate.downPayment), amount: ringgit(estimate.loanAmount), monthly: ringgit(estimate.monthly) } : null,
     end: endCopy(input.lang),
   });
   const cut = (s: Slice) => sharp(sheet.png).extract({ left: 0, top: s.top, width: WIDTH, height: s.height }).png().toBuffer();
+  const loanCard = sheet.layout.loan ? await cut(sheet.layout.loan) : null;
   const header = await cut(sheet.layout.header);
   const openingText = await cut(sheet.layout.opening);
   const hookText = sheet.layout.hook ? await cut(sheet.layout.hook) : null;
@@ -185,6 +191,10 @@ export async function renderQuickVideo(input: RenderInput): Promise<RenderResult
       if (s.kind === "end") {
         img = sharp(END_BG);
         parts.push({ input: await cut(sheet.layout.end), left: 0, top: Math.round((HEIGHT - sheet.layout.end.height) / 2) });
+      } else if (s.kind === "loan") {
+        img = sharp(await blurredBackground(bases[0], 0.3));
+        parts.push({ input: header, left: 0, top: LAYOUT.headerTop });
+        parts.push({ input: loanCard!, left: 0, top: Math.round((HEIGHT - sheet.layout.loan!.height) / 2) });
       } else if (s.kind === "facts") {
         img = sharp(await blurredBackground(bases[0], 0.3));
         parts.push({ input: header, left: 0, top: LAYOUT.headerTop });
