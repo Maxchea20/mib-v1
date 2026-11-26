@@ -47,6 +47,13 @@ export default function MobileSidebar({ open, onClose }: Props) {
             Settings
           </Link>
           <Link
+            href="/intake"
+            onClick={onClose}
+            className="flex items-center rounded-xl px-4 py-3 text-[var(--ink)] hover:bg-[var(--paper)]"
+          >
+            Listing intake
+          </Link>
+          <Link
             href="/queue"
             onClick={onClose}
             className="flex items-center rounded-xl px-4 py-3 text-[var(--ink)] hover:bg-[var(--paper)]"
