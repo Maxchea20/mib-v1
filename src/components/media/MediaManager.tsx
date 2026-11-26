@@ -1,6 +1,7 @@
 // File: src/components/media/MediaManager.tsx
 
 import PhotoCard from "./PhotoCard";
+import ImportedPhotos from "./ImportedPhotos";
 
 type Props = {
   propertyId: number;
@@ -81,6 +82,8 @@ export default function MediaManager({
         ))}
 
       </div>
+
+      <ImportedPhotos propertyId={propertyId} />
 
     </div>
   );

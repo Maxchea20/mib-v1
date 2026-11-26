@@ -202,3 +202,9 @@ test("the loan card is a slow scene right after the facts card, and only when as
   const without = buildTimeline(5, [], { length: "auto", facts: true });
   assert.ok(!without.some((s) => s.kind === "loan"));
 });
+
+test("imported photos (Photo 1, Photo 2...) get no room label in a video", () => {
+  assert.equal(defaultLabel("Photo 3", "en"), "");
+  assert.equal(defaultLabel("Photo 12", "zh"), "");
+  assert.equal(defaultLabel("Kitchen", "en"), "Kitchen");
+});

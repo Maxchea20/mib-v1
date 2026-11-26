@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import {
-  INTAKE_WORKER_READY, STATUS_LABEL, canRemove, canSend, cleanAgentName, cleanIntakeUrl, shortUrl,
+  INTAKE_WORKER_READY, STATUS_LABEL, isNoteGood, canRemove, canSend, cleanAgentName, cleanIntakeUrl, shortUrl,
   type IntakeRow, type IntakeStatus,
 } from "@/lib/listingIntake";
 
@@ -30,6 +30,8 @@ export default function IntakeBoard() {
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [tableMissing, setTableMissing] = useState(false);
+  // Test mode: Becky only says "received". Nothing is opened or created. Turn it off for the real thing.
+  const [dryRun, setDryRun] = useState(true);
 
   const load = useCallback(async () => {
     const { data, error: e } = await supabase.from("listing_intake").select(COLUMNS).order("created_at", { ascending: false }).limit(200);
@@ -84,10 +86,10 @@ export default function IntakeBoard() {
     setNote("");
     setBusy(true);
     try {
-      const res = await fetch("/api/intake/send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids }) });
+      const res = await fetch("/api/intake/send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, dryRun }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not send to the worker.");
-      setNote(`Sent ${data.sent} link${data.sent === 1 ? "" : "s"} to the worker. It does them one at a time.`);
+      setNote(`${data.dryRun ? "Test: sent" : "Sent"} ${data.sent} link${data.sent === 1 ? "" : "s"} to Becky. She does them one at a time.`);
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not send to the worker.");
@@ -131,14 +133,15 @@ export default function IntakeBoard() {
             disabled={busy || !INTAKE_WORKER_READY || sendable.length === 0}
             className="min-h-12 rounded-lg border border-stone-900 bg-white px-4 text-sm font-bold text-stone-900 disabled:opacity-40"
           >
-            Send {sendable.length} to worker
+            {dryRun ? "Test" : "Send"} {sendable.length} {dryRun ? "with Becky" : "to Becky"}
           </button>
         </div>
-        {!INTAKE_WORKER_READY && (
-          <p className="mt-2 text-sm text-stone-600">
-            Sending is switched off for now: the worker on your PC cannot read these links yet. The links you add are kept safely in this table until it can.
-          </p>
-        )}
+        <label className="mt-3 flex min-h-12 cursor-pointer items-start gap-3 rounded-lg border border-stone-200 bg-stone-50 p-3 text-sm">
+          <input type="checkbox" checked={dryRun} onChange={(e) => setDryRun(e.target.checked)} className="mt-0.5 h-5 w-5" />
+          <span>
+            <b>Test only</b>: Becky just says she received the link. She does not open Facebook or make a listing. Untick it to make real draft listings.
+          </span>
+        </label>
         <p className="mt-1 text-xs text-stone-500">The worker takes one link at a time. You can follow the jobs on the <Link href="/queue" className="underline">Worker queue</Link> page.</p>
 
         {!loaded ? (
@@ -155,9 +158,9 @@ export default function IntakeBoard() {
                   <span className="text-xs text-stone-500">{TIME.format(new Date(r.created_at))}</span>
                 </div>
                 <a href={r.source_url} target="_blank" rel="noopener noreferrer" className="break-all text-sm text-sky-800 underline">{shortUrl(r.source_url, 70)}</a>
-                {r.error && <p className="text-sm text-red-700">{r.error}</p>}
+                {r.error && <p className={`text-sm ${isNoteGood(r.status, r.error) ? "text-emerald-800" : "text-red-700"}`}>{r.error}</p>}
                 {r.status === "done" && r.property_id && (
-                  <Link href={`/listings/${r.property_id}`} className="text-sm font-bold text-emerald-800 underline">Open the draft listing</Link>
+                  <Link href={`/listings/${r.property_id}`} className="text-sm font-bold text-emerald-800 underline">Open the draft listing (private, Inactive)</Link>
                 )}
                 <div className="flex flex-wrap gap-2">
                   {canSend(r.status) && (

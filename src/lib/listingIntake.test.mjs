@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { cleanIntakeUrl, cleanAgentName, canRemove, canSend, shortUrl, INTAKE_WORKER_READY, MAX_AGENT_NAME } from "./listingIntake.ts";
+import { cleanIntakeUrl, cleanAgentName, canRemove, canSend, shortUrl, isNoteGood, INTAKE_WORKER_READY, MAX_AGENT_NAME } from "./listingIntake.ts";
 
 test("Facebook links are accepted and tidied", () => {
   const r = cleanIntakeUrl("  https://www.facebook.com/groups/123/posts/456/?fbclid=AAA&mibextid=x&__cft__[0]=zz#abc ");
@@ -45,8 +45,15 @@ test("which rows can be sent or removed", () => {
   assert.equal(canRemove("saved"), true);
 });
 
-test("links are shortened for the table, and sending is off until the worker is ready", () => {
+test("links are shortened for the table", () => {
   assert.equal(shortUrl("https://www.facebook.com/a"), "facebook.com/a");
   assert.equal(shortUrl("https://www.facebook.com/" + "b".repeat(100), 20).length, 20);
-  assert.equal(INTAKE_WORKER_READY, false);
+  assert.equal(INTAKE_WORKER_READY, true);
+});
+
+test("a test result or a finished draft is shown calmly, a failure is not", () => {
+  assert.equal(isNoteGood("saved", "Test OK: Becky received this link at 08:15 PM."), true);
+  assert.equal(isNoteGood("done", "Draft made with 4 photos."), true);
+  assert.equal(isNoteGood("failed", "Nothing could be read from the post."), false);
+  assert.equal(isNoteGood("saved", null), false);
 });
