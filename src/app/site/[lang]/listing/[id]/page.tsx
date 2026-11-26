@@ -11,6 +11,7 @@ import { breadcrumbSchema, listingSchema, safeJson } from "@/site/schema";
 import { slugFromCategory } from "@/site/categories";
 import { getPublicListing, getVideoForListing } from "@/site/data";
 import LiteYouTube from "@/components/site/LiteYouTube";
+import { loanCopy, loanEstimate, rm } from "@/site/loanEstimate";
 import { pickText as pickVideoText, vlogText } from "@/site/vlog";
 import {
   formatPrice,
@@ -112,6 +113,8 @@ export default async function ListingPage({ params }: Props) {
     [text.parking, (listing.parking_spaces ?? 0) > 0 ? listing.parking_spaces : null],
     [text.facing, titleCase(listing.facing) || null],
   ];
+  const loan = loanEstimate(listing);
+  const loanText = loan ? loanCopy(loan, lang) : null;
   const visibleRows = rows.filter(([, v]) => v !== null && v !== "");
   const highlights = (listing.highlights ?? []).filter((h) => h && h.trim());
 
@@ -187,6 +190,29 @@ export default async function ListingPage({ params }: Props) {
                   </div>
                 ))}
               </dl>
+            </section>
+          )}
+
+          {loan && loanText && (
+            <section className="flex flex-col gap-4 rounded-2xl border border-[var(--mp-line)] bg-[var(--mp-card)] p-6" aria-label={loanText.heading}>
+              <h2 className="mp-display text-xl font-bold">{loanText.heading}</h2>
+              <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">
+                <div>
+                  <dt className="text-[13px] text-[var(--mp-muted)]">{loanText.downPayment}</dt>
+                  <dd className="mt-1 text-xl font-bold">{rm(loan.downPayment)}</dd>
+                </div>
+                <div>
+                  <dt className="text-[13px] text-[var(--mp-muted)]">{loanText.loanAmount}</dt>
+                  <dd className="mt-1 text-xl font-bold">{rm(loan.loanAmount)}</dd>
+                </div>
+                <div>
+                  <dt className="text-[13px] text-[var(--mp-muted)]">{loanText.monthly}</dt>
+                  <dd className="mp-display mt-1 text-2xl font-bold text-[var(--mp-accent)]">
+                    {rm(loan.monthly)} <span className="text-sm font-semibold text-[var(--mp-muted)]">{loanText.perMonth}</span>
+                  </dd>
+                </div>
+              </dl>
+              <p className="text-[13px] leading-relaxed text-[var(--mp-muted)]">{loanText.note}</p>
             </section>
           )}
 

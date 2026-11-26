@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { buildTimeline, cleanHook, cleanLabel, defaultLabel, factsCopy, hasFacts, hookCopy, MAX_HOOK, MAX_LABEL, MAX_PHOTOS, totalSeconds, type HookStyle, type Length, type VideoLang } from "@/lib/quickVideo/plan";
 import type { ShareListing } from "@/lib/shareKit";
+import { loanEstimate } from "@/site/loanEstimate";
 
 /*
 | QUICK VIDEO. Makes a vertical video from the listing's own photos: slow pans,
@@ -39,6 +40,7 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
   const [length, setLength] = useState<Length>("auto");
   const [showFacts, setShowFacts] = useState(true);
   const [showPrice, setShowPrice] = useState(true);
+  const [showLoan, setShowLoan] = useState(true);
   const [hook, setHook] = useState<HookStyle>("question");
   const [hookEdit, setHookEdit] = useState<string | null>(null);
   const [chosen, setChosen] = useState<number[]>(() => photos.slice(0, 8).map((p) => p.id));
@@ -55,10 +57,11 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
   const [vNote, setVNote] = useState("");
 
   // The length is worked out from the number of photos, using the same plan as the server.
+  const loanOk = loanEstimate(listing) !== null;
   const factsOk = hasFacts(factsCopy(listing, lang, showPrice));
   const autoHook = hookCopy(listing, lang, hook, showPrice);
   const hookLine = hook === "off" ? "" : cleanHook(hookEdit ?? autoHook, lang) || autoHook;
-  const estimate = chosen.length > 0 ? totalSeconds(buildTimeline(chosen.length, [], { length, facts: showFacts && factsOk, hook: hookLine !== "" })) : 0;
+  const estimate = chosen.length > 0 ? totalSeconds(buildTimeline(chosen.length, [], { length, facts: showFacts && factsOk, loan: loanOk && showLoan, hook: hookLine !== "" })) : 0;
 
   const byId = useMemo(() => new Map(photos.map((p) => [p.id, p])), [photos]);
   const labelOf = (p: Photo) => labels[p.id] ?? defaultLabel(p.photo_type, lang);
@@ -166,6 +169,7 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
           length,
           showPrice,
           showFacts,
+          showLoan: loanOk && showLoan,
           hook,
           hookText: hook === "off" ? "" : hookLine,
           vertical: useVertical,
@@ -337,6 +341,12 @@ export default function QuickVideoTab({ listing }: { listing: Listing }) {
           <input type="checkbox" checked={showFacts && factsOk} disabled={!factsOk} onChange={(e) => setShowFacts(e.target.checked)} className="h-5 w-5 accent-[var(--copper)]" />
           Add a facts card (price, size, tenure, place)
         </label>
+        <label className={`flex min-h-12 items-center gap-3 text-sm font-bold ${loanOk ? "cursor-pointer" : "opacity-50"}`}>
+          <input type="checkbox" checked={showLoan && loanOk} disabled={!loanOk} onChange={(e) => setShowLoan(e.target.checked)} className="h-5 w-5 accent-[var(--copper)]" />
+          Add a loan estimate card (down payment and monthly instalment)
+        </label>
+        {!loanOk && <p className="text-xs text-stone-500">The loan card is only for for-sale listings that have a price.</p>}
+        {loanOk && showLoan && <p className="text-xs text-stone-500">Indicative only: it uses the standard percentage for this property type and 4.5% a year, and says it depends on bank approval.</p>}
         {!factsOk && <p className="text-xs text-stone-500">This listing needs at least two facts filled in (such as size and tenure) for the facts card.</p>}
       </div>
 

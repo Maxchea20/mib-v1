@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { FONT_JAKARTA600, FONT_JAKARTA800, FONT_PLAYFAIR700, LOGO_PNG } from "./assets.generated";
+import type { LoanCopy } from "../../site/loanEstimate";
 import { WIDTH, type EndCopy, type FactsCopy, type OpeningCopy, type VideoLang } from "./plan";
 
 /*
@@ -24,6 +25,7 @@ export const OPENING_H = 330;
 export const HOOK_H = 420;
 export const LABEL_H = 170;
 export const FACTS_H = 1200;
+export const LOAN_H = 1200;
 export const END_H = 1200;
 
 export type Slice = { top: number; height: number };
@@ -35,9 +37,11 @@ export type SheetSpec = {
   /** One entry per label band (empty labels get no band). */
   labels: string[];
   facts: FactsCopy | null;
+  /** The financing card: words plus the three amounts, already formatted. */
+  loan: { copy: LoanCopy; down: string; amount: string; monthly: string } | null;
   end: EndCopy;
 };
-export type SheetLayout = { header: Slice; opening: Slice; hook: Slice | null; labels: Slice[]; facts: Slice | null; end: Slice };
+export type SheetLayout = { header: Slice; opening: Slice; hook: Slice | null; labels: Slice[]; facts: Slice | null; loan: Slice | null; end: Slice };
 
 type Font = { name: string; data: ArrayBuffer; weight: 400 | 600 | 700 | 800; style: "normal" };
 
@@ -77,13 +81,14 @@ export async function renderSheet(spec: SheetSpec): Promise<{ png: Buffer; layou
   const w800 = zh ? 700 : (800 as const);
   const caps = zh ? "none" : ("uppercase" as const);
 
-  const layout: SheetLayout = { header: { top: 0, height: HEADER_H }, opening: { top: 0, height: OPENING_H }, hook: null, labels: [], facts: null, end: { top: 0, height: END_H } };
+  const layout: SheetLayout = { header: { top: 0, height: HEADER_H }, opening: { top: 0, height: OPENING_H }, hook: null, labels: [], facts: null, loan: null, end: { top: 0, height: END_H } };
   let y = 0;
   layout.header.top = y; y += HEADER_H;
   layout.opening.top = y; y += OPENING_H;
   if (spec.hook) { layout.hook = { top: y, height: HOOK_H }; y += HOOK_H; }
   spec.labels.forEach(() => { layout.labels.push({ top: y, height: LABEL_H }); y += LABEL_H; });
   if (spec.facts) { layout.facts = { top: y, height: FACTS_H }; y += FACTS_H; }
+  if (spec.loan) { layout.loan = { top: y, height: LOAN_H }; y += LOAN_H; }
   layout.end.top = y; y += END_H;
   const total = y;
 
@@ -140,6 +145,32 @@ export async function renderSheet(spec: SheetSpec): Promise<{ png: Buffer; layou
                 <div style={{ display: "flex", marginTop: 6, fontFamily: r.big ? head : body, fontWeight: r.big ? w700 : w600, fontSize: r.big ? 84 : Array.from(r.value).length > 22 ? 42 : 54, lineHeight: 1.12, color: r.big ? GOLD : CREAM }}>{r.value}</div>
               </div>
             ))}
+          </div>
+        </div>
+      ) : null}
+
+      {/* financing card */}
+      {spec.loan ? (
+        <div style={{ width: WIDTH, height: LOAN_H, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ display: "flex", flexDirection: "column", width: 940, padding: 56, borderRadius: 36, backgroundColor: "rgba(10,10,11,0.76)", border: "2px solid rgba(212,175,55,0.55)" }}>
+            <div style={{ display: "flex", width: 84, height: 6, backgroundColor: GOLD, borderRadius: 3, marginBottom: 22 }} />
+            <div style={{ display: "flex", fontFamily: body, fontWeight: w800, fontSize: 34, letterSpacing: zh ? 6 : 7, textTransform: caps, color: GOLD, marginBottom: 12 }}>{spec.loan.copy.heading}</div>
+            <div style={{ display: "flex", flexDirection: "column", paddingTop: 22, paddingBottom: 20 }}>
+              <div style={{ display: "flex", fontFamily: body, fontWeight: w600, fontSize: 28, letterSpacing: zh ? 3 : 4, textTransform: caps, color: MUTED }}>{spec.loan.copy.downPayment}</div>
+              <div style={{ display: "flex", marginTop: 6, fontFamily: body, fontWeight: w600, fontSize: 58, color: CREAM }}>{spec.loan.down}</div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", paddingTop: 22, paddingBottom: 20, borderTop: "1px solid rgba(244,239,228,0.18)" }}>
+              <div style={{ display: "flex", fontFamily: body, fontWeight: w600, fontSize: 28, letterSpacing: zh ? 3 : 4, textTransform: caps, color: MUTED }}>{spec.loan.copy.loanAmount}</div>
+              <div style={{ display: "flex", marginTop: 6, fontFamily: body, fontWeight: w600, fontSize: 58, color: CREAM }}>{spec.loan.amount}</div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", paddingTop: 22, paddingBottom: 26, borderTop: "1px solid rgba(244,239,228,0.18)" }}>
+              <div style={{ display: "flex", fontFamily: body, fontWeight: w600, fontSize: 28, letterSpacing: zh ? 3 : 4, textTransform: caps, color: MUTED }}>{spec.loan.copy.monthly}</div>
+              <div style={{ display: "flex", alignItems: "flex-end", marginTop: 6 }}>
+                <div style={{ display: "flex", fontFamily: head, fontWeight: w700, fontSize: 88, lineHeight: 1.1, color: GOLD }}>{spec.loan.monthly}</div>
+                <div style={{ display: "flex", marginLeft: 14, marginBottom: 12, fontFamily: body, fontWeight: w600, fontSize: 34, color: SOFT }}>{spec.loan.copy.perMonth}</div>
+              </div>
+            </div>
+            <div style={{ display: "flex", paddingTop: 22, borderTop: "1px solid rgba(244,239,228,0.18)", fontFamily: body, fontWeight: w600, fontSize: 28, lineHeight: 1.4, color: "#D8D2C4" }}>{spec.loan.copy.note}</div>
           </div>
         </div>
       ) : null}
