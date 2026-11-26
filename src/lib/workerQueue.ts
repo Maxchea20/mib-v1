@@ -35,6 +35,7 @@ export const JOB_LABELS: Record<string, string> = {
   facebook_group_post: "Facebook group post",
   google_business_post: "Google Business post",
   generate_property_video: "Property video",
+  listing_intake: "Listing intake",
   test_job: "Test job",
   background_test: "Background test",
 };

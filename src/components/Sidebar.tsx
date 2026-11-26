@@ -42,6 +42,16 @@ export default function Sidebar({ userInitial = "M" }: { userInitial?: string })
           Settings
         </Link>
         <Link
+          href="/intake"
+          className={`flex items-center px-3 py-2.5 rounded-xl text-sm ${
+            pathname?.startsWith("/intake")
+              ? "bg-[#f3eee6] text-[#1c1917]"
+              : "text-[#d6d3d1] hover:bg-white/5"
+          }`}
+        >
+          Listing intake
+        </Link>
+        <Link
           href="/queue"
           className={`flex items-center px-3 py-2.5 rounded-xl text-sm ${
             pathname?.startsWith("/queue")

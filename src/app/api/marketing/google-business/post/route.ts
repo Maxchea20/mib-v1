@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { INTAKE_WORKER } from "@/lib/workerRoles";
 
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/apiAuth";
@@ -152,7 +153,7 @@ export async function POST(request: Request) {
     const { data: worker, error: workerError } = await supabase
       .from("desktop_workers")
       .select("id, worker_name")
-      .eq("status", "online")
+      .eq("status", "online").neq("worker_name", INTAKE_WORKER)
       .order("last_seen", { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -160,14 +161,14 @@ export async function POST(request: Request) {
     if (workerError) {
       console.error("Desktop worker lookup error:", workerError);
       return NextResponse.json(
-        { success: false, error: "Failed to find an online MIB Desktop worker." },
+        { success: false, error: "Failed to find the posting worker (Woody)." },
         { status: 500 }
       );
     }
 
     if (!worker) {
       return NextResponse.json(
-        { success: false, error: "No MIB Desktop worker is currently online." },
+        { success: false, error: "Woody (the posting worker) is not online." },
         { status: 503 }
       );
     }
