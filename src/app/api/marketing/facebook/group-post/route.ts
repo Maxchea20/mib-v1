@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { INTAKE_WORKER } from "@/lib/workerRoles";
 
 import { requireUser } from "@/lib/apiAuth";
 import { createClient } from "@/lib/supabase/server";
@@ -182,7 +183,7 @@ export async function POST(request: Request) {
       .eq(
         "status",
         "online"
-      )
+      ).neq("worker_name", INTAKE_WORKER)
       .order(
         "last_seen",
         {
@@ -202,7 +203,7 @@ export async function POST(request: Request) {
         {
           success: false,
           error:
-            "Failed to find an online MIB Desktop worker.",
+            "Failed to find the posting worker (Woody).",
         },
         { status: 500 }
       );
@@ -213,7 +214,7 @@ export async function POST(request: Request) {
         {
           success: false,
           error:
-            "No MIB Desktop worker is currently online.",
+            "Woody (the posting worker) is not online.",
         },
         { status: 503 }
       );

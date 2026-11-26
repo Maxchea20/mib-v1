@@ -9,6 +9,8 @@
 |
 */
 
+export { INTAKE_JOB_TYPE } from "./workerRoles";
+
 export type IntakeStatus = "saved" | "queued" | "running" | "done" | "failed";
 
 export type IntakeRow = {
@@ -29,7 +31,6 @@ export type IntakeRow = {
  * Until then, sending would only make jobs that fail with "no handler registered".
  */
 export const INTAKE_WORKER_READY = false;
-export const INTAKE_JOB_TYPE = "listing_intake";
 
 export const MAX_AGENT_NAME = 80;
 export const MAX_URL = 500;

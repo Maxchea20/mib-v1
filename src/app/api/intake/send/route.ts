@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/apiAuth";
 import { createClient } from "@/lib/supabase/server";
-import { INTAKE_JOB_TYPE, INTAKE_WORKER_READY, canSend, type IntakeRow } from "@/lib/listingIntake";
+import { INTAKE_WORKER_READY, canSend, type IntakeRow } from "@/lib/listingIntake";
+import { INTAKE_JOB_TYPE, INTAKE_WORKER } from "@/lib/workerRoles";
 
 /*
-| Sends saved intake links to the MIB Desktop worker: ONE job per link, so the worker does them one
+| Sends saved intake links to Becky, the intake worker: ONE job per link, so the worker does them one
 | at a time. The links must already be in the listing_intake table (saved or failed). The jobs only
 | carry the row's id, link and agent name; the worker makes a DRAFT listing, never a public one.
 */
@@ -40,10 +41,11 @@ export async function POST(request: Request) {
     .from("desktop_workers")
     .select("id, status, last_seen")
     .eq("status", "online")
+    .eq("worker_name", INTAKE_WORKER)
     .order("last_seen", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (!worker) return bad("No MIB Desktop worker is currently online.", 503);
+  if (!worker) return bad("Becky (the intake worker) is not online. Start her on your PC first.", 503);
 
   const { data: jobs, error: jobError } = await supabase
     .from("desktop_jobs")

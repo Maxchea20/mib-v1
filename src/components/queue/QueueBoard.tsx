@@ -113,6 +113,19 @@ export default function QueueBoard({
         </div>
         <p className="mt-2 text-sm">{summary.text}</p>
         {state.online && <p className="mt-1 text-xs">Last heartbeat {agoText(state.lastSeenMs, now)}.</p>}
+        {workers.length > 1 && (
+          <ul className="mt-3 flex flex-wrap gap-2 text-sm font-semibold text-slate-900" data-testid="worker-list">
+            {workers.map((w) => {
+              const on = workerState(w, now).online;
+              return (
+                <li key={String(w.id)} className="flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1">
+                  <span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${on ? "bg-emerald-600" : "bg-red-600"}`} />
+                  {w.worker_name ?? "Worker"}: {on ? "Online" : "Offline"}
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </section>
 
       {problem && (
