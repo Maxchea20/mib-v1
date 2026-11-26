@@ -13,8 +13,8 @@ export default function IntakePage() {
     <div className="max-w-4xl">
       <h1 className="text-3xl font-bold">Listing intake</h1>
       <p className="mt-2 text-slate-600">
-        Add Facebook links one by one, with the co-broke agent&apos;s name. They are saved in the table first. Then they go to the worker on your PC,
-        one link at a time, and each becomes a draft listing for you to check. Nothing is published by itself.
+        Add Facebook links one by one, with the co-broke agent&apos;s name. They are saved in the table first. Then they go to Becky on your PC, one
+        link at a time. She reads the post and photos and makes a private draft listing (status Inactive) for you to check. Nothing is published by itself.
       </p>
       <IntakeBoard />
     </div>

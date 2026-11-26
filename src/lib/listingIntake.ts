@@ -26,11 +26,8 @@ export type IntakeRow = {
   finished_at: string | null;
 };
 
-/**
- * Flip to true only once the worker on the PC can handle "listing_intake" jobs.
- * Until then, sending would only make jobs that fail with "no handler registered".
- */
-export const INTAKE_WORKER_READY = false;
+/** Becky (the intake worker) can read these links. Kept as a switch in case sending ever has to be turned off. */
+export const INTAKE_WORKER_READY = true;
 
 export const MAX_AGENT_NAME = 80;
 export const MAX_URL = 500;
@@ -91,3 +88,6 @@ export function shortUrl(url: string, max = 52): string {
   const t = url.replace(/^https?:\/\/(www\.)?/i, "");
   return t.length <= max ? t : `${t.slice(0, max - 1)}…`;
 }
+
+/** A good result or a test result is shown calmly; only a failed row is shown in red. */
+export const isNoteGood = (status: IntakeStatus, note: string | null) => Boolean(note) && (status === "done" || /^Test OK/.test(note ?? ""));

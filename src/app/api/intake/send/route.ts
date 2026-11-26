@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (!auth.user) return auth.response;
 
-  if (!INTAKE_WORKER_READY) return bad("Sending is switched off: the worker on your PC cannot read these links yet.", 409);
+  if (!INTAKE_WORKER_READY) return bad("Sending is switched off.", 409);
 
   let body: Record<string, unknown> = {};
   try {
@@ -27,6 +27,7 @@ export async function POST(request: Request) {
   } catch {
     /* no body means "all saved links" */
   }
+  const dryRun = body.dryRun === true;
   const ids = Array.isArray(body.ids) ? body.ids.map(Number).filter((n) => Number.isSafeInteger(n) && n > 0).slice(0, 100) : null;
 
   const supabase = await createClient();
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
       rows.map((r) => ({
         worker_id: worker.id,
         job_type: INTAKE_JOB_TYPE,
-        payload: { intake_id: r.id, url: r.source_url, cobroke_agent: r.cobroke_agent },
+        payload: { intake_id: r.id, url: r.source_url, cobroke_agent: r.cobroke_agent, dry_run: dryRun },
         status: "queued",
       }))
     )
@@ -65,5 +66,5 @@ export async function POST(request: Request) {
     const intakeId = Number((job.payload as { intake_id?: number } | null)?.intake_id);
     await supabase.from("listing_intake").update({ status: "queued", error: null, job_id: String(job.id), sent_at: now, finished_at: null }).eq("id", intakeId);
   }
-  return NextResponse.json({ ok: true, sent: jobs.length });
+  return NextResponse.json({ ok: true, sent: jobs.length, dryRun });
 }

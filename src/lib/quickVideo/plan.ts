@@ -80,7 +80,8 @@ const COVER_TYPES = ["Front House", "Shop Front", "Factory Front", "Front View"]
 /** Default label for a photo, from its type in MIB (cover photos get none). */
 export function defaultLabel(photoType: string | null | undefined, lang: VideoLang): string {
   const t = (photoType ?? "").trim();
-  if (!t || COVER_TYPES.includes(t)) return "";
+  // "Photo 1", "Photo 2"... are photos imported from a post: no room name is known, so no label
+  if (!t || COVER_TYPES.includes(t) || /^Photo \d+$/.test(t)) return "";
   return ROOM_NAMES[t]?.[lang] ?? t;
 }
 
