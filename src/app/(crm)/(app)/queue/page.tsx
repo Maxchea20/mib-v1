@@ -5,9 +5,8 @@ import QueueBoard, { type GroupRow, type ListingTitle } from "@/components/queue
 import { listingIdOf, type JobRow, type WorkerRow } from "@/lib/workerQueue";
 
 /*
-| MIB > Worker queue. Read-only view of what the MIB Desktop worker has been
-| asked to do: waiting, running, finished and failed jobs, and whether the
-| worker is online. Reads with the signed-in owner's own access.
+| MIB > Worker queue. What Woody and Becky have been asked to do: waiting, running, finished
+| and failed jobs, and whether each is online. Reads with the signed-in owner's own access.
 */
 
 /** Kept outside the page so the page itself stays pure. */
@@ -32,8 +31,8 @@ export default async function QueuePage() {
     <div className="max-w-4xl">
       <h1 className="text-3xl font-bold">Worker queue</h1>
       <p className="mt-2 text-slate-600">
-        What the MIB Desktop worker on your PC has been asked to do: posts to iProperty, Facebook groups and Google Business. It does one job at a
-        time, and this page refreshes by itself.
+        What your two workers on your PC have been asked to do. Woody posts to iProperty, Facebook groups and Google Business; Becky reads listing
+        intake links. Each does one job at a time, and this page refreshes by itself. You can cancel a waiting job or delete a finished one.
       </p>
       <QueueBoard
         initialWorkers={(workers ?? []) as WorkerRow[]}
