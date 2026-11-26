@@ -153,3 +153,72 @@ export function workerSummary(state: WorkerState, counts: Counts, now: number): 
   const jobs = counts.waiting > 0 ? ` ${counts.waiting} job${counts.waiting === 1 ? " is" : "s are"} waiting and will not run until it is back.` : "";
   return { tone: counts.waiting > 0 ? "bad" : "warn", text: `The worker is offline. ${when} Open the MIB Desktop app on your PC to start it.${jobs}` };
 }
+
+/* ------------------------------------------------------------ named workers */
+
+/** The two workers the page always shows, even before one has ever started. */
+export const WORKER_PANELS = [
+  { name: "Woody", role: "Posts to Facebook groups, iProperty and Google Business, and makes property videos." },
+  { name: "Becky", role: "Reads Facebook links from co-broke agents into draft listings." },
+] as const;
+
+export type PanelView = {
+  name: string;
+  role: string;
+  /** The worker has registered at least once. */
+  known: boolean;
+  online: boolean;
+  lastSeenMs: number | null;
+  running: number;
+  waiting: number;
+};
+
+/** One panel per named worker: online or offline from its heartbeat, and its own running and waiting jobs. */
+export function workerPanels(workers: WorkerRow[], jobs: JobRow[], now: number): PanelView[] {
+  return WORKER_PANELS.map(({ name, role }) => {
+    const lower = name.toLowerCase();
+    const w =
+      workers.find((x) => (x.worker_name ?? "").trim().toLowerCase() === lower) ??
+      (name === "Woody" ? workers.find((x) => (x.worker_name ?? "").trim().toLowerCase() === "mib desktop") : undefined);
+    const state = workerState(w ?? null, now);
+    const mine = w ? jobs.filter((j) => String(j.worker_id ?? "") === String(w.id)) : [];
+    const kinds = mine.map((j) => statusKind(j.status));
+    return {
+      name,
+      role,
+      known: Boolean(w),
+      online: state.online,
+      lastSeenMs: state.lastSeenMs,
+      running: kinds.filter((k) => k === "running").length,
+      waiting: kinds.filter((k) => k === "waiting").length,
+    };
+  });
+}
+
+/** One plain line about a worker. */
+export function panelText(p: PanelView, now: number): string {
+  if (p.online) {
+    if (p.running > 0) return "Busy with a job.";
+    if (p.waiting > 0) return `Online. ${p.waiting} job${p.waiting === 1 ? " is" : "s are"} waiting and will start within about 15 seconds.`;
+    return "Online and idle. Nothing is waiting.";
+  }
+  if (!p.known) return `${p.name} has not started yet. Open MIB Desktop on your PC.`;
+  const jobs = p.waiting > 0 ? ` ${p.waiting} job${p.waiting === 1 ? " is" : "s are"} waiting and will not run until ${p.name} is back.` : "";
+  return `Offline. Last seen ${agoText(p.lastSeenMs, now)}. Open MIB Desktop on your PC to start.${jobs}`;
+}
+
+/* ------------------------------------------------------ cancel and delete */
+
+export const WAITING_STATUSES = ["queued", "pending", "scheduled", "waiting", "new"];
+export const FAILED_STATUSES = ["failed", "error", "errored"];
+
+/**
+ * A job can be removed unless the worker is running it right now. A job that has been "running" for a
+ * very long time (stuck, the worker was closed in the middle) can be removed too.
+ */
+export function canRemoveJob(kind: StatusKind, stuck: boolean): boolean {
+  return kind !== "running" || stuck;
+}
+
+/** The button words: a waiting job is cancelled, a finished one is deleted. */
+export const removeLabel = (kind: StatusKind): string => (kind === "waiting" ? "Cancel job" : "Delete");

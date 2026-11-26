@@ -4,14 +4,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import {
-  countJobs, describeJob, listingIdOf, sortJobs, workerState, workerSummary, agoText,
+  FAILED_STATUSES, WAITING_STATUSES, agoText, canRemoveJob, countJobs, describeJob, listingIdOf, panelText, removeLabel, sortJobs, workerPanels,
   type JobRow, type StatusKind, type WorkerRow,
 } from "@/lib/workerQueue";
 
 /*
-| The worker queue. Shows whether the worker is online (from its 30-second
-| heartbeat) and the latest 100 jobs. It only reads: it never starts, stops,
-| retries or deletes a job. It refreshes every 10 seconds.
+| The worker queue. Shows whether Woody and Becky are online (from their 30-second
+| heartbeat) and the latest 100 jobs. A job that is waiting can be cancelled and a finished
+| or failed one deleted; a job the worker is running right now cannot. It never starts or
+| retries a job. It refreshes every 10 seconds.
 */
 
 export type ListingTitle = { id: number; title: string | null };
@@ -59,6 +60,8 @@ export default function QueueBoard({
   const [filter, setFilter] = useState<"all" | StatusKind>("all");
   const [problem, setProblem] = useState(loadError);
   const [refreshing, setRefreshing] = useState(false);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState("");
 
   const groupName = useMemo(() => new Map(groups.map((g) => [g.group_url ?? "", g.name ?? ""])), [groups]);
 
@@ -90,43 +93,64 @@ export default function QueueBoard({
     return () => window.clearInterval(t);
   }, [refresh]);
 
-  const worker = workers[0] ?? null;
-  const state = workerState(worker, now);
+  const panels = workerPanels(workers, jobs, now);
   const counts = countJobs(jobs);
-  const summary = workerSummary(state, counts, now);
   const shown = sortJobs(jobs).filter((j) => filter === "all" || describeJob(j, now).kind === filter);
-  const tone = summary.tone === "good" ? "border-emerald-300 bg-emerald-50 text-emerald-900" : summary.tone === "warn" ? "border-amber-300 bg-amber-50 text-amber-900" : "border-red-300 bg-red-50 text-red-900";
+
+  /** Takes a job out of the queue. A listing intake job also puts its link back to "Saved" so it can be sent again. */
+  async function removeJob(j: JobRow, kind: StatusKind) {
+    const ask = kind === "waiting" ? "Cancel this job? It will not run." : "Delete this job from the list?";
+    if (!window.confirm(ask)) return;
+    setActionError("");
+    setBusyId(String(j.id));
+    let q = supabase.from("desktop_jobs").delete().eq("id", j.id);
+    // a waiting job is only removed while it is still waiting, so one the worker has just taken is left alone
+    if (kind === "waiting") q = q.in("status", WAITING_STATUSES);
+    const { error } = await q;
+    if (error) {
+      setActionError("Could not remove the job. Please try again.");
+    } else if (j.job_type === "listing_intake") {
+      await supabase.from("listing_intake").update({ status: "saved", job_id: null, sent_at: null }).eq("job_id", String(j.id)).eq("status", "queued");
+    }
+    setBusyId(null);
+    await refresh();
+  }
+
+  async function clearFailed() {
+    const n = counts.failed;
+    if (n === 0 || !window.confirm(`Delete all ${n} failed job${n === 1 ? "" : "s"} from the list?`)) return;
+    setActionError("");
+    setBusyId("failed");
+    const { error } = await supabase.from("desktop_jobs").delete().in("status", FAILED_STATUSES);
+    if (error) setActionError("Could not delete the failed jobs. Please try again.");
+    setBusyId(null);
+    await refresh();
+  }
 
   return (
     <div data-testid="queue-board">
-      <section className={`mt-5 rounded-xl border p-4 ${tone}`} data-testid="worker-summary">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span aria-hidden="true" className={`h-3 w-3 rounded-full ${state.online ? "bg-emerald-600" : "bg-red-600"}`} />
-            <p className="text-lg font-bold">
-              {worker?.worker_name ?? "MIB Desktop"}: {state.online ? "Online" : "Offline"}
-            </p>
-          </div>
-          <button type="button" onClick={() => void refresh()} disabled={refreshing} className="min-h-11 rounded-lg border border-current px-4 text-sm font-bold disabled:opacity-50" data-testid="refresh">
-            {refreshing ? "Refreshing…" : "Refresh now"}
-          </button>
-        </div>
-        <p className="mt-2 text-sm">{summary.text}</p>
-        {state.online && <p className="mt-1 text-xs">Last heartbeat {agoText(state.lastSeenMs, now)}.</p>}
-        {workers.length > 1 && (
-          <ul className="mt-3 flex flex-wrap gap-2 text-sm font-semibold text-slate-900" data-testid="worker-list">
-            {workers.map((w) => {
-              const on = workerState(w, now).online;
-              return (
-                <li key={String(w.id)} className="flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1">
-                  <span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${on ? "bg-emerald-600" : "bg-red-600"}`} />
-                  {w.worker_name ?? "Worker"}: {on ? "Online" : "Offline"}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+      <div className="mt-5 flex items-center justify-between gap-3">
+        <h2 className="text-lg font-bold text-slate-900">Workers</h2>
+        <button type="button" onClick={() => void refresh()} disabled={refreshing} className="min-h-11 rounded-lg border border-slate-300 bg-white px-4 text-sm font-bold text-slate-900 disabled:opacity-50" data-testid="refresh">
+          {refreshing ? "Refreshing…" : "Refresh now"}
+        </button>
+      </div>
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2" data-testid="worker-list">
+        {panels.map((p) => {
+          const tone = p.online ? "border-emerald-300 bg-emerald-50 text-emerald-900" : p.known ? "border-red-300 bg-red-50 text-red-900" : "border-amber-300 bg-amber-50 text-amber-900";
+          return (
+            <section key={p.name} className={`rounded-xl border p-4 ${tone}`} data-testid="worker-summary">
+              <div className="flex items-center gap-3">
+                <span aria-hidden="true" className={`h-3 w-3 rounded-full ${p.online ? "bg-emerald-600" : "bg-red-600"}`} />
+                <p className="text-lg font-bold">{p.name}: {p.online ? "Online" : "Offline"}</p>
+              </div>
+              <p className="mt-1 text-xs">{p.role}</p>
+              <p className="mt-2 text-sm">{panelText(p, now)}</p>
+              {p.online && <p className="mt-1 text-xs">Last heartbeat {agoText(p.lastSeenMs, now)}.</p>}
+            </section>
+          );
+        })}
+      </div>
 
       {problem && (
         <p role="alert" className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
@@ -144,6 +168,8 @@ export default function QueueBoard({
         ))}
       </div>
 
+      {actionError && <p role="alert" className="mt-3 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-900">{actionError}</p>}
+
       <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Filter jobs">
         {FILTERS.map((f) => (
           <button key={f.id} type="button" onClick={() => setFilter(f.id)} aria-pressed={filter === f.id}
@@ -152,6 +178,11 @@ export default function QueueBoard({
           </button>
         ))}
       </div>
+      {counts.failed > 0 && (
+        <button type="button" onClick={() => void clearFailed()} disabled={busyId !== null} className="mt-3 min-h-11 rounded-lg border border-red-300 bg-white px-4 text-sm font-bold text-red-800 disabled:opacity-50" data-testid="clear-failed">
+          Delete all {counts.failed} failed
+        </button>
+      )}
 
       <div className="mt-4 flex flex-col gap-3" data-testid="jobs">
         {shown.length === 0 && (
@@ -195,6 +226,19 @@ export default function QueueBoard({
                   <summary className="cursor-pointer text-sm font-semibold text-red-800">What went wrong</summary>
                   <p className="mt-1 whitespace-pre-wrap text-sm text-red-800">{v.error}</p>
                 </details>
+              )}
+              {canRemoveJob(v.kind, v.stuck) && (
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={() => void removeJob(j, v.kind)}
+                    disabled={busyId !== null}
+                    className="min-h-11 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-red-800 disabled:opacity-50"
+                    data-testid="remove-job"
+                  >
+                    {busyId === String(j.id) ? "Working…" : v.stuck ? "Remove stuck job" : removeLabel(v.kind)}
+                  </button>
+                </div>
               )}
             </article>
           );

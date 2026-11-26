@@ -91,3 +91,48 @@ test("the top message says whether jobs can run", () => {
   assert.ok(workerSummary(workerState(null, NOW), none, NOW).text.includes("never"));
   assert.ok(workerSummary(offline, { ...none, waiting: 1 }, NOW).text.includes("1 job is waiting"));
 });
+
+test("Woody and Becky each get their own panel, online or offline on their own heartbeat", async () => {
+  const { workerPanels, panelText } = await import("./workerQueue.ts");
+  const now = Date.parse("2026-11-26T12:00:00Z");
+  const workers = [
+    { id: "a", worker_name: "Woody", status: "online", last_seen: "2026-11-26T11:59:50Z" },
+    { id: "b", worker_name: "Becky", status: "online", last_seen: "2026-11-26T11:50:00Z" },
+  ];
+  const jobs = [
+    { id: 1, worker_id: "a", job_type: "facebook_group_post", status: "running", created_at: null },
+    { id: 2, worker_id: "b", job_type: "listing_intake", status: "queued", created_at: null },
+    { id: 3, worker_id: "b", job_type: "listing_intake", status: "queued", created_at: null },
+  ];
+  const [woody, becky] = workerPanels(workers, jobs, now);
+  assert.equal(woody.name, "Woody");
+  assert.equal(woody.online, true);
+  assert.equal(woody.running, 1);
+  assert.equal(becky.online, false); // 10 minutes since her last heartbeat
+  assert.equal(becky.waiting, 2);
+  assert.match(panelText(woody, now), /Busy/);
+  assert.match(panelText(becky, now), /Offline.*2 jobs are waiting/);
+});
+
+test("the old MIB Desktop row counts as Woody; a worker that never started says so", async () => {
+  const { workerPanels, panelText } = await import("./workerQueue.ts");
+  const now = Date.parse("2026-11-26T12:00:00Z");
+  const [woody, becky] = workerPanels([{ id: "a", worker_name: "MIB Desktop", status: "online", last_seen: "2026-11-26T11:59:59Z" }], [], now);
+  assert.equal(woody.online, true);
+  assert.equal(becky.known, false);
+  assert.match(panelText(becky, now), /Becky has not started yet/);
+  assert.match(panelText(woody, now), /idle/);
+});
+
+test("which jobs can be cancelled or deleted", async () => {
+  const { canRemoveJob, removeLabel, WAITING_STATUSES, FAILED_STATUSES } = await import("./workerQueue.ts");
+  assert.equal(canRemoveJob("waiting", false), true);
+  assert.equal(canRemoveJob("failed", false), true);
+  assert.equal(canRemoveJob("done", false), true);
+  assert.equal(canRemoveJob("running", false), false); // the worker is on it
+  assert.equal(canRemoveJob("running", true), true); // stuck for a long time
+  assert.equal(removeLabel("waiting"), "Cancel job");
+  assert.equal(removeLabel("failed"), "Delete");
+  assert.ok(WAITING_STATUSES.includes("queued") && !WAITING_STATUSES.includes("running"));
+  assert.ok(FAILED_STATUSES.includes("failed"));
+});
