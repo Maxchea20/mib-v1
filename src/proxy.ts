@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { loginUrlFor } from "@/lib/resume";
 import { updateSession } from "@/lib/supabase/middleware";
 import { BRAND } from "@/site/brand";
 import { resolvePublicRoute } from "@/site/routing";
@@ -106,7 +107,7 @@ export async function proxy(request: NextRequest) {
     );
   }
 
-  const loginUrl = new URL("/login", request.url);
+  const loginUrl = new URL(loginUrlFor(path, request.nextUrl.search), request.url);
   return NextResponse.redirect(loginUrl);
 }
 

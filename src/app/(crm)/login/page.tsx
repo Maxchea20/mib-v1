@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { safePath } from "@/lib/resume";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -29,7 +30,9 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/");
+    // go back to the page you were trying to open, if the login was asked for by that page
+    const next = safePath(new URLSearchParams(window.location.search).get("next"));
+    router.push(next ?? "/");
     router.refresh();
   }
 
