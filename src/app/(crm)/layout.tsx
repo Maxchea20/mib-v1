@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Outfit, Geist_Mono } from "next/font/google";
 import "../globals.css";
+import ResumePage from "@/components/ResumePage";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -49,6 +50,7 @@ export default function RootLayout({
       className={`${fraunces.variable} ${outfit.variable} ${geistMono.variable}`}
     >
       <body className="min-h-screen bg-[var(--paper)] text-[var(--ink)] antialiased">
+        <ResumePage />
         {children}
       </body>
     </html>
